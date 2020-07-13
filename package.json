@@ -1,0 +1,44 @@
+{
+  "name": "tangem-id-android",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "jsonld": "^3.1.1",
+    "liquidcore": "^0.7.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "server": "liquidcore server",
+    "bundler": "liquidcore bundle",
+    "init": "liquidcore init",
+    "gradle-config": "liquidcore gradle",
+    "pod-config": "liquidcore pod",
+    "postinstall": "liquidcore postinstall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://dbaturin@bitbucket.org/tangem/tangem-id-android.git"
+  },
+  "keywords": [
+    "tangem",
+    "ID",
+    "verifiable",
+    "credentials",
+    "DID"
+  ],
+  "author": "Tangem AG",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/tangem/tangem-id-android#readme",
+  "liquidcore": {
+    "entry": [
+      "index.js"
+    ],
+    "gradle_options": {
+      "module": "tangem-id-core"
+    },
+    "bundler_output": {
+      "android": "tangem-id-core/src/main/res/raw"
+    }
+  }
+}

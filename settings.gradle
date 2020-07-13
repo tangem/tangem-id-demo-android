@@ -1,2 +1,3 @@
+include ':tangem-id-core'
 include ':app'
 rootProject.name = "tangem-id"
