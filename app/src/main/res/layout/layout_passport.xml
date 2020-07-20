@@ -2,12 +2,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
+        android:minWidth="300dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:background="@android:color/white"
         android:elevation="3dp">
 
@@ -22,11 +22,11 @@
                 android:layout_height="58dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Passport"
+                android:text="@string/credential_personal_info"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="6sp"
-                android:textColor="@color/dark"
+                android:textColor="@color/darkGray6"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -36,10 +36,10 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Name"
+                android:text="@string/credential_personal_info_name"
                 android:textSize="12sp"
                 android:lineSpacingExtra="2sp"
-                android:textColor="@color/textGrey"
+                android:textColor="@color/darkGray1"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -50,10 +50,10 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="10dp"
-                android:text="John"
+                tools:text="John"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5sp"
-                android:textColor="@color/textDarkGrey"
+                android:textColor="@color/darkGray5"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -64,10 +64,10 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Surname"
+                android:text="@string/credential_personal_info_surname"
                 android:textSize="12sp"
                 android:lineSpacingExtra="2sp"
-                android:textColor="@color/textGrey"
+                android:textColor="@color/darkGray1"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -78,10 +78,10 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="10dp"
-                android:text="Smith"
+                tools:text="Smith"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5sp"
-                android:textColor="@color/textDarkGrey"
+                android:textColor="@color/darkGray5"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -91,10 +91,10 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Date of Birth"
+                android:text="@string/credential_personal_info_date_of_birth"
                 android:textSize="12sp"
                 android:lineSpacingExtra="2sp"
-                android:textColor="@color/textGrey"
+                android:textColor="@color/darkGray1"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -105,10 +105,10 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="10dp"
-                android:text="01/01/1980"
+                tools:text="01/01/1980"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5sp"
-                android:textColor="@color/textDarkGrey"
+                android:textColor="@color/darkGray5"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -118,10 +118,10 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Gender"
+                android:text="@string/credential_personal_info_gender"
                 android:textSize="12sp"
                 android:lineSpacingExtra="2sp"
-                android:textColor="@color/textGrey"
+                android:textColor="@color/darkGray1"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -135,7 +135,7 @@
                 android:text="Male"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5sp"
-                android:textColor="@color/textDarkGrey"
+                android:textColor="@color/darkGray5"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 

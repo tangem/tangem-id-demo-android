@@ -4,20 +4,23 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginTop="24dp"
+    >
     
     <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:title="Issue Credentials"
+        app:title="@string/issuer_screen_toolbar"
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         style="@style/Widget.MaterialComponents.Toolbar.Surface"
         />
     
     <ImageView
         android:id="@+id/iv_issuer_qr"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         android:layout_marginTop="55dp"
         android:layout_gravity="center"/>
 
@@ -29,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         tools:text="Ministry of Internal Affairs"
-        android:textColor="@color/textDarkGrey"
+        android:textColor="@color/darkGray5"
         android:textSize="20sp"/>
 
     <TextView
