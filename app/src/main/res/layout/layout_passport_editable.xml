@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fl_passport_editable"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -25,8 +25,8 @@
                 android:lineSpacingExtra="6sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Passport"
-                android:textColor="@color/dark"
+                android:text="@string/credential_personal_info"
+                android:textColor="@color/darkGray6"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
@@ -37,12 +37,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:hint="Name">
+                android:hint="@string/credential_personal_info_name">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/white"
                     android:inputType="textPersonName|textCapWords" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -53,12 +54,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:hint="Surname">
+                android:hint="@string/credential_personal_info_surname">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_surname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/white"
                     android:inputType="textPersonName|textCapWords" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -73,27 +75,25 @@
                     android:id="@+id/radio_gender_male"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginLeft="16dp"
-                    android:text="Male" />
+                    android:layout_weight="1"
+                    android:text="@string/credential_personal_info_gender_male" />
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/radio_gender_female"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginLeft="16dp"
-                    android:text="Female"
-                    />
+                    android:layout_weight="1"
+                    android:text="@string/credential_personal_info_gender_female" />
 
                 <com.google.android.material.radiobutton.MaterialRadioButton
                     android:id="@+id/radio_gender_other"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginLeft="16dp"
-                    android:text="Other"
-                    />
+                    android:layout_weight="1"
+                    android:text="@string/credential_personal_info_gender_other" />
 
             </RadioGroup>
 
@@ -103,13 +103,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:hint="Date of birth">
+                android:hint="@string/credential_personal_info_date_of_birth">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="date" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white"
+                    android:inputType="date" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

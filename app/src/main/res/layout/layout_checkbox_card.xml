@@ -2,12 +2,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:id="@+id/fl_checkbox"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:background="@android:color/white"
         android:elevation="3dp">
 
@@ -15,22 +17,21 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:minWidth="300dp">
 
 
             <TextView
                 android:id="@+id/tv_checkbox_title"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Age of Majority"
+                tools:text="Age of Majority"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="6sp"
-                android:textColor="@color/dark"
+                android:textColor="@color/darkGray6"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"/>
 
@@ -42,10 +43,10 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="10dp"
-                android:text="Valid"
+                android:text="@string/credential_valid"
                 android:textSize="16sp"
                 android:lineSpacingExtra="5sp"
-                android:textColor="@color/textDarkGrey"
+                android:textColor="@color/darkGray5"
                 android:layout_gravity="center"
                 android:gravity="start|center_vertical"
                 app:layout_constraintTop_toBottomOf="@+id/tv_checkbox_title"
@@ -58,8 +59,9 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_checkbox_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_gravity="center"
+                app:buttonTint="@color/checkbox_tint"
 
-                />
+            />
 
 
 

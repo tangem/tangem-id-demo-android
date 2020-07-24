@@ -1,3 +1,44 @@
 <resources>
     <string name="app_name">Tangem ID</string>
+
+    <string name="credential_photo">Photo</string>
+    <string name="credential_personal_info">Personal Information</string>
+    <string name="credential_personal_info_name">Name</string>
+    <string name="credential_personal_info_surname">Surname</string>
+    <string name="credential_personal_info_gender">Gender</string>
+    <string name="credential_personal_info_gender_male">Male</string>
+    <string name="credential_personal_info_gender_female">Female</string>
+    <string name="credential_personal_info_gender_other">Other</string>
+    <string name="credential_personal_info_date_of_birth">Date of birth</string>
+    <string name="credential_ssn">SSN</string>
+    <string name="credential_age_of_majority">Age Over 21</string>
+    <string name="credential_valid">Valid</string>
+    <string name="credential_valid_until">Valid until %s</string>
+    <string name="credential_valid_from">Valid from %s</string>
+
+
+    <string name="starting_screen_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Ornare tellus tincidunt nunc convallis id viverra fermentum lacus, morbi. Massa pulvinar erat
+        sit eu tellus dolor quis.</string>
+    <string name="starting_screen_btn_issuer">Issuer</string>
+    <string name="starting_screen_btn_holder">Holder</string>
+    <string name="starting_screen_btn_verifier">Verifier</string>
+
+    
+    <string name="holder_screen_toolbar">Personal Card</string>
+    <string name="holder_screen_btn_request">Request New Credential</string>
+    <string name="holder_screen_btn_save">Save Changes</string>
+    <string name="holder_screen_credentials_title">Credentials</string>
+    <string name="holder_screen_menu_change_pin">Change Passcode</string>
+
+    
+    <string name="issuer_screen_toolbar">Issue Credentials</string>
+    <string name="issuer_screen_btn_issue">Issue Credentials</string>
+
+    <string name="issue_credentials_photo_btn_add">Add photo</string>
+    <string name="issue_credentials_btn_sign">Sign</string>
+    <string name="issue_credentials_btn_write">Write Credentials</string>
+
+
+    <string name="verifier_screen_toolbar">ID Validator</string>
 </resources>

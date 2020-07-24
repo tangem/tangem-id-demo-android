@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_holder_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,18 +18,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         style="@style/Widget.MaterialComponents.Toolbar"
-        app:titleTextColor="@android:color/white"
+        app:theme="@style/DarkToolbarStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_baseline_arrow_white"
-        app:title="ID Validator" />
+        app:title="@string/holder_screen_toolbar"
+        app:titleTextColor="@android:color/white"
+        android:layout_marginTop="24dp"
+        app:menu="@menu/holder"/>
 
     <ImageView
         android:id="@+id/iv_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="38dp"
         android:elevation="3dp"
         android:src="@drawable/card_with_shadow"
         app:layout_constraintBottom_toBottomOf="@id/background_image"
@@ -41,7 +48,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:text="CB12 3456 7890 1234"
+        tools:text="CB12 3456 7890 1234"
         android:textColor="#636366"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -56,14 +63,15 @@
         android:lineSpacingExtra="6sp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="Credentials"
-        android:textColor="@color/dark"
+        android:text="@string/holder_screen_credentials_title"
+        android:textColor="@color/darkGray6"
         android:textSize="17sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/background_image" />
 
     <ImageView
+        android:id="@+id/iv_edit_credentials"
         android:layout_width="wrap_content"
         android:layout_height="58dp"
         android:paddingStart="16dp"
@@ -72,30 +80,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/background_image" />
 
-    <TextView
-        android:id="@+id/tv_photo"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_holder_credentials"
         android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:layout_gravity="center"
-        android:gravity="start|center_vertical"
-        android:lineSpacingExtra="6sp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="Credentials"
-        android:textColor="@color/dark"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/background_image" />
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/tv_credentials" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="58dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:src="@drawable/ic_baseline_edit_24"
+    <include
+        layout="@layout/layout_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/background_image" />
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_holder_credentials" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
