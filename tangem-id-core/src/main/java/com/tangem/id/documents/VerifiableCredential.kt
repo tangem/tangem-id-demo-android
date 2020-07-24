@@ -51,7 +51,8 @@ open class VerifiableCredential(
     companion object {
         const val DEFAULT_TYPE = "VerifiableCredential"
         const val TANGEM_ETH_CREDENTIAL = "TangemEthCredential"
-        const val TANGEM_DEMO_CONTEXT = "https://tangem.com/context/demo" // TODO: set actual context
+        const val TANGEM_DEMO_CONTEXT =
+            "https://tangem.com/context/demo" // TODO: set actual context
 
         private val jsonAdapter =
             Moshi.Builder().build().adapter(VerifiableCredential::class.java)

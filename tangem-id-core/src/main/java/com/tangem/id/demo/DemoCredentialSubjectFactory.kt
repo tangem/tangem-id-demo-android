@@ -2,8 +2,6 @@ package com.tangem.id.demo
 
 import com.tangem.id.extensions.calculateSha3v256
 import org.apache.commons.codec.binary.Base64
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class DemoCredentialSubjectFactory(val subjectId: String, val personData: DemoPersonData) {
 
@@ -15,13 +13,13 @@ class DemoCredentialSubjectFactory(val subjectId: String, val personData: DemoPe
     )
 
     fun createPersonalInformationCredentialSubject() = mapOf(
-            "id" to subjectId,
-            "givenName" to personData.givenName,
-            "familyName" to personData.familyName,
-            "gender" to personData.gender,
-            "born" to personData.born,
-            "photoHash" to photoHash
-        )
+        "id" to subjectId,
+        "givenName" to personData.givenName,
+        "familyName" to personData.familyName,
+        "gender" to personData.gender,
+        "born" to personData.born,
+        "photoHash" to photoHash
+    )
 
     fun createSsnCredentialSubject() = mapOf(
         "id" to subjectId,

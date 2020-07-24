@@ -45,17 +45,21 @@ suspend fun createDemoCredentials(
         }
 
         val approvalTransaction =
-            when (val result = issuerWalletManager.buildTransaction(credentials[0].ethCredentialStatus!!)) {
+            when (val result =
+                issuerWalletManager.buildTransaction(credentials[0].ethCredentialStatus!!)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return@coroutineScope SimpleResult.Failure(result.error)
             }
 
         val arrayToSign = (approvalTransaction.hashes + credentialHashes).toTypedArray()
 
-        val signatures = when (val signerResponse = signer.sign(arrayToSign, issuerWalletManager.cardId)) {
-            is CompletionResult.Success -> signerResponse.data.signature
-            is CompletionResult.Failure -> return@coroutineScope SimpleResult.failure(signerResponse.error)
-        }
+        val signatures =
+            when (val signerResponse = signer.sign(arrayToSign, issuerWalletManager.cardId)) {
+                is CompletionResult.Success -> signerResponse.data.signature
+                is CompletionResult.Failure -> return@coroutineScope SimpleResult.failure(
+                    signerResponse.error
+                )
+            }
         val transactionSignature = signatures.sliceArray(0 until SIGNATURE_SIZE)
 
         val credentialSignatures = mutableListOf<ByteArray>()
@@ -71,7 +75,7 @@ suspend fun createDemoCredentials(
             secp256k1Proof.addSignature(credentialSignatures[index])
         }
 
-        val cborCredentials = credentials.map{ credential ->
+        val cborCredentials = credentials.map { credential ->
             JsonLdCborEncoder.encode(credential.toMap())
         }
 

@@ -11,7 +11,10 @@ class Secp256k1Proof(
     challenge: String? = null
 ) : LinkedDataProof(TYPE, verificationMethod, challenge) {
 
-    suspend fun calculateHashToSign(document: VerifiableDocument, androidContext: Context): Result<ByteArray> {
+    suspend fun calculateHashToSign(
+        document: VerifiableDocument,
+        androidContext: Context
+    ): Result<ByteArray> {
         val verifyHash =
             when (val result = document.calculateVerifyHash(androidContext, this)) {
                 is Result.Success -> result.data

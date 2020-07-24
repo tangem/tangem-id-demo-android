@@ -72,7 +72,10 @@ class EthereumIssuerWalletManager(
         )
     }
 
-    suspend fun sendSignedTransaction(transaction: TransactionToSign, signature: ByteArray): SimpleResult {
+    suspend fun sendSignedTransaction(
+        transaction: TransactionToSign,
+        signature: ByteArray
+    ): SimpleResult {
         val transactionToSend = transactionBuilder.buildToSend(signature, transaction)
         return networkManager.sendTransaction("0x${transactionToSend.toHexString()}")
     }
@@ -88,40 +91,3 @@ class EthereumIssuerWalletManager(
         }
     }
 }
-
-//suspend fun buildApproveTransactions(credentialIds: Collection<String>): Result<List<TransactionToSign>> {
-//    val fee = when (val result = getFee()) {
-//        is Result.Success -> result.data
-//        is Result.Failure -> return result
-//    }
-//
-//    val transactionDataList = credentialIds.map { id ->
-//        createTransaction(minAmount, fee, id.removePrefix("did:ethr:"))
-//    }
-//
-//    return Result.Success(
-//        transactionDataList.map { transactionData ->
-//            transactionBuilder.buildToSign(transactionData, txCount++.toBigInteger())
-//                ?: return Result.Failure(Exception("Not enough data"))
-//        }
-//    )
-//}
-//
-//suspend fun bulkSend(
-//    signatures: Collection<ByteArray>,
-//    transactions: Collection<TransactionToSign>
-//): SimpleResult {
-//
-//    val signaturesAndTransactions = signatures zip transactions
-//
-//    val transactionsToSend = signaturesAndTransactions.map { pair ->
-//        transactionBuilder.buildToSend(pair.first, pair.second)
-//    }
-//
-//    for (transaction in transactionsToSend) {
-//        val sendResult = networkManager.sendTransaction("0x${transaction.toHexString()}")
-//        if (sendResult is SimpleResult.Failure) return sendResult
-//    }
-//
-//    return SimpleResult.Success
-//}
