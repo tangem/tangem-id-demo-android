@@ -7,12 +7,13 @@ import com.tangem.id.proof.LinkedDataProof
 import java.time.Instant
 
 @JsonClass(generateAdapter = true)
-class VerifiableCredential(
+open class VerifiableCredential(
     val credentialSubject: Map<String, Any>,
     val issuer: String,
     val issuanceDate: String,
     val validFrom: String?,
-    var id: String?,
+    val id: String?,
+    var ethCredentialStatus: String?,
     @Json(name = "@context") context: Collection<String>,
     type: Collection<String>,
     proof: LinkedDataProof?
@@ -23,13 +24,15 @@ class VerifiableCredential(
         issuer: String,
         extraContexts: Collection<String>? = null,
         extraTypes: Collection<String>? = null,
-        validFrom: String? = null
+        validFrom: String? = null,
+        id: String? = null
     ) : this(
         credentialSubject = credentialSubject,
         issuer = issuer,
         issuanceDate = Instant.now().toString(),
         validFrom = validFrom,
-        id = null,
+        id = id,
+        ethCredentialStatus = null,
         context = setOf(DEFAULT_CONTEXT),
         type = setOf(DEFAULT_TYPE),
         proof = null
@@ -40,14 +43,25 @@ class VerifiableCredential(
 
     override fun toJson(): String = jsonAdapter.toJson(this)
 
+    @Suppress("UNCHECKED_CAST")
+    fun toMap(): Map<String, Any> {
+        return jsonAdapter.toJsonValue(this) as Map<String, Any>
+    }
+
     companion object {
         const val DEFAULT_TYPE = "VerifiableCredential"
+        const val TANGEM_ETH_CREDENTIAL = "TangemEthCredential"
+        const val TANGEM_DEMO_CONTEXT = "https://tangem.com/context/demo" // TODO: set actual context
 
         private val jsonAdapter =
             Moshi.Builder().build().adapter(VerifiableCredential::class.java)
 
         fun fromJson(jsonString: String): VerifiableCredential { // TODO: change return type to Result
             return jsonAdapter.fromJson(jsonString)!!
+        }
+
+        fun fromMap(map: Map<String, String>): VerifiableCredential { // TODO: change return type to Result
+            return jsonAdapter.fromJsonValue(map)!!
         }
     }
 }

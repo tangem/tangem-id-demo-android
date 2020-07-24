@@ -29,6 +29,11 @@ class VerifiablePresentation internal constructor(
 
     override fun toJson(): String = jsonAdapter.toJson(this)
 
+    @Suppress("UNCHECKED_CAST")
+    fun toMap(): Map<String, Any> {
+        return jsonAdapter.toJsonValue(this) as Map<String, Any>
+    }
+
     companion object {
         const val DEFAULT_TYPE = "VerifiablePresentation"
 
@@ -37,6 +42,10 @@ class VerifiablePresentation internal constructor(
 
         fun fromJson(jsonString: String): VerifiablePresentation { // TODO: change return type to Result
             return jsonAdapter.fromJson(jsonString)!!
+        }
+
+        fun fromMap(map: Map<String, String>): VerifiablePresentation { // TODO: change return type to Result
+            return jsonAdapter.fromJsonValue(map)!!
         }
     }
 }
