@@ -1,12 +1,7 @@
-package com.tangem.id
+package com.tangem.id.utils
 
 import android.content.Context
-import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
-import com.tangem.common.extensions.calculateSha256
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
 import org.liquidplayer.service.MicroService
 import kotlin.coroutines.resume
