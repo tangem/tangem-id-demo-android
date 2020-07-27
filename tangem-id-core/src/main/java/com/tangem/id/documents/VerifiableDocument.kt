@@ -2,8 +2,10 @@ package com.tangem.id.documents
 
 import android.content.Context
 import com.tangem.blockchain.extensions.Result
+import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.extensions.calculateSha256
 import com.tangem.id.proof.LinkedDataProof
+import com.tangem.id.proof.Secp256k1Proof
 import com.tangem.id.utils.normalizeJsonLd
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -17,6 +19,16 @@ abstract class VerifiableDocument(
     abstract fun toJson(): String
 
     fun toJSONObject() = JSONObject(this.toJson())
+
+    // TODO: check issuer DID for verification method key
+    suspend fun verify(androidContext: Context): SimpleResult {
+        val proofType = proof?.type ?: return SimpleResult.Failure(Exception("Proof not found"))
+        if (proofType != Secp256k1Proof.TYPE) {
+            return SimpleResult.Failure(Exception("Unknown proof type"))
+        }
+
+        return (proof as Secp256k1Proof).verify(this, androidContext)
+    }
 
     suspend fun calculateVerifyHash(
         androidContext: Context,
