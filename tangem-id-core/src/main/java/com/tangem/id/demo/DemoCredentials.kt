@@ -55,7 +55,7 @@ class DemoCredentialFactory(
 
     private fun createAgeOver18Credential(): VerifiableCredential {
         val credentialSubject =
-            credentialSubjectFactory.createSsnCredentialSubject()
+            credentialSubjectFactory.createAgeOver18CredentialSubject()
 
         val bornDate = LocalDate.parse(personData.born, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
         val over18Date = bornDate.plusYears(18)

@@ -27,11 +27,8 @@ class DemoCredentialSubjectFactory(val subjectId: String, val personData: DemoPe
         "photoHash" to photoHash
     )
 
-    fun createAgeOver18CredentialSubject(): Map<String, Any> {
-        val credentialSubject = mutableMapOf(
-            "id" to subjectId,
-            "photoHash" to photoHash
-        )
-        return credentialSubject
-    }
+    fun createAgeOver18CredentialSubject() = mapOf(
+        "id" to subjectId,
+        "photoHash" to photoHash
+    )
 }
