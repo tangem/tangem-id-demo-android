@@ -1,5 +1,6 @@
 package com.tangem.id.features.issuecredentials.redux
 
+import android.content.Context
 import android.graphics.Bitmap
 import com.tangem.id.common.redux.Gender
 import org.rekotlin.Action
@@ -9,14 +10,16 @@ sealed class IssueCredentialsAction : Action {
         data class Success(val photo: Bitmap) : IssueCredentialsAction()
         object Failure : IssueCredentialsAction()
     }
-    data class SaveName(val name: String) : IssueCredentialsAction()
-    data class SaveSurname(val surname: String) : IssueCredentialsAction()
-    data class SaveDate(val date: String) : IssueCredentialsAction()
-    data class SaveGender(val gender: Gender) : IssueCredentialsAction()
-    data class SaveAgeOfMajority(val ageOfMajority: Boolean) : IssueCredentialsAction()
+    data class AddHoldersAddress(val address: String): IssueCredentialsAction()
+
+    data class SavePersonalInfo(
+        val name: String?, val surname: String?, val gender: Gender?, val date: String?
+    ) : IssueCredentialsAction()
+//    data class SaveGender(val gender: Gender) : IssueCredentialsAction()
+
     data class SaveSecurityNumber(val securityNumber: String) : IssueCredentialsAction()
-    data class SaveImmunity(val validUntil: String) : IssueCredentialsAction()
-    object Sign : IssueCredentialsAction() {
+
+    data class Sign(val context: Context) : IssueCredentialsAction() {
         object Success : IssueCredentialsAction()
         object Failure : IssueCredentialsAction()
     }

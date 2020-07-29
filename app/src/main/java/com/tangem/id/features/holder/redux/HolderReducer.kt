@@ -5,11 +5,22 @@ import org.rekotlin.Action
 
 fun holderReducer(action: Action, state: AppState): HolderState {
 
-    val holderAction = action as? HolderAction ?: return state.holderState
+    if (action !is HolderAction) return state.holderState
 
     var newState = state.holderState
 
-    when (holderAction) {
+    when (action) {
+        is HolderAction.CredentialsRead -> {
+            newState = HolderState(
+                cardId = action.cardId,
+                accessLevelsFromCard = action.accessLevels,
+                passport = action.credentials.find { it is Passport } as? Passport,
+                photo = action.credentials.find { it is Photo } as? Photo,
+                securityNumber = action.credentials.find { it is SecurityNumber } as? SecurityNumber,
+                ageOfMajority = action.credentials.find { it is AgeOfMajority } as? AgeOfMajority
+            )
+        }
+
         HolderAction.ToggleEditCredentials -> {
             val editActivated = newState.editActivated
 
@@ -35,12 +46,14 @@ fun holderReducer(action: Action, state: AppState): HolderState {
                 }
             }
 
-            if (editActivated) newState = newState.copy(accessLevelsModified = newState.accessLevelsFromCard)
+            if (editActivated) newState =
+                newState.copy(accessLevelsModified = newState.accessLevelsFromCard)
 
-            newState = newState.copy(editActivated = !editActivated, credentialsToDelete = arrayListOf())
+            newState =
+                newState.copy(editActivated = !editActivated, credentialsToDelete = arrayListOf())
         }
         is HolderAction.RequestNewCredential.Success -> {
-            newState = newState.copy(immunityPassport = holderAction.immunityPassport)
+            newState = newState.copy(immunityPassport = action.immunityPassport)
         }
         HolderAction.SaveChanges -> {
 
@@ -54,15 +67,15 @@ fun holderReducer(action: Action, state: AppState): HolderState {
         is HolderAction.ChangeCredentialAccessLevel -> {
             if (newState.editActivated) {
                 val credentialsAccessLevel =
-                    newState.accessLevelsModified.toggleAccessLevel(holderAction.credential)
+                    newState.accessLevelsModified.toggleAccessLevel(action.credential)
                 newState = newState.copy(accessLevelsModified = credentialsAccessLevel)
             }
 
         }
         is HolderAction.RemoveCredential -> {
             if (newState.editActivated) {
-                val credentialsToDelete = newState.credentialsToDelete + holderAction.credential
-                when (holderAction.credential) {
+                val credentialsToDelete = newState.credentialsToDelete + action.credential
+                when (action.credential) {
                     is Photo -> {
                         newState = newState.copy(
                             photo = null,
@@ -97,7 +110,7 @@ fun holderReducer(action: Action, state: AppState): HolderState {
             }
         }
         is HolderAction.ShowCredentialDetails -> {
-            newState = newState.copy(detailsOpened = holderAction.credential)
+            newState = newState.copy(detailsOpened = action.credential)
         }
         is HolderAction.ShowJson -> {
 

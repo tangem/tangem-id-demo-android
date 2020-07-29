@@ -15,10 +15,12 @@ fun navigationReducer(action: Action, state: AppState): NavigationState {
         }
         is NavigationAction.PopBackTo -> {
             val screen =
-                navigationAction.screen ?: navigationAction.activity.get()?.getPreviousScreen()
+                navigationAction.screen ?: navState.activity?.get()?.getPreviousScreen()
             val index = navState.backStack.lastIndexOf(screen) + 1
             state.navigationState.copy(backStack = navState.backStack.subList(0, index))
         }
         is NavigationAction.RestoreSavedBackStack -> navState
+        is NavigationAction.ActivityCreated -> navState.copy(activity = navigationAction.activity)
+        is NavigationAction.ActivityDestroyed -> navState.copy(activity = null)
     }
 }

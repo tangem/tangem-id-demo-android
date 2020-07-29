@@ -5,13 +5,12 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
-import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
+import com.tangem.id.features.issuer.redux.IssuerAction
 import com.tangem.id.features.issuer.redux.IssuerState
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.fragment_issuer.*
 import org.rekotlin.StoreSubscriber
-import java.lang.ref.WeakReference
 
 class IssuerFragment : Fragment(R.layout.fragment_issuer), StoreSubscriber<IssuerState> {
 
@@ -19,7 +18,7 @@ class IssuerFragment : Fragment(R.layout.fragment_issuer), StoreSubscriber<Issue
         super.onCreate(savedInstanceState)
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+                store.dispatch(NavigationAction.PopBackTo())
             }
         })
     }
@@ -50,16 +49,12 @@ class IssuerFragment : Fragment(R.layout.fragment_issuer), StoreSubscriber<Issue
         super.onViewCreated(view, savedInstanceState)
 
 
-        toolbar.setNavigationOnClickListener{
-            store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+        toolbar.setNavigationOnClickListener {
+            store.dispatch(NavigationAction.PopBackTo())
         }
 
         btn_issue_credentials.setOnClickListener {
-            store.dispatch(
-                NavigationAction.NavigateTo(
-                    AppScreen.IssueCredential, WeakReference(requireActivity())
-                )
-            )
+            store.dispatch(IssuerAction.ReadHoldersCard)
         }
     }
 }

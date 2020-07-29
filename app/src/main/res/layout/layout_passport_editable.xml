@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fl_passport_editable"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -7,7 +8,10 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:background="@android:color/white"
         android:elevation="3dp">
 
@@ -36,15 +40,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:gravity="center"
-                android:hint="@string/credential_personal_info_name">
+                android:hint="@string/credential_personal_info_name"
+                android:textColorHint="@color/darkGray1"
+                app:boxStrokeColor="@color/text_input_underline_color">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:inputType="textPersonName|textCapWords" />
+                    android:inputType="textPersonName|textCapWords"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,15 +63,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:gravity="center"
-                android:hint="@string/credential_personal_info_surname">
+                android:hint="@string/credential_personal_info_surname"
+                android:textColorHint="@color/darkGray1"
+                app:boxStrokeColor="@color/text_input_underline_color">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_surname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:inputType="textPersonName|textCapWords" />
+                    android:inputType="textPersonName|textCapWords"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -97,22 +113,47 @@
 
             </RadioGroup>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_date"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:hint="@string/credential_personal_info_date_of_birth">
+                android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_date"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/white"
-                    android:inputType="date" />
+                    android:layout_gravity="center"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:hint="@string/credential_personal_info_date_of_birth"
+                    android:textColorHint="@color/darkGray1"
+                    app:boxStrokeColor="@color/text_input_underline_color">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:inputType="date"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/iv_date_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingEnd="26dp"
+                    android:paddingStart="26dp"
+                    android:layout_marginBottom="16dp"
+                    android:src="@drawable/ic_calendar"
+                    android:backgroundTint="@android:color/white"
+                    android:layout_gravity="end|center_vertical"/>
+                
+            </FrameLayout>
+           
 
         </LinearLayout>
 

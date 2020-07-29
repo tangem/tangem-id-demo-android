@@ -18,20 +18,17 @@ class EditablePhotoWidget(private val fragment: Fragment) :
 
     override fun setup(credential: Photo, editable: Boolean) {
         if (credential.photo != null) {
-            fragment.btn_add_photo?.hide()
             fragment.view_photo?.show()
             fragment.iv_photo?.show()
             fragment.iv_photo?.setImageBitmap(credential.photo)
-
         } else {
             fragment.view_photo?.hide()
             fragment.iv_photo?.hide()
-            fragment.btn_add_photo?.show()
-            fragment.btn_add_photo?.setOnClickListener {
-                store.dispatch(
-                    NavigationAction.NavigateTo(AppScreen.Camera, fragment.requireActivity())
-                )
-            }
+        }
+        fragment.btn_add_photo?.setOnClickListener {
+            store.dispatch(
+                NavigationAction.NavigateTo(AppScreen.Camera)
+            )
         }
     }
 }

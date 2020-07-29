@@ -6,14 +6,23 @@ import org.rekotlin.Action
 
 sealed class HolderAction : Action {
     object ToggleEditCredentials : HolderAction()
+
+    data class CredentialsRead(
+        val cardId: String,
+        val credentials: List<Credential>,
+        val accessLevels: CredentialsAccessLevels
+    ) : HolderAction()
+
     object RequestNewCredential : HolderAction() {
         data class Success(val immunityPassport: ImmunityPassport) : HolderAction()
         object Failure : HolderAction()
     }
+
     object SaveChanges : HolderAction() {
         object Success : HolderAction()
         object Failure : HolderAction()
     }
+
     data class ChangeCredentialAccessLevel(val credential: Credential) : HolderAction()
     data class RemoveCredential(val credential: Credential) : HolderAction()
     data class ShowCredentialDetails(val credential: Credential?) : HolderAction()

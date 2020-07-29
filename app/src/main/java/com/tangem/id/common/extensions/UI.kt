@@ -4,11 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.Spannable
+import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.card.MaterialCardView
@@ -47,10 +51,19 @@ fun Context.dpToPixels(dp: Int): Int =
         TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), this.resources.displayMetrics
     ).toInt()
 
-fun MaterialCardView.setMargins() {
+fun MaterialCardView.setMargins(
+    marginLeftDp: Int = 16,
+    marginTopDp: Int = 8,
+    marginRightDp: Int = 16,
+    marginBottomDp: Int = 8
+) {
     val params = this.layoutParams
-    val margin = context?.dpToPixels(16) ?: 16
-    (params as ViewGroup.MarginLayoutParams).setMargins(margin, margin, margin, margin)
+    (params as ViewGroup.MarginLayoutParams).setMargins(
+        context.dpToPixels(marginLeftDp),
+        context.dpToPixels(marginTopDp),
+        context.dpToPixels(marginRightDp),
+        context.dpToPixels(marginBottomDp)
+    )
     this.layoutParams = params
 }
 
@@ -82,9 +95,9 @@ fun FragmentActivity.popBackTo(screen: AppScreen?) {
     this.supportFragmentManager.popBackStack(screen?.name, 0)
 }
 
-fun FragmentActivity.getPreviousScreen() : AppScreen? {
+fun FragmentActivity.getPreviousScreen(): AppScreen? {
     val indexOfLastFragment = this.supportFragmentManager.backStackEntryCount - 1
-    val tag =  this.supportFragmentManager.getBackStackEntryAt(indexOfLastFragment).name
+    val tag = this.supportFragmentManager.getBackStackEntryAt(indexOfLastFragment).name
     return tag?.let { AppScreen.valueOf(tag) }
 }
 
@@ -92,14 +105,36 @@ fun FragmentActivity.restoreBackStack(backStack: List<AppScreen>) {
     backStack.map { openFragment(it) }
 }
 
-private fun fragmentFactory(screen: AppScreen) : Fragment {
+private fun fragmentFactory(screen: AppScreen): Fragment {
     return when (screen) {
         AppScreen.Home -> HomeFragment()
         AppScreen.Verifier -> VerifierFragment()
         AppScreen.Holder -> HolderFragment()
         AppScreen.Issuer -> IssuerFragment()
-        AppScreen.IssueCredential -> IssueCredentialsFragment()
+        AppScreen.IssueCredentials -> IssueCredentialsFragment()
         AppScreen.Camera -> CameraFragment()
         AppScreen.QrScan -> QrScanFragment()
     }
+}
+
+fun String.colorSegment(
+    context: Context,
+    color: Int,
+    startIndex: Int = 0,
+    endIndex: Int = this.length
+): Spannable {
+    return this.toSpannable()
+        .also { spannable ->
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, color)),
+                startIndex,
+                endIndex,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+}
+
+fun View.hideKeyboard() {
+    val inputMethodManager = context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    inputMethodManager?.hideSoftInputFromWindow(this.windowToken, 0)
 }

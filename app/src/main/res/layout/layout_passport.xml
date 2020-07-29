@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fl_passport"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_passport"
         android:layout_width="match_parent"
-        android:minWidth="300dp"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:elevation="3dp">
+        android:elevation="3dp"
+        android:minWidth="300dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,124 +22,136 @@
                 android:id="@+id/tv_passport"
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="6sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="@string/credential_personal_info"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:lineSpacingExtra="6sp"
                 android:textColor="@color/darkGray6"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_name_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="2sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="@string/credential_personal_info_name"
-                android:textSize="12sp"
-                android:lineSpacingExtra="2sp"
                 android:textColor="@color/darkGray1"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:layout_marginBottom="10dp"
-                tools:text="John"
-                android:textSize="16sp"
-                android:lineSpacingExtra="5sp"
                 android:textColor="@color/darkGray5"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="16sp"
+                tools:text="John" />
 
 
             <TextView
                 android:id="@+id/tv_surname_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="2sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="@string/credential_personal_info_surname"
-                android:textSize="12sp"
-                android:lineSpacingExtra="2sp"
                 android:textColor="@color/darkGray1"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_surname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:layout_marginBottom="10dp"
-                tools:text="Smith"
-                android:textSize="16sp"
-                android:lineSpacingExtra="5sp"
                 android:textColor="@color/darkGray5"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="16sp"
+                tools:text="Smith" />
 
             <TextView
                 android:id="@+id/tv_birth_date_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="2sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="@string/credential_personal_info_date_of_birth"
-                android:textSize="12sp"
-                android:lineSpacingExtra="2sp"
                 android:textColor="@color/darkGray1"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_birth_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:layout_marginBottom="10dp"
-                tools:text="01/01/1980"
-                android:textSize="16sp"
-                android:lineSpacingExtra="5sp"
                 android:textColor="@color/darkGray5"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="16sp"
+                tools:text="01/01/1980" />
 
             <TextView
                 android:id="@+id/tv_gender_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="2sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="@string/credential_personal_info_gender"
-                android:textSize="12sp"
-                android:lineSpacingExtra="2sp"
                 android:textColor="@color/darkGray1"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_gender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:layout_marginBottom="10dp"
                 android:text="Male"
-                android:textSize="16sp"
-                android:lineSpacingExtra="5sp"
                 android:textColor="@color/darkGray5"
-                android:layout_gravity="center"
-                android:gravity="start|center_vertical"/>
+                android:textSize="16sp" />
+
+            <View
+                android:id="@+id/v_separator_passport"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/separatorGrey"/>
+
+            <include
+                android:id="@+id/l_credential_status_passport"
+                layout="@layout/layout_credential_status" />
 
         </LinearLayout>
 

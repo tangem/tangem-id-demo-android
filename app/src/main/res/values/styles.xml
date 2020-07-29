@@ -16,6 +16,10 @@
         <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
+    <!-- EditText -->
+    <style name="StyledEditText" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="colorControlNormal">#e34b1c</item>
+    </style>
 
 
 </resources>

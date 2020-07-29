@@ -22,7 +22,7 @@ class QrScanFragment : Fragment(0), ZXingScannerView.ResultHandler {
         super.onCreate(savedInstanceState)
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+                store.dispatch(NavigationAction.PopBackTo())
             }
         })
     }
@@ -51,7 +51,7 @@ class QrScanFragment : Fragment(0), ZXingScannerView.ResultHandler {
 //      result.text
         store.dispatch(HolderAction.RequestNewCredential.Success(ImmunityPassport()))
         store.dispatch(
-            NavigationAction.PopBackTo(AppScreen.Holder, requireActivity())
+            NavigationAction.PopBackTo(AppScreen.Holder)
         )
     }
 

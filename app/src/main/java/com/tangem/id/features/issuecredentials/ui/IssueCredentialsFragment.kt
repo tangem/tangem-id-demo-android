@@ -6,15 +6,17 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
+import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
+import com.tangem.id.features.issuecredentials.redux.IssueCredentialsButton
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsState
-import com.tangem.id.features.issuecredentials.redux.NewCredentialsButton
 import com.tangem.id.features.issuecredentials.ui.widgets.CredentialWidgetFactory
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.fragment_issue_credentials.*
 import kotlinx.android.synthetic.main.layout_button.*
 import org.rekotlin.StoreSubscriber
+
 
 class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
     StoreSubscriber<IssueCredentialsState> {
@@ -23,7 +25,7 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         super.onCreate(savedInstanceState)
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+                store.dispatch(NavigationAction.PopBackTo())
             }
         })
     }
@@ -44,19 +46,27 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbar.setNavigationOnClickListener{
-            store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+        toolbar.setNavigationOnClickListener {
+            store.dispatch(NavigationAction.PopBackTo())
         }
+//        ll_root?.setOnClickListener {
+//            it.hideKeyboard()
+//        }
     }
 
     override fun newState(state: IssueCredentialsState) {
         if (activity == null) return
 
+        if (state.issueCredentialsCompleted) {
+            NavigationAction.PopBackTo(AppScreen.Home)
+            return
+        }
+
         val credentialWidgetFactory =
             CredentialWidgetFactory(
                 this
             )
-        state.credentials.map { credential ->
+        state.getCredentials().map { credential ->
             credentialWidgetFactory.createFrom(credential)
                 ?.inflateAndSetup(credential, ll_root, state.editable)
         }
@@ -66,16 +76,18 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
             ll_root.addView(buttonView)
         }
         when (state.button) {
-            is NewCredentialsButton.Sign -> {
+            is IssueCredentialsButton.Sign -> {
                 btn_filled?.text = getString(R.string.issue_credentials_btn_sign)
-                if (state.inputDataReady) {
+                if (state.isInputDataReady()) {
                     btn_filled?.isEnabled = true
-                    btn_filled?.setOnClickListener { store.dispatch(IssueCredentialsAction.Sign) }
+                    btn_filled?.setOnClickListener {
+                        store.dispatch(IssueCredentialsAction.Sign(requireContext().applicationContext))
+                    }
                 } else {
                     btn_filled?.isEnabled = false
                 }
             }
-            is NewCredentialsButton.WriteCredentials -> {
+            is IssueCredentialsButton.WriteCredentials -> {
                 btn_filled.isEnabled = true
                 btn_filled?.text = getString(R.string.issue_credentials_btn_write)
                 btn_filled?.setOnClickListener {

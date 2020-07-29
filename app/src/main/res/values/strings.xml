@@ -41,4 +41,15 @@
 
 
     <string name="verifier_screen_toolbar">ID Validator</string>
+    <string name="verifier_screen_status">Status: %s</string>
+    <string name="verifier_screen_status_valid">Valid</string>
+    <string name="verifier_screen_status_invalid">Invalid</string>
+    <string name="verifier_screen_status_revoked">Revoked</string>
+    <string name="verifier_screen_status_offline">Offline</string>
+    <string name="verifier_screen_issued_by">Issued by %1s issuer\n%2s</string>
+    <string name="verifier_screen_issuer_trusted">Trusted</string>
+    <string name="verifier_screen_issuer_unknown">Unknown</string>
+    <string name="verifier_screen_btn_json">Show Presentation JSON</string>
+    <string name="verifier_screen_btn_json_description">Current presentation of credentials can be stored.</string>
+
 </resources>

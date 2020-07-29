@@ -20,7 +20,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         super.onCreate(savedInstanceState)
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+                store.dispatch(NavigationAction.PopBackTo())
             }
         })
     }
@@ -35,7 +35,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     if (bitmap != null) {
                         store.dispatch(IssueCredentialsAction.AddPhoto.Success(bitmap))
                         store.dispatch(
-                            NavigationAction.PopBackTo(AppScreen.IssueCredential, requireActivity())
+                            NavigationAction.PopBackTo(AppScreen.IssueCredentials)
                         )
                     } else {
                         store.dispatch(IssueCredentialsAction.AddPhoto.Failure)

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tangem.id.R
 import com.tangem.id.common.extensions.getDrawable
+import com.tangem.id.common.extensions.hide
 import com.tangem.id.common.extensions.setSystemBarTextColor
 import com.tangem.id.common.redux.*
 import com.tangem.id.common.redux.navigation.AppScreen
@@ -37,7 +38,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
         super.onCreate(savedInstanceState)
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+                store.dispatch(NavigationAction.PopBackTo())
             }
         })
     }
@@ -48,7 +49,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
         requireActivity().setSystemBarTextColor(true)
 
         toolbar.setNavigationOnClickListener {
-            store.dispatch(NavigationAction.PopBackTo(activity = requireActivity()))
+            store.dispatch(NavigationAction.PopBackTo())
         }
 
         viewManager = LinearLayoutManager(context)
@@ -101,7 +102,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 btn_filled?.text = getString(R.string.holder_screen_btn_request)
                 btn_filled?.setOnClickListener {
 //                    store.dispatch(HolderAction.RequestNewCredential)
-                    store.dispatch(NavigationAction.NavigateTo(AppScreen.Camera, requireActivity()))
+                    store.dispatch(NavigationAction.NavigateTo(AppScreen.Camera))
                 }
             }
         }
@@ -133,23 +134,29 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 credential.surname?.let { dialog.tv_surname?.setText(it) }
                 credential.gender?.let { dialog.tv_gender?.setText(it.toString()) }
                 credential.birthDate?.let { dialog.et_date?.setText(it) }
+                dialog.v_separator_passport?.hide()
+                dialog.l_credential_status_passport?.hide()
             }
             is Photo -> {
                 dialog.setContentView(R.layout.layout_photo)
                 credential.photo?.let { dialog.iv_photo?.setImageBitmap(it) }
+                dialog.l_credential_status_photo?.hide()
             }
             is SecurityNumber -> {
                 dialog.setContentView(R.layout.layout_ssn)
                 credential.number?.let { dialog.tv_ssn?.setText(it) }
+                dialog.v_separator_ssn?.hide()
+                dialog.l_credential_status_ssn?.hide()
             }
             is AgeOfMajority -> {
                 dialog.setContentView(R.layout.layout_checkbox_card)
                 dialog.tv_checkbox_title?.text = getString(R.string.credential_age_of_majority)
                 credential.valid?.let { dialog.checkbox?.isChecked = it }
                 dialog.checkbox?.isEnabled = false
+                dialog.v_separator_age_of_majority?.hide()
+                dialog.l_credential_status_age_of_majority?.hide()
             }
         }
     }
-
 
 }
