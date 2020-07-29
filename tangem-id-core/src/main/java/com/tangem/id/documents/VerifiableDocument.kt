@@ -9,6 +9,7 @@ import com.tangem.id.proof.Secp256k1Proof
 import com.tangem.id.utils.normalizeJsonLd
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import org.json.JSONArray
 import org.json.JSONObject
 
 abstract class VerifiableDocument(
@@ -39,7 +40,7 @@ abstract class VerifiableDocument(
             ?: proof?.toJSONObject()
             ?: return Result.Failure(error("No proof options found"))
 
-        proofOptions.put("@context", context)
+        proofOptions.put("@context", JSONArray(context))
         proofOptions.remove("jws")
 //        proofOptions.remove("type") TODO: check https://github.com/w3c-ccg/ld-proofs/issues/27
 //        proofOptions.remove("proofPurpose")
