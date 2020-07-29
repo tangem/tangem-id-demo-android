@@ -9,6 +9,7 @@ import com.tangem.blockchain.blockchains.ethereum.network.EthereumNetworkManager
 import com.tangem.blockchain.common.*
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
+import com.tangem.commands.Card
 import com.tangem.common.extensions.toHexString
 import java.math.BigDecimal
 
@@ -18,6 +19,13 @@ class EthereumIssuerWalletManager(
     private val transactionBuilder: EthereumTransactionBuilder,
     private val networkManager: EthereumNetworkManager
 ) : WalletManager(cardId, wallet) {
+
+    constructor(card: Card) : this(
+        card.cardId,
+        Wallet(Blockchain.Ethereum, Blockchain.Ethereum.makeAddress(card.walletPublicKey!!)),
+        EthereumTransactionBuilder(card.walletPublicKey!!, Blockchain.Ethereum),
+        EthereumNetworkManager(Blockchain.Ethereum)
+    )
 
     private val blockchain = wallet.blockchain
 

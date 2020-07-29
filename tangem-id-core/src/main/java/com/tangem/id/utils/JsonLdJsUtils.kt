@@ -29,7 +29,7 @@ suspend fun normalizeJsonLd(jsonObject: JSONObject, androidContext: Context): Re
                     continuation.resumeWithException(exception)
                 }
 
-            val uri = MicroService.Bundle(androidContext, "jsonld")
+            val uri = MicroService.Bundle(androidContext, "index")
             val service = MicroService(androidContext, uri, startListener, errorListener)
             service.start()
         }
