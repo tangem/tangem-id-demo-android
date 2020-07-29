@@ -3,7 +3,6 @@ package com.tangem.id.demo
 import android.content.Context
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.id.documents.VerifiableCredential
-import com.tangem.id.documents.VerifiableCredential.Companion.TANGEM_DEMO_CONTEXT
 import com.tangem.id.documents.VerifiableCredential.Companion.TANGEM_ETH_CREDENTIAL
 import com.tangem.id.extensions.calculateSha3v512
 import org.json.JSONArray
@@ -25,7 +24,7 @@ class DemoCredentialFactory(
         return VerifiableCredential(
             credentialSubject = credentialSubject,
             issuer = issuer,
-            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
+//            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
             extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_PHOTO_CREDENTIAL)
         )
     }
@@ -37,7 +36,7 @@ class DemoCredentialFactory(
         return VerifiableCredential(
             credentialSubject = credentialSubject,
             issuer = issuer,
-            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
+//            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
             extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_PERSONAL_INFORMATION_CREDENTIAL)
         )
     }
@@ -49,7 +48,7 @@ class DemoCredentialFactory(
         return VerifiableCredential(
             credentialSubject = credentialSubject,
             issuer = issuer,
-            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
+//            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
             extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_SSN_CREDENTIAL)
         )
     }
@@ -66,7 +65,7 @@ class DemoCredentialFactory(
         return VerifiableCredential(
             credentialSubject = credentialSubject,
             issuer = issuer,
-            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
+//            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
             extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_AGE_OVER_18_CREDENTIAL),
             validFrom = validFrom
         )
