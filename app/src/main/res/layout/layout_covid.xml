@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fl_covid"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_covid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:elevation="3dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minWidth="300dp">
+
+            <TextView
+                android:id="@+id/tv_covid_title"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="6sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/darkGray6"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="@string/credential_covid" />
+
+            <TextView
+                android:id="@+id/tv_covid_description"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/credential_valid"
+                android:textColor="@color/darkGray5"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@+id/tv_covid_title" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox_covid"
+                android:layout_width="wrap_content"
+                android:layout_height="58dp"
+                android:layout_gravity="center"
+                app:buttonTint="@color/checkbox_tint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_covid_title" />
+
+            <View
+                android:id="@+id/v_separator_covid"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/separatorGrey"
+                app:layout_constraintTop_toBottomOf="@id/tv_covid_description" />
+
+            <include
+                android:id="@+id/l_credential_status_covid"
+                layout="@layout/layout_credential_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_covid_description" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

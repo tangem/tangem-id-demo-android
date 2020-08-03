@@ -57,6 +57,6 @@ fun LocalDate.isOver18Years(): Boolean {
 
 fun Bitmap.toByteArray(): ByteArray {
     val stream = ByteArrayOutputStream()
-    this.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    this.compress(Bitmap.CompressFormat.JPEG, 20, stream)
     return stream.toByteArray()
 }

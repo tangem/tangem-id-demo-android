@@ -46,6 +46,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <include
+                layout="@layout/layout_covid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_presentation_json"
@@ -70,8 +75,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="40dp"
-                android:textAlignment="center"
                 android:text="@string/verifier_screen_btn_json_description"
+                android:textAlignment="center"
                 android:textColor="@color/darkGray6"
                 android:textSize="12sp" />
 

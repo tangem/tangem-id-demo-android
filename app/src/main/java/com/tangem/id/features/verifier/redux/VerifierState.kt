@@ -2,6 +2,7 @@ package com.tangem.id.features.verifier.redux
 
 import com.tangem.id.R
 import com.tangem.id.common.redux.*
+import com.tangem.id.demo.VerifiableDemoCredential
 import org.rekotlin.StateType
 
 data class CredentialStatus(val issuer: Issuer, val verificationStatus: VerificationStatus)
@@ -60,7 +61,19 @@ data class VerifierState(
 data class VerifierCredential<T : Credential>(
     val credential: T,
     val credentialStatus: CredentialStatus
-)
+) {
+    companion object {
+        fun from(demoCredential: VerifiableDemoCredential): VerifierCredential<*>? {
+
+            val issuerAddress = demoCredential.verifiableCredential.issuer
+            val issuer = Issuer(issuerAddress, true)
+            val verificationStatus = VerificationStatus.Offline
+            val status = CredentialStatus(issuer, verificationStatus)
+
+            return VerifierCredential(Credential.from(demoCredential.decodedCredential), status)
+        }
+    }
+}
 
 
 

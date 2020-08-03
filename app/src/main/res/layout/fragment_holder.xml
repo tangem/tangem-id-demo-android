@@ -20,7 +20,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         style="@style/Widget.MaterialComponents.Toolbar"
-        app:theme="@style/DarkToolbarStyle"
+        android:theme="@style/DarkToolbarStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"

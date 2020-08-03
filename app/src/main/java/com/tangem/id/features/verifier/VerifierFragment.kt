@@ -18,6 +18,7 @@ import com.tangem.id.store
 import kotlinx.android.synthetic.main.fragment_issuer.toolbar
 import kotlinx.android.synthetic.main.fragment_verifier.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
+import kotlinx.android.synthetic.main.layout_covid.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
@@ -88,10 +89,21 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
             fl_checkbox?.hide()
         } else {
             fl_checkbox?.show()
-            checkbox?.isChecked = state.ageOfMajority.credential.valid ?: false
+            checkbox?.isChecked = state.ageOfMajority.credential.valid
             setCredentialsStatus(
                 state.ageOfMajority.credential,
                 state.ageOfMajority.credentialStatus
+            )
+            card_checkbox?.setMargins()
+        }
+        if (state.immunityPassport == null) {
+            fl_covid?.hide()
+        } else {
+            fl_covid?.show()
+            checkbox_covid?.isChecked = state.immunityPassport.credential.valid
+            setCredentialsStatus(
+                state.immunityPassport.credential,
+                state.immunityPassport.credentialStatus
             )
             card_checkbox?.setMargins()
         }
@@ -139,6 +151,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
             is Passport -> l_credential_status_passport
             is SecurityNumber -> l_credential_status_ssn
             is AgeOfMajority -> l_credential_status_age_of_majority
+            is ImmunityPassport -> l_credential_status_covid
             else -> null
         }
     }

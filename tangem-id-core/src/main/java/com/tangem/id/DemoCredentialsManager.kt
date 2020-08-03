@@ -7,6 +7,8 @@ import com.tangem.blockchain.common.TransactionSigner
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.CompletionResult
+import com.tangem.id.card.WriteFilesTask
+import com.tangem.id.card.issuer
 import com.tangem.id.demo.DemoCredentialFactory
 import com.tangem.id.demo.DemoPersonData
 import com.tangem.id.documents.VerifiableCredential
@@ -35,7 +37,7 @@ class DemoCredentialsManager(
             androidContext = androidContext
         )
 
-        val credentials = credentialFactory.createCredentials().drop(0)
+        val credentials = credentialFactory.createCredentials()
 
         val credentialHashes = credentials
             .map { credential ->
@@ -50,14 +52,14 @@ class DemoCredentialsManager(
                 }
             }
 
-        val approvalTransaction =
+        approvalTransaction =
             when (val result =
                 issuerWalletManager.buildTransaction(credentials[0].ethCredentialStatus!!)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return Result.Failure(result.error)
             }
 
-        val arrayToSign = (approvalTransaction.hashes + credentialHashes).toTypedArray()
+        val arrayToSign = (approvalTransaction!!.hashes + credentialHashes).toTypedArray()
 
         val signatures =
             when (val signerResponse = signer.sign(arrayToSign, issuerWalletManager.cardId)) {
@@ -103,7 +105,10 @@ class DemoCredentialsManager(
 
         val result = suspendCancellableCoroutine<SimpleResult> { continuation ->
             tangemSdk.startSessionWithRunnable(
-                WriteFilesTask(cborCredentials, issuer().dataKeyPair)
+                WriteFilesTask(
+                    cborCredentials,
+                    issuer().dataKeyPair
+                )
             ) { result ->
                 when (result) {
                     is CompletionResult.Failure -> if (continuation.isActive) {

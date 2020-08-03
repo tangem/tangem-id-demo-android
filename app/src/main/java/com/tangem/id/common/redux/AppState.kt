@@ -2,8 +2,12 @@ package com.tangem.id.common.redux
 
 import android.graphics.Bitmap
 import com.tangem.id.R
+import com.tangem.id.common.extensions.toBitmap
 import com.tangem.id.common.extensions.toDate
 import com.tangem.id.common.redux.navigation.NavigationState
+import com.tangem.id.demo.CovidStatus
+import com.tangem.id.demo.DemoCredential
+import com.tangem.id.demo.VerifiableDemoCredential
 import com.tangem.id.features.holder.redux.HolderState
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsState
 import com.tangem.id.features.issuer.redux.IssuerState
@@ -22,6 +26,28 @@ abstract class Button(val enabled: Boolean)
 
 interface Credential {
     fun isDataPresent(): Boolean
+
+    companion object {
+        fun from(credential: DemoCredential): Credential {
+            return when (credential) {
+                is DemoCredential.PhotoCredential -> {
+                    val photoInBytes = credential.photo
+                    val photoBitmap = photoInBytes.toBitmap()
+                    Photo(photoBitmap)
+                }
+                is DemoCredential.PersonalInfoCredential -> {
+                    Passport(
+                        credential.name, credential.surname,
+                        Gender.valueOf(credential.gender), credential.birthDate
+                    )
+                }
+                is DemoCredential.SsnCredential -> SecurityNumber(credential.ssn)
+                is DemoCredential.AgeOfMajorityCredential -> AgeOfMajority(credential.valid)
+                is DemoCredential.CovidCredential ->
+                    ImmunityPassport(credential.result == CovidStatus.Positive)
+            }
+        }
+    }
 }
 
 data class Photo(val photo: Bitmap? = null) : Credential {
@@ -42,6 +68,20 @@ data class Passport(
         if (birthDate.isNullOrBlank()) return null
         return birthDate.toDate() != null
     }
+
+    companion object {
+        fun from(demoCredential: VerifiableDemoCredential): Passport? {
+            val credential = demoCredential.decodedCredential
+            return if (credential is DemoCredential.PersonalInfoCredential) {
+                Passport(
+                    credential.name, credential.surname,
+                    Gender.valueOf(credential.gender), credential.birthDate
+                )
+            } else {
+                null
+            }
+        }
+    }
 }
 
 data class SecurityNumber(val number: String? = null) : Credential {
@@ -52,8 +92,8 @@ data class AgeOfMajority(val valid: Boolean = false) : Credential {
     override fun isDataPresent(): Boolean = true
 }
 
-data class ImmunityPassport(val validUntil: String? = null) : Credential {
-    override fun isDataPresent(): Boolean = validUntil != null
+data class ImmunityPassport(val valid: Boolean) : Credential {
+    override fun isDataPresent(): Boolean = true
 }
 
 enum class Gender {

@@ -11,7 +11,6 @@ import com.tangem.id.R
 import com.tangem.id.common.extensions.show
 import com.tangem.id.common.redux.*
 import com.tangem.id.features.holder.redux.AccessLevel
-import com.tangem.id.features.holder.redux.CredentialsAccessLevels
 import com.tangem.id.features.holder.redux.HolderAction
 import kotlinx.android.synthetic.main.layout_holder_credential.view.*
 
@@ -19,19 +18,16 @@ class HolderCredentialsAdapter(
     private val itemClickListener: (HolderAction) -> Unit
 ) : RecyclerView.Adapter<HolderCredentialsAdapter.CredentialViewHolder>() {
 
-    private var items: List<Credential> = listOf()
-    private var credentialsAccessLevels: CredentialsAccessLevels = CredentialsAccessLevels()
+    private var items: List<Pair<Credential, AccessLevel>> = listOf()
     private var isEditActivated = false
 
     override fun getItemCount() = items.size
 
     fun setItems(
-        credentials: List<Credential>,
-        accessLevels: CredentialsAccessLevels,
+        credentials: List<Pair<Credential, AccessLevel>>,
         isEditActivated: Boolean = false
     ) {
         items = credentials
-        credentialsAccessLevels = accessLevels
         this.isEditActivated = isEditActivated
         notifyDataSetChanged()
     }
@@ -47,7 +43,8 @@ class HolderCredentialsAdapter(
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
 
-        val credential = items[position]
+        val credential = items[position].first
+        val accessLevel = items[position].second
         val context = holder.ivAccess.context
 
         holder.tvCredential.text =
@@ -56,13 +53,13 @@ class HolderCredentialsAdapter(
                 is Photo -> context.getString(R.string.credential_photo)
                 is SecurityNumber -> context.getString(R.string.credential_ssn)
                 is AgeOfMajority -> context.getString(R.string.credential_age_of_majority)
-                is ImmunityPassport -> "Immunity"
+                is ImmunityPassport -> context.getString(R.string.credential_covid)
                 else -> "Unknown"
             }
 
         holder.ivDelete.show(isEditActivated)
 
-        val accessLevelImage = when (credentialsAccessLevels.getAccessLevel(credential)) {
+        val accessLevelImage = when (accessLevel) {
             AccessLevel.Private -> ContextCompat.getDrawable(
                 holder.ivAccess.context,
                 R.drawable.ic_baseline_lock

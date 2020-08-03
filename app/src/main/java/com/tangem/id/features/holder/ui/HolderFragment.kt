@@ -82,7 +82,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
     override fun newState(state: HolderState) {
         if (activity == null) return
 
-        viewAdapter.setItems(state.credentials, state.accessLevelsModified, state.editActivated)
+        viewAdapter.setItems(state.credentials, state.editActivated)
 
         toggleEditIcon(state.editActivated)
 
@@ -119,10 +119,8 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
 
     private fun showDetails(state: HolderState) {
         val dialog = Dialog(requireContext())
-        dialog.setOnDismissListener { store.dispatch(HolderAction.ShowCredentialDetails(null)) }
-
+        dialog.setOnDismissListener { store.dispatch(HolderAction.HideCredentialDetails) }
         state.detailsOpened?.let { credential -> fillInCredentialDetails(dialog, credential) }
-
         dialog.show()
     }
 

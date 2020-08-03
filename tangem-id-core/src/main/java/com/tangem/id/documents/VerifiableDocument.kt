@@ -1,6 +1,7 @@
 package com.tangem.id.documents
 
 import android.content.Context
+import com.tangem.Log
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.extensions.calculateSha256
@@ -47,6 +48,8 @@ abstract class VerifiableDocument(
 
         val document = this.toJSONObject()
         document.remove("proof")
+
+        Log.i("TangemCredential", this.toJson())
 
         return try {
             coroutineScope<Result<ByteArray>> {

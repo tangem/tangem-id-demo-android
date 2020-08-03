@@ -1,4 +1,4 @@
-package com.tangem.id
+package com.tangem.id.card
 
 import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
@@ -52,7 +52,8 @@ class WriteFilesTask(
         if (currentFileIndex > data.lastIndex) {
             callback(
                 CompletionResult.Success(
-                WriteFilesResponse(cardId, filesIndices))
+                    WriteFilesResponse(cardId, filesIndices)
+                )
             )
             return
         }

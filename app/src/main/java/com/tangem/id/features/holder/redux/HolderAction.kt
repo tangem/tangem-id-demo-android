@@ -1,7 +1,6 @@
 package com.tangem.id.features.holder.redux
 
 import com.tangem.id.common.redux.Credential
-import com.tangem.id.common.redux.ImmunityPassport
 import org.rekotlin.Action
 
 sealed class HolderAction : Action {
@@ -9,12 +8,11 @@ sealed class HolderAction : Action {
 
     data class CredentialsRead(
         val cardId: String,
-        val credentials: List<Credential>,
-        val accessLevels: CredentialsAccessLevels
+        val credentials: List<Pair<Credential, AccessLevel>>
     ) : HolderAction()
 
     object RequestNewCredential : HolderAction() {
-        data class Success(val immunityPassport: ImmunityPassport) : HolderAction()
+        data class Success(val allCredentials: List<Pair<Credential, AccessLevel>>) : HolderAction()
         object Failure : HolderAction()
     }
 
@@ -25,7 +23,8 @@ sealed class HolderAction : Action {
 
     data class ChangeCredentialAccessLevel(val credential: Credential) : HolderAction()
     data class RemoveCredential(val credential: Credential) : HolderAction()
-    data class ShowCredentialDetails(val credential: Credential?) : HolderAction()
+    data class ShowCredentialDetails(val credential: Credential) : HolderAction()
+    object HideCredentialDetails : HolderAction()
     data class ShowJson(val credential: Credential) : HolderAction()
 }
 

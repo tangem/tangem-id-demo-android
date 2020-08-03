@@ -15,6 +15,7 @@
     <string name="credential_valid">Valid</string>
     <string name="credential_valid_until">Valid until %s</string>
     <string name="credential_valid_from">Valid from %s</string>
+    <string name="credential_covid">Covid 19 Immunity Passport</string>
 
 
     <string name="starting_screen_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
