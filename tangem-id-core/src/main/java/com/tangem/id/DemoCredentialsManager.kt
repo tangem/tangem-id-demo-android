@@ -1,11 +1,13 @@
 package com.tangem.id
 
 import android.content.Context
+import com.tangem.Message
 import com.tangem.TangemSdk
 import com.tangem.blockchain.blockchains.ethereum.TransactionToSign
 import com.tangem.blockchain.common.TransactionSigner
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
+import com.tangem.commands.SignResponse
 import com.tangem.common.CompletionResult
 import com.tangem.id.card.WriteFilesTask
 import com.tangem.id.card.issuer
@@ -25,6 +27,7 @@ class DemoCredentialsManager(
 
     private var approvalTransaction: TransactionToSign? = null
     private var transactionSignature: ByteArray? = null
+    private var credentials: List<VerifiableCredential>? = null
 
     suspend fun createDemoCredentials(
         personData: DemoPersonData, subjectEthereumAddress: String, signer: TransactionSigner
@@ -38,6 +41,7 @@ class DemoCredentialsManager(
         )
 
         val credentials = credentialFactory.createCredentials()
+        this.credentials = credentials
 
         val credentialHashes = credentials
             .map { credential ->
@@ -90,9 +94,14 @@ class DemoCredentialsManager(
 
     }
 
+    fun showCredentials(): List<String> {
+        return credentials!!.map { it.toPrettyJson() }
+    }
+
     suspend fun completeWithId(
         credentials: List<VerifiableCredential>,
-        tangemSdk: TangemSdk
+        tangemSdk: TangemSdk,
+        initialMessage: Message
     ): SimpleResult {
 
         if (approvalTransaction == null || transactionSignature == null) return SimpleResult.Failure(
@@ -108,7 +117,8 @@ class DemoCredentialsManager(
                 WriteFilesTask(
                     cborCredentials,
                     issuer().dataKeyPair
-                )
+                ),
+                initialMessage = initialMessage
             ) { result ->
                 when (result) {
                     is CompletionResult.Failure -> if (continuation.isActive) {
@@ -132,4 +142,13 @@ class DemoCredentialsManager(
     companion object {
         const val SIGNATURE_SIZE = 64
     }
+}
+
+class IdSigner(private val tangemSdk: TangemSdk, private val initialMessage: Message) : TransactionSigner {
+    override suspend fun sign(hashes: Array<ByteArray>, cardId: String): CompletionResult<SignResponse> =
+        suspendCancellableCoroutine { continuation ->
+            tangemSdk.sign(hashes, cardId, initialMessage = initialMessage) { result ->
+                if (continuation.isActive) continuation.resume(result)
+            }
+        }
 }

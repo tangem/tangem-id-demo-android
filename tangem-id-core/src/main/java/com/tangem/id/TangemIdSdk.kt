@@ -1,14 +1,11 @@
 package com.tangem.id
 
 import androidx.activity.ComponentActivity
-import com.tangem.CardFilter
-import com.tangem.Config
-import com.tangem.Log
-import com.tangem.TangemSdk
+import com.tangem.*
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
-import com.tangem.blockchain.extensions.Signer
 import com.tangem.blockchain.extensions.SimpleResult
+import com.tangem.commands.Product
 import com.tangem.commands.file.FileSettings
 import com.tangem.common.CompletionResult
 import com.tangem.common.extensions.CardType
@@ -17,6 +14,7 @@ import com.tangem.id.card.ReadFilesTask
 import com.tangem.id.card.issuer
 import com.tangem.id.card.toggleVisibility
 import com.tangem.id.demo.DemoCovidCredential
+import com.tangem.id.demo.DemoCredential
 import com.tangem.id.demo.DemoPersonData
 import com.tangem.id.demo.VerifiableDemoCredential
 import com.tangem.id.documents.VerifiableCredential
@@ -60,17 +58,27 @@ class TangemIdSdk(val activity: ComponentActivity) {
         Log.e("TangemIdSdk", exceptionAsString)
     }
 
-    fun readIssuerCard(callback: (String?) -> Unit) {
-        tangemSdk.scanCard { result ->
+    fun readIssuerCard(callback: (CompletionResult<String>) -> Unit) {
+        tangemSdk.scanCard(
+            initialMessage = Message("Tap Issuer's Card")
+        ) { result ->
             when (result) {
-                is CompletionResult.Failure -> scope.launch(Dispatchers.Main) { callback(null) }
+                is CompletionResult.Failure ->
+                    callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
                 is CompletionResult.Success -> {
+                    if ((result.data.cardData?.productMask?.contains(Product.Note) != true &&
+                                result.data.cardData?.productMask?.contains(Product.IdIssuer) != true)
+                        || result.data.cardData?.productMask?.contains(Product.IdCard) == true
+                    ) {
+                        callback(CompletionResult.Failure(TangemIdError.WrongIssuerCardType(activity)))
+                        return@scanCard
+                    }
                     issuerWallet = EthereumIssuerWalletManager(result.data)
                     credentialsManager = DemoCredentialsManager(
                         issuerWallet!!,
-                        activity.applicationContext
+                        activity
                     )
-                    scope.launch(Dispatchers.Main) { callback(issuerWallet!!.wallet.address) }
+                    callback(CompletionResult.Success(issuerWallet!!.wallet.address))
                 }
             }
 
@@ -79,26 +87,48 @@ class TangemIdSdk(val activity: ComponentActivity) {
     }
 
 
-    fun getHolderAddress(callback: (String?) -> Unit) {
-        tangemSdk.scanCard { result ->
+    fun getHolderAddress(callback: (CompletionResult<String>) -> Unit) {
+        tangemSdk.scanCard(
+            initialMessage = Message("Tap Holder's Card")
+        ) { result ->
             when (result) {
-                is CompletionResult.Failure -> scope.launch(Dispatchers.Main) { callback(null) }
+                is CompletionResult.Failure -> callback(
+                    CompletionResult.Failure(
+                        TangemIdError.ReadingCardError(activity)
+                    )
+                )
                 is CompletionResult.Success -> {
+                    if (result.data.cardData?.productMask?.contains(Product.IdCard) != true) {
+                        callback(CompletionResult.Failure(TangemIdError.WrongHolderCardType(activity)))
+                        return@scanCard
+                    }
                     holderAddress =
                         EthereumAddressService().makeAddress(result.data.walletPublicKey!!)
-                    scope.launch(Dispatchers.Main) { callback(holderAddress) }
+                    if (holderAddress != null) {
+                        callback(CompletionResult.Success(holderAddress!!))
+                    } else {
+                        callback(CompletionResult.Failure(TangemIdError.CardError(activity)))
+                    }
                 }
             }
         }
     }
 
-    fun readCredentialsAsHolder(callback: (Result<HolderData>) -> Unit) {
-        tangemSdk.startSessionWithRunnable(ReadFilesTask(true)) { result ->
+    fun readCredentialsAsHolder(callback: (CompletionResult<HolderData>) -> Unit) {
+        tangemSdk.startSessionWithRunnable(
+            ReadFilesTask(true),
+            initialMessage = Message("Tap Holder's Card")
+        ) { result ->
             when (result) {
                 is CompletionResult.Failure -> {
-                    scope.launch(Dispatchers.Main) { callback(Result.Failure(Exception())) }
+                    callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
                 }
                 is CompletionResult.Success -> {
+                    if (result.data.files.isEmpty() || result.data.files[0].fileData.isEmpty()) {
+                        callback(CompletionResult.Failure(TangemIdError.NoCredentials(activity)))
+                        return@startSessionWithRunnable
+                    }
+
                     val visibility =
                         result.data.files.map { it.fileSettings ?: FileSettings.Public }
                     val holderCredentials = result.data.files
@@ -112,26 +142,51 @@ class TangemIdSdk(val activity: ComponentActivity) {
                         }
                     this.holderCredentials = holderCredentials
                     Log.i("Credentials", holderCredentials.toString())
-                    scope.launch(Dispatchers.Main) {
-                        callback(Result.Success(HolderData(result.data.cardId, holderCredentials)))
+                    holderAddress =
+                        EthereumAddressService().makeAddress(result.data.walletPublicKey)
+                    if (holderAddress == null) {
+                        callback(CompletionResult.Failure(TangemIdError.CardError(activity)))
+                        return@startSessionWithRunnable
                     }
+
+                    callback(
+                        CompletionResult.Success(
+                            HolderData(
+                                result.data.cardId,
+                                holderCredentials
+                            )
+                        )
+                    )
                 }
             }
         }
     }
 
-    fun readCredentialsAsVerifier(callback: (List<VerifiableDemoCredential>?) -> Unit) {
+    fun readCredentialsAsVerifier(callback: (CompletionResult<List<VerifiableDemoCredential>>) -> Unit) {
         tangemSdk.readFileDataTask(readPrivateFiles = false) { result ->
-            when (result) {
-                is CompletionResult.Failure -> scope.launch(Dispatchers.Main) { callback(null) }
-                is CompletionResult.Success -> {
-                    verifierCredentials = result.data.files
-                        .map { it.fileData }
-                        .map { JsonLdCborEncoder.decode(it) }
-                        .map { VerifiableCredential.fromMap((it as Map<String, String>)) }
-                        .mapNotNull { VerifiableDemoCredential.from(it) }
-                    Log.i("Credentials", verifierCredentials.toString())
-                    scope.launch(Dispatchers.Main) { callback(verifierCredentials) }
+            scope.launch {
+                when (result) {
+                    is CompletionResult.Failure ->
+                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    is CompletionResult.Success -> {
+                        if (result.data.files.isEmpty() || result.data.files[0].fileData.isEmpty()) {
+                            callback(CompletionResult.Failure(TangemIdError.NoCredentials(activity)))
+                            return@launch
+                        }
+
+                        verifierCredentials = result.data.files
+                            .map { it.fileData }
+                            .map { JsonLdCborEncoder.decode(it) }
+                            .map { VerifiableCredential.fromMap((it as Map<String, String>)) }
+                            .mapNotNull {
+                                VerifiableDemoCredential.from(
+                                    it
+//                                    it.simpleVerify(activity)
+                                )
+                            }
+                        Log.i("Credentials", verifierCredentials.toString())
+                        callback(CompletionResult.Success(verifierCredentials!!))
+                    }
                 }
             }
         }
@@ -139,45 +194,60 @@ class TangemIdSdk(val activity: ComponentActivity) {
 
     fun formCredentialsAndSign(
         personData: DemoPersonData, holdersAddress: String,
-        callback: (SimpleResult) -> Unit
+        callback: (SimpleResponse) -> Unit
     ) {
         scope.launch {
             val result = credentialsManager!!.createDemoCredentials(
-                personData, holdersAddress, Signer(tangemSdk)
+                personData, holdersAddress, IdSigner(tangemSdk, Message("Tap Issuer's Card"))
             )
             withContext(Dispatchers.Main) {
                 when (result) {
                     is Result.Success -> {
                         credentials = result.data
-                        callback(SimpleResult.Success)
+                        callback(SimpleResponse.Success)
                     }
-                    is Result.Failure -> callback(SimpleResult.Failure(Error()))
+                    is Result.Failure ->
+                        callback(
+                            SimpleResponse.Failure(TangemIdError.ErrorCreatingCredentials(activity))
+                        )
                 }
             }
         }
     }
 
-    fun writeCredentialsAndSend(callback: (SimpleResult) -> Unit) {
+    fun writeCredentialsAndSend(callback: (SimpleResponse) -> Unit) {
         scope.launch {
-            val result = credentialsManager!!.completeWithId(credentials!!, tangemSdk)
-            withContext(Dispatchers.Main) { callback(result) }
+            val result = credentialsManager!!.completeWithId(
+                credentials!!, tangemSdk, Message("Tap Holder's Card")
+            )
+            withContext(Dispatchers.Main) {
+                when (result) {
+                    is SimpleResult.Success -> callback(SimpleResponse.Success)
+                    is SimpleResult.Failure ->
+                        callback(
+                            SimpleResponse.Failure(TangemIdError.ErrorWritingCredentials(activity))
+                        )
+                }
+            }
         }
     }
 
     fun changeHoldersCredentials(
         indicesToDelete: List<Int>, indicesToChangeVisibility: List<Int>,
-        callback: (SimpleResult) -> Unit
+        callback: (SimpleResponse) -> Unit
     ) {
         val task = ChangeFilesTask(
             indicesToDelete, indicesToChangeVisibility,
             holderCredentials!!.unzip().second
         )
 
-        tangemSdk.startSessionWithRunnable(task) { result ->
+        tangemSdk.startSessionWithRunnable(
+            task, initialMessage = Message("Tap Holder's Card")
+        ) { result ->
             when (result) {
-                is CompletionResult.Failure -> scope.launch(Dispatchers.Main) {
-                    callback(SimpleResult.failure(result.error))
-                }
+                is CompletionResult.Failure ->
+                    callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))
+
                 is CompletionResult.Success -> {
                     holderCredentials = holderCredentials
                         ?.mapIndexed { index, pair ->
@@ -190,39 +260,94 @@ class TangemIdSdk(val activity: ComponentActivity) {
                         ?.mapIndexed { index, pair ->
                             if (indicesToDelete.contains(index)) null else pair
                         }?.filterNotNull()
-                    scope.launch(Dispatchers.Main) { callback(SimpleResult.Success) }
+                    callback(SimpleResponse.Success)
                 }
             }
         }
     }
 
 
-    fun addCovidCredential(holderAddress: String, callback: (SimpleResult) -> Unit) {
+    fun addCovidCredential(
+        callback: (CompletionResult<List<Pair<VerifiableDemoCredential, FileSettings>>>) -> Unit
+    ) {
+        if (holderCredentials?.find {
+                it.first.decodedCredential is DemoCredential.CovidCredential
+            } != null) {
+            callback(CompletionResult.Failure(TangemIdError.CredentialAlreadyIssued(activity)))
+            return
+        }
+
         scope.launch {
             val covidResult =
                 DemoCovidCredential.createCovidCredential(
-                    holderAddress,
+                    holderAddress!!,
                     activity.applicationContext
                 )
             when (covidResult) {
-                is Result.Failure -> withContext(Dispatchers.Main) {
-                    callback(SimpleResult.Failure(covidResult.error))
-                }
+                is Result.Failure ->
+                    callback(
+                        CompletionResult.Failure(
+                            TangemIdError.ErrorAddingNewCredential(
+                                activity
+                            )
+                        )
+                    )
                 is Result.Success -> {
                     val encoded = JsonLdCborEncoder.encode(covidResult.data.toMap())
                     tangemSdk.writeFileDataTask(
-                        data = encoded, issuerKeys = issuer().dataKeyPair
+                        data = encoded, issuerKeys = issuer().dataKeyPair,
+                        initialMessage = Message("Tap Holder's Card")
                     ) { result ->
-
                         when (result) {
-                            is CompletionResult.Failure -> TODO()
-                            is CompletionResult.Success -> TODO()
+                            is CompletionResult.Failure ->
+                                callback(
+                                    CompletionResult.Failure(TangemIdError.ReadingCardError(activity))
+                                )
+                            is CompletionResult.Success -> {
+                                val credential = VerifiableDemoCredential.from(covidResult.data)
+                                if (credential != null) {
+                                    holderCredentials =
+                                        holderCredentials!! + (credential to FileSettings.Public)
+                                    callback(CompletionResult.Success(holderCredentials!!))
+                                } else {
+                                    callback(
+                                        CompletionResult.Failure(
+                                            TangemIdError.ConvertingCredentialError(activity)
+                                        )
+                                    )
+                                }
+                            }
+
+
                         }
 
                     }
                 }
             }
         }
+    }
+
+    fun changePasscode(callback: (SimpleResponse) -> Unit) {
+        tangemSdk.changePin2(initialMessage = Message("Tap Holder's Card")) { result ->
+            when (result) {
+                is CompletionResult.Failure ->
+                    callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))
+                is CompletionResult.Success -> callback(SimpleResponse.Success)
+            }
+        }
+    }
+
+    fun showJsonWhileCreating(): String {
+        return credentialsManager!!.showCredentials().joinToString("\n")
+    }
+
+    fun showHoldersCredential(index: Int): String {
+        return holderCredentials!![index].first.verifiableCredential.toPrettyJson()
+    }
+
+    fun showVerifierCredentials(): String {
+        return verifierCredentials!!.map { it.verifiableCredential.toPrettyJson() }
+            .joinToString("\n")
     }
 
 }
@@ -232,3 +357,8 @@ data class HolderData(
     val cardId: String,
     val credentials: List<Pair<VerifiableDemoCredential, FileSettings>>
 )
+
+sealed class SimpleResponse {
+    object Success : SimpleResponse()
+    data class Failure(val error: TangemError) : SimpleResponse()
+}

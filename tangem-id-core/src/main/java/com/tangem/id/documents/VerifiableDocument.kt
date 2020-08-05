@@ -16,7 +16,7 @@ import org.json.JSONObject
 abstract class VerifiableDocument(
     val context: MutableSet<String>,
     val type: MutableSet<String>,
-    var proof: LinkedDataProof?
+    var proof: Secp256k1Proof?
 ) {
     abstract fun toJson(): String
 
@@ -54,18 +54,23 @@ abstract class VerifiableDocument(
         return try {
             coroutineScope<Result<ByteArray>> {
                 val documentNormalizationDeferred =
-                    async {
-                        normalizeJsonLd(
-                            document,
-                            androidContext
-                        )
+                    retry {
+                        async {
+                            normalizeJsonLd(
+                                proofOptions,
+                                androidContext
+                            )
+                        }
                     }
+
                 val proofOptionsNormalizationDeferred =
-                    async {
-                        normalizeJsonLd(
-                            proofOptions,
-                            androidContext
-                        )
+                    retry {
+                        async {
+                            normalizeJsonLd(
+                                proofOptions,
+                                androidContext
+                            )
+                        }
                     }
 
                 val documentNormalizationResult = documentNormalizationDeferred.await()
@@ -92,4 +97,18 @@ abstract class VerifiableDocument(
     companion object {
         const val DEFAULT_CONTEXT = "https://www.w3.org/2018/credentials/v1"
     }
+}
+
+suspend fun <T> retry(
+    times: Int = 5,
+    block: suspend () -> T
+): T {
+    repeat(times - 1) {
+        try {
+            return block()
+        } catch (e: Exception) {
+            e.localizedMessage
+        }
+    }
+    return block() // last attempt
 }

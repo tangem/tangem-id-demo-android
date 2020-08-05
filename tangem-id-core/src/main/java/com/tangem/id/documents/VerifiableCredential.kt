@@ -3,7 +3,7 @@ package com.tangem.id.documents
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
-import com.tangem.id.proof.LinkedDataProof
+import com.tangem.id.proof.Secp256k1Proof
 import java.time.Instant
 
 @JsonClass(generateAdapter = true)
@@ -16,7 +16,7 @@ open class VerifiableCredential(
     var ethCredentialStatus: String?,
     @Json(name = "@context") context: Collection<String>,
     type: Collection<String>,
-    proof: LinkedDataProof?
+    proof: Secp256k1Proof?
 ) : VerifiableDocument(context.toMutableSet(), type.toMutableSet(), proof) {
 
     constructor(
@@ -42,6 +42,7 @@ open class VerifiableCredential(
     }
 
     override fun toJson(): String = jsonAdapter.toJson(this)
+    fun toPrettyJson(): String = jsonAdapter.indent("  ").toJson(this)
 
     @Suppress("UNCHECKED_CAST")
     fun toMap(): Map<String, Any> {

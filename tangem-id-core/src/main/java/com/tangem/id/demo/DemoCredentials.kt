@@ -2,8 +2,10 @@ package com.tangem.id.demo
 
 import android.content.Context
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
+import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.documents.VerifiableCredential.Companion.TANGEM_ETH_CREDENTIAL
+import com.tangem.id.documents.VerifiableDocument
 import com.tangem.id.extensions.calculateSha3v512
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONArray
@@ -140,10 +142,15 @@ enum class CovidStatus {
 
 class VerifiableDemoCredential(
     val verifiableCredential: VerifiableCredential,
-    val decodedCredential: DemoCredential
+    val decodedCredential: DemoCredential,
+    val verified: Boolean? = null
 ) {
     companion object {
-        fun from(verifiableCredential: VerifiableCredential): VerifiableDemoCredential? {
+
+        fun from(
+            verifiableCredential: VerifiableCredential,
+            verified: Boolean? = null
+        ): VerifiableDemoCredential? {
             val demoCredential: DemoCredential? =
                 when {
                     verifiableCredential.type.contains(DemoCredentialFactory.TANGEM_PHOTO_CREDENTIAL) -> {
@@ -171,7 +178,7 @@ class VerifiableDemoCredential(
                         val valid = if (dateValidFrom != null) {
                             dateValidFrom < LocalDate.now()
                         } else {
-                            false
+                            true
                         }
 
                         DemoCredential.AgeOfMajorityCredential(valid)
@@ -191,11 +198,17 @@ class VerifiableDemoCredential(
                 null
             } else {
                 VerifiableDemoCredential(
-                    verifiableCredential = verifiableCredential, decodedCredential = demoCredential
+                    verifiableCredential = verifiableCredential, decodedCredential = demoCredential,
+                    verified = verified
                 )
             }
         }
     }
+}
+
+suspend fun VerifiableDocument.simpleVerify(androidContext: Context): Boolean {
+        val result = this.verify(androidContext)
+        return result is SimpleResult.Success
 }
 
 fun String.toDate(): LocalDate? =
