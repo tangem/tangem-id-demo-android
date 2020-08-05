@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fl_passport"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -152,6 +153,25 @@
             <include
                 android:id="@+id/l_credential_status_passport"
                 layout="@layout/layout_credential_status" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_marginStart="46dp"
+                android:layout_marginTop="34dp"
+                android:layout_marginEnd="46dp"
+                android:layout_marginBottom="16dp"
+                android:id="@+id/btn_passport_json"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:elevation="3dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textAllCaps="false"
+                android:layout_gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:cornerRadius="4dp"
+                android:text="Show JSON"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

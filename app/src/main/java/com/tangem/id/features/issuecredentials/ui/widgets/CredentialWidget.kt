@@ -23,7 +23,7 @@ abstract class CredentialWidget<in T : Credential>(private val context: Context?
 
     fun inflateAndSetup(credential: T, parent: ViewGroup, editable: Boolean = true) {
         inflate(parent)
-        setup(credential)
+        setup(credential, editable)
     }
 }
 

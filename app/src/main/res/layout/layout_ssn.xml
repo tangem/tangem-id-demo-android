@@ -63,6 +63,26 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_ssn_title" />
 
+            <com.google.android.material.button.MaterialButton
+                android:layout_marginStart="46dp"
+                android:layout_marginTop="34dp"
+                android:layout_marginEnd="46dp"
+                android:layout_marginBottom="16dp"
+                android:id="@+id/btn_ssn_json"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:elevation="3dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textAllCaps="false"
+                app:layout_constraintTop_toBottomOf="@id/l_credential_status_ssn"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:cornerRadius="4dp"
+                android:text="Show JSON"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

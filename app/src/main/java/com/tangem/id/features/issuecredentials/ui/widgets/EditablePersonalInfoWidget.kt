@@ -71,6 +71,9 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         fragment.et_name.isEnabled = editable
         fragment.et_surname.isEnabled = editable
         fragment.radio_group_gender.isEnabled = editable
+        fragment.radio_gender_female.isEnabled = editable
+        fragment.radio_gender_male.isEnabled = editable
+        fragment.radio_gender_other.isEnabled = editable
         fragment.et_date.isEnabled = editable
     }
 

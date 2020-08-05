@@ -1,5 +1,6 @@
 package com.tangem.id.features.verifier
 
+import android.app.Dialog
 import android.os.Bundle
 import android.text.Spannable
 import android.view.View
@@ -19,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_issuer.toolbar
 import kotlinx.android.synthetic.main.fragment_verifier.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_covid.*
+import kotlinx.android.synthetic.main.layout_json_dialog.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
@@ -51,6 +53,14 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
 
     override fun newState(state: VerifierState) {
         if (activity == null) return
+
+        if (state.jsonShown != null) {
+            val dialog = Dialog(requireContext())
+            dialog.setOnDismissListener { store.dispatch(VerifierAction.HideJson) }
+            dialog.setContentView(R.layout.layout_json_dialog)
+            dialog.tv_json?.text = state.jsonShown
+            dialog.show()
+        }
 
         if (state.photo == null) {
             layout_photo?.hide()
@@ -105,7 +115,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
                 state.immunityPassport.credential,
                 state.immunityPassport.credentialStatus
             )
-            card_checkbox?.setMargins()
+            card_covid?.setMargins()
         }
     }
 

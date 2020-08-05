@@ -6,7 +6,8 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
-import com.tangem.id.common.redux.navigation.AppScreen
+import com.tangem.id.common.extensions.hide
+import com.tangem.id.common.extensions.show
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsButton
@@ -49,17 +50,15 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         toolbar.setNavigationOnClickListener {
             store.dispatch(NavigationAction.PopBackTo())
         }
-//        ll_root?.setOnClickListener {
-//            it.hideKeyboard()
-//        }
     }
 
     override fun newState(state: IssueCredentialsState) {
         if (activity == null) return
 
         if (state.issueCredentialsCompleted) {
-            NavigationAction.PopBackTo(AppScreen.Home)
-            return
+//            store.dispatch(IssueCredentialsAction.ResetState)
+//            store.dispatch(NavigationAction.PopBackTo(AppScreen.Home))
+//            return
         }
 
         val credentialWidgetFactory =
@@ -77,6 +76,7 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         }
         when (state.button) {
             is IssueCredentialsButton.Sign -> {
+                progress_btn?.hide()
                 btn_filled?.text = getString(R.string.issue_credentials_btn_sign)
                 if (state.isInputDataReady()) {
                     btn_filled?.isEnabled = true
@@ -86,8 +86,14 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
                 } else {
                     btn_filled?.isEnabled = false
                 }
+                if (state.button.progress) {
+                    btn_filled?.text = null
+                    progress_btn?.show()
+                    return
+                }
             }
             is IssueCredentialsButton.WriteCredentials -> {
+                progress_btn?.hide()
                 btn_filled.isEnabled = true
                 btn_filled?.text = getString(R.string.issue_credentials_btn_write)
                 btn_filled?.setOnClickListener {

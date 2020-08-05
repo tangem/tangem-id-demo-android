@@ -2,8 +2,8 @@ package com.tangem.id.common.redux
 
 import android.os.Handler
 import android.os.Looper
-import com.tangem.blockchain.extensions.Result
-import com.tangem.blockchain.extensions.SimpleResult
+import com.tangem.common.CompletionResult
+import com.tangem.id.SimpleResponse
 import com.tangem.id.common.extensions.toByteArray
 import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
@@ -26,52 +26,79 @@ val cardMiddleware: Middleware<AppState> = { dispatch, state ->
         { action ->
             when (action) {
                 is HomeAction.ReadIssuerCard -> {
-                    tangemIdSdk.readIssuerCard { address ->
-                        if (address != null) {
-                            store.dispatch(IssuerAction.AddAddress(address))
-                            store.dispatch(NavigationAction.NavigateTo(AppScreen.Issuer))
-                        } else {
-                            //TODO: handle failure
+                    tangemIdSdk.readIssuerCard { result ->
+                        mainThread.post {
+                            when (result) {
+                                is CompletionResult.Success -> {
+                                    store.dispatch(IssuerAction.AddAddress(result.data))
+                                    store.dispatch(NavigationAction.NavigateTo(AppScreen.Issuer))
+                                }
+                                is CompletionResult.Failure ->
+                                    store.dispatch(HomeAction.ReadIssuerCard.Failure(result.error))
+                            }
                         }
                     }
                 }
                 is HomeAction.ReadCredentialsAsVerifier -> {
-                    tangemIdSdk.readCredentialsAsVerifier { credentials ->
-                        if (credentials != null) {
-                            val verifierCredentials =
-                                credentials.mapNotNull { VerifierCredential.from(it) }
-                            store.dispatch(VerifierAction.CredentialsRead(verifierCredentials))
-                            store.dispatch(NavigationAction.NavigateTo(AppScreen.Verifier))
+                    tangemIdSdk.readCredentialsAsVerifier { result ->
+                        when (result) {
+                            is CompletionResult.Success -> {
+                                val verifierCredentials =
+                                    result.data.mapNotNull { VerifierCredential.from(it) }
+                                mainThread.post {
+                                    store.dispatch(
+                                        VerifierAction.CredentialsRead(
+                                            verifierCredentials
+                                        )
+                                    )
+                                    store.dispatch(NavigationAction.NavigateTo(AppScreen.Verifier))
+                                }
+                            }
+                            is CompletionResult.Failure ->
+                                store.dispatch(
+                                    HomeAction.ReadCredentialsAsVerifier.Failure(result.error)
+                                )
                         }
                     }
                 }
                 is HomeAction.ReadCredentialsAsHolder -> {
                     tangemIdSdk.readCredentialsAsHolder { result ->
-                        when (result) {
-                            is Result.Failure -> store.dispatch(HomeAction.ReadCredentialsAsHolder.Failure)
-                            is Result.Success -> {
-                                val holdersCredentials =
-                                    result.data.credentials.map { Credential.from(it.first.decodedCredential) }
-                                val visibility =
-                                    result.data.credentials.map { AccessLevel.from(it.second) }
-                                store.dispatch(
-                                    HolderAction.CredentialsRead(
-                                        result.data.cardId, holdersCredentials.zip(visibility)
+                        mainThread.post {
+                            when (result) {
+                                is CompletionResult.Failure ->
+                                    store.dispatch(HomeAction.ReadCredentialsAsHolder.Failure(result.error))
+                                is CompletionResult.Success -> {
+                                    val holdersCredentials =
+                                        result.data.credentials.map {
+                                            Credential.from(it.first.decodedCredential)
+                                        }
+                                    val visibility =
+                                        result.data.credentials.map { AccessLevel.from(it.second) }
+
+                                    store.dispatch(
+                                        HolderAction.CredentialsRead(
+                                            result.data.cardId, holdersCredentials.zip(visibility)
+                                        )
                                     )
-                                )
-                                store.dispatch(NavigationAction.NavigateTo(AppScreen.Holder))
+                                    store.dispatch(NavigationAction.NavigateTo(AppScreen.Holder))
+                                }
+
                             }
                         }
 
                     }
                 }
                 is IssuerAction.ReadHoldersCard -> {
-                    tangemIdSdk.getHolderAddress { address ->
-                        if (address != null) {
-                            store.dispatch(IssueCredentialsAction.AddHoldersAddress(address))
-                            store.dispatch(NavigationAction.NavigateTo(AppScreen.IssueCredentials))
-                        } else {
-                            //TODO: handle failure
+                    tangemIdSdk.getHolderAddress { result ->
+                        mainThread.post {
+                            when (result) {
+                                is CompletionResult.Success -> {
+                                    store.dispatch(IssueCredentialsAction.AddHoldersAddress(result.data))
+                                    store.dispatch(NavigationAction.NavigateTo(AppScreen.IssueCredentials))
+                                }
+                                is CompletionResult.Failure ->
+                                    store.dispatch(IssuerAction.ReadHoldersCard.Failure(result.error))
+                            }
                         }
                     }
                 }
@@ -88,17 +115,29 @@ val cardMiddleware: Middleware<AppState> = { dispatch, state ->
                     tangemIdSdk.formCredentialsAndSign(
                         data, store.state.issueCredentialsState.holdersAddress!!
                     ) { result ->
-                        when (result) {
-                            SimpleResult.Success -> store.dispatch(IssueCredentialsAction.Sign.Success)
-                            is SimpleResult.Failure -> store.dispatch(IssueCredentialsAction.Sign.Failure)
+                        mainThread.post {
+                            when (result) {
+                                SimpleResponse.Success -> store.dispatch(IssueCredentialsAction.Sign.Success)
+                                is SimpleResponse.Failure ->
+                                    store.dispatch(IssueCredentialsAction.Sign.Failure(result.error))
+                            }
                         }
                     }
                 }
                 is IssueCredentialsAction.WriteCredentials -> {
                     tangemIdSdk.writeCredentialsAndSend { result ->
-                        when (result) {
-                            SimpleResult.Success -> store.dispatch(IssueCredentialsAction.WriteCredentials.Success)
-                            is SimpleResult.Failure -> store.dispatch(IssueCredentialsAction.WriteCredentials.Failure)
+                        mainThread.post {
+                            when (result) {
+                                SimpleResponse.Success -> {
+                                    store.dispatch(NavigationAction.PopBackTo(AppScreen.Home))
+                                    store.dispatch(
+                                        IssueCredentialsAction.WriteCredentials.Success()
+                                    )
+                                }
+                                is SimpleResponse.Failure -> store.dispatch(
+                                    IssueCredentialsAction.WriteCredentials.Failure(result.error)
+                                )
+                            }
                         }
                     }
                 }
@@ -123,13 +162,50 @@ val cardMiddleware: Middleware<AppState> = { dispatch, state ->
                         ) { result ->
                             mainThread.post {
                                 when (result) {
-                                    SimpleResult.Success -> store.dispatch(HolderAction.SaveChanges.Success)
-                                    is SimpleResult.Failure -> store.dispatch(HolderAction.SaveChanges.Failure)
+                                    SimpleResponse.Success -> store.dispatch(HolderAction.SaveChanges.Success)
+                                    is SimpleResponse.Failure ->
+                                        store.dispatch(HolderAction.SaveChanges.Failure(result.error))
                                 }
                             }
 
                         }
 
+                    }
+                }
+                is HolderAction.ChangePasscodeAction -> {
+                    tangemIdSdk.changePasscode { result ->
+                        mainThread.post {
+                            when (result) {
+                                SimpleResponse.Success ->
+                                    store.dispatch(HolderAction.ChangePasscodeAction.Success)
+                                is SimpleResponse.Failure ->
+                                    store.dispatch(HolderAction.ChangePasscodeAction.Failure(result.error))
+                            }
+                        }
+                    }
+                }
+                is HolderAction.RequestNewCredential -> {
+                    tangemIdSdk.addCovidCredential { result ->
+                        mainThread.post {
+                            when (result) {
+                                is CompletionResult.Success -> {
+                                    val holdersCredentials =
+                                        result.data.map {
+                                            Credential.from(it.first.decodedCredential) to AccessLevel.from(
+                                                it.second
+                                            )
+                                        }
+
+                                    store.dispatch(
+                                        HolderAction.RequestNewCredential.Success(holdersCredentials)
+                                    )
+//                                    store.dispatch(NavigationAction.PopBackTo(AppScreen.Holder))
+                                }
+
+                                is CompletionResult.Failure ->
+                                    store.dispatch(HolderAction.RequestNewCredential.Failure(result.error))
+                            }
+                        }
                     }
                 }
             }

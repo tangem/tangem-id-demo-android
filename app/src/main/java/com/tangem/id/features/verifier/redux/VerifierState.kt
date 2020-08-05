@@ -52,7 +52,8 @@ data class VerifierState(
         VerifierCredential(SecurityNumber("000-00-000"), credentialStatus),
     val ageOfMajority: VerifierCredential<AgeOfMajority>? =
         VerifierCredential(AgeOfMajority(true), credentialStatus),
-    val immunityPassport: VerifierCredential<ImmunityPassport>? = null
+    val immunityPassport: VerifierCredential<ImmunityPassport>? = null,
+    val jsonShown: String? = null
 ) : StateType {
     fun getCredentials() =
         listOfNotNull(photo, passport, securityNumber, ageOfMajority, immunityPassport)
@@ -67,7 +68,13 @@ data class VerifierCredential<T : Credential>(
 
             val issuerAddress = demoCredential.verifiableCredential.issuer
             val issuer = Issuer(issuerAddress, true)
-            val verificationStatus = VerificationStatus.Offline
+            val verificationStatus = if (demoCredential.verified == false)  {
+                VerificationStatus.Invalid
+            } else if (demoCredential.verified == true) {
+                VerificationStatus.Valid
+            } else {
+                VerificationStatus.Offline
+            }
             val status = CredentialStatus(issuer, verificationStatus)
 
             return VerifierCredential(Credential.from(demoCredential.decodedCredential), status)

@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import com.google.android.material.card.MaterialCardView
 import com.tangem.id.R
 import com.tangem.id.common.redux.navigation.AppScreen
@@ -93,8 +94,9 @@ fun FragmentActivity.openFragment(screen: AppScreen, addToBackStack: Boolean = t
     transaction.commit();
 }
 
-fun FragmentActivity.popBackTo(screen: AppScreen?) {
-    this.supportFragmentManager.popBackStack(screen?.name, 0)
+fun FragmentActivity.popBackTo(screen: AppScreen?, inclusive: Boolean = false) {
+    val inclusiveFlag = if (inclusive) POP_BACK_STACK_INCLUSIVE else 0
+    this.supportFragmentManager.popBackStack(screen?.name, inclusiveFlag)
 }
 
 fun FragmentActivity.getPreviousScreen(): AppScreen? {

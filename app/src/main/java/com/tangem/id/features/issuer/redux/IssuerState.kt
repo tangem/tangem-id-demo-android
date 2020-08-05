@@ -11,7 +11,7 @@ sealed class IssuerButton(enabled: Boolean) : Button(enabled) {
 
 
 data class IssuerState(
-    val issuerName: String? = "Ministry of Internal Affairs",
+//    val issuerName: String? = "Ministry of Internal Affairs",
     val issuerAddress: String? = "did:ethr:0x91901762C7d20d2894396c189d74483aFa118f4",
     val issuerButton: IssuerButton = IssuerButton.IssueNewCredentials()
 ) : StateType {

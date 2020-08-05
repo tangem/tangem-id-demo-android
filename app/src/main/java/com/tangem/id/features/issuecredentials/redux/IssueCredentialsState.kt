@@ -5,7 +5,7 @@ import com.tangem.id.common.redux.*
 import org.rekotlin.StateType
 
 sealed class IssueCredentialsButton(enabled: Boolean) : Button(enabled) {
-    class Sign(enabled: Boolean = true) : IssueCredentialsButton(enabled)
+    class Sign(enabled: Boolean = true, val progress: Boolean = false) : IssueCredentialsButton(enabled)
     class WriteCredentials(enabled: Boolean = true) : IssueCredentialsButton(enabled)
 }
 

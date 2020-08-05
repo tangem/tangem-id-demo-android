@@ -5,9 +5,6 @@ import com.tangem.id.common.extensions.toDate
 import com.tangem.id.common.redux.AgeOfMajority
 import com.tangem.id.common.redux.AppState
 import com.tangem.id.common.redux.Photo
-import com.tangem.id.common.redux.navigation.AppScreen
-import com.tangem.id.common.redux.navigation.NavigationAction
-import com.tangem.id.store
 import org.rekotlin.Action
 
 fun issueCredentialsReducer(action: Action, state: AppState): IssueCredentialsState {
@@ -43,17 +40,23 @@ fun issueCredentialsReducer(action: Action, state: AppState): IssueCredentialsSt
                 newState.securityNumber?.copy(number = action.securityNumber)
             newState = newState.copy(securityNumber = securityNumber)
         }
+        is IssueCredentialsAction.Sign -> {
+            newState = newState.copy(
+                editable = false,
+                button = IssueCredentialsButton.Sign(enabled = false, progress = true)
+            )
+        }
         is IssueCredentialsAction.Sign.Success -> {
             newState = newState.copy(
-                editable = false, button = IssueCredentialsButton.WriteCredentials()
+                button = IssueCredentialsButton.WriteCredentials()
             )
         }
         is IssueCredentialsAction.WriteCredentials.Success -> {
             newState = IssueCredentialsState()
-            store.dispatch(NavigationAction.PopBackTo(AppScreen.Home))
         }
         is IssueCredentialsAction.AddHoldersAddress ->
             newState = newState.copy(holdersAddress = action.address)
+        is IssueCredentialsAction.ResetState -> newState = IssueCredentialsState()
     }
     return newState
 }

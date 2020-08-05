@@ -1,6 +1,10 @@
 package com.tangem.id.features.holder.redux
 
+import com.tangem.TangemError
+import com.tangem.id.R
 import com.tangem.id.common.redux.Credential
+import com.tangem.id.common.redux.ErrorAction
+import com.tangem.id.common.redux.NotificationAction
 import org.rekotlin.Action
 
 sealed class HolderAction : Action {
@@ -12,13 +16,28 @@ sealed class HolderAction : Action {
     ) : HolderAction()
 
     object RequestNewCredential : HolderAction() {
-        data class Success(val allCredentials: List<Pair<Credential, AccessLevel>>) : HolderAction()
-        object Failure : HolderAction()
+        data class Success(val allCredentials: List<Pair<Credential, AccessLevel>>) :
+            HolderAction(), NotificationAction {
+            override val messageResource = R.string.holder_screen_notification_request_credential_success
+        }
+        class Failure(override val error: TangemError) : HolderAction(), ErrorAction
     }
 
     object SaveChanges : HolderAction() {
-        object Success : HolderAction()
-        object Failure : HolderAction()
+        object Success : HolderAction(), NotificationAction {
+            override val messageResource = R.string.holder_screen_notification_save_changes_success
+        }
+
+        class Failure(override val error: TangemError) : HolderAction(), ErrorAction
+    }
+
+    object ChangePasscodeAction : HolderAction() {
+        object Success : HolderAction(), NotificationAction {
+            override val messageResource =
+                R.string.holder_screen_notification_change_passcode_success
+        }
+
+        class Failure(override val error: TangemError) : HolderAction(), ErrorAction
     }
 
     data class ChangeCredentialAccessLevel(val credential: Credential) : HolderAction()

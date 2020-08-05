@@ -21,9 +21,9 @@
     <string name="starting_screen_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         Ornare tellus tincidunt nunc convallis id viverra fermentum lacus, morbi. Massa pulvinar erat
         sit eu tellus dolor quis.</string>
-    <string name="starting_screen_btn_issuer">Issuer</string>
-    <string name="starting_screen_btn_holder">Holder</string>
-    <string name="starting_screen_btn_verifier">Verifier</string>
+    <string name="starting_screen_btn_issuer">I’m an issuer</string>
+    <string name="starting_screen_btn_holder">I’m a holder</string>
+    <string name="starting_screen_btn_verifier">I’m a verifier</string>
 
     
     <string name="holder_screen_toolbar">Personal Card</string>
@@ -31,14 +31,21 @@
     <string name="holder_screen_btn_save">Save Changes</string>
     <string name="holder_screen_credentials_title">Credentials</string>
     <string name="holder_screen_menu_change_pin">Change Passcode</string>
+    <string name="holder_screen_notification_request_credential_success">New credential has been added</string>
+    <string name="holder_screen_notification_save_changes_success">Changes have been saved</string>
+    <string name="holder_screen_notification_change_passcode_success">Passcode has been changed</string>
 
     
-    <string name="issuer_screen_toolbar">Issue Credentials</string>
+    <string name="issuer_screen_toolbar">Issuer\'s Details</string>
+    <string name="issuer_screen_title">DID Address of the Issuer</string>
     <string name="issuer_screen_btn_issue">Issue Credentials</string>
 
+    <string name="issue_credentials_screen_toolbar">Issue Credentials</string>
     <string name="issue_credentials_photo_btn_add">Add photo</string>
     <string name="issue_credentials_btn_sign">Sign</string>
     <string name="issue_credentials_btn_write">Write Credentials</string>
+    <string name="issue_credentials_notification_write_success">Credentials have been issued</string>
+    <string name="issue_credentials_notification_sign_success">You have created and signed credentials. Now write them on a holder\'s card</string>
 
 
     <string name="verifier_screen_toolbar">ID Validator</string>

@@ -1,6 +1,7 @@
 package com.tangem.id.features.holder.redux
 
 import com.tangem.id.common.redux.AppState
+import com.tangem.id.tangemIdSdk
 import org.rekotlin.Action
 
 fun holderReducer(action: Action, state: AppState): HolderState {
@@ -45,7 +46,7 @@ fun holderReducer(action: Action, state: AppState): HolderState {
                 credentialsToDelete = listOf()
             )
         }
-        HolderAction.SaveChanges.Failure -> {
+        is HolderAction.SaveChanges.Failure -> {
             newState = newState.copy(
                 editActivated = false,
                 credentials = newState.credentialsOnCard,
@@ -80,10 +81,14 @@ fun holderReducer(action: Action, state: AppState): HolderState {
             newState = newState.copy(detailsOpened = action.credential)
         }
         HolderAction.HideCredentialDetails -> {
-            newState = newState.copy(detailsOpened = null)
+            newState = newState.copy(detailsOpened = null, jsonShown = null)
         }
 
         is HolderAction.ShowJson -> {
+
+            val index = newState.credentialsOnCard.indexOfFirst { it.first == action.credential }
+            val json = tangemIdSdk.showHoldersCredential(index)
+            newState = newState.copy(jsonShown = json)
 
         }
     }
