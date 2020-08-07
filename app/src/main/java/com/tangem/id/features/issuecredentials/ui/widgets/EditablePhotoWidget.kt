@@ -25,10 +25,16 @@ class EditablePhotoWidget(private val fragment: Fragment) :
             fragment.view_photo?.hide()
             fragment.iv_photo?.hide()
         }
-        fragment.btn_add_photo?.setOnClickListener {
-            store.dispatch(
-                NavigationAction.NavigateTo(AppScreen.Camera)
-            )
+        if (editable) {
+            fragment.btn_add_photo?.show()
+            fragment.btn_add_photo?.setOnClickListener {
+                store.dispatch(
+                    NavigationAction.NavigateTo(AppScreen.Camera)
+                )
+            }
+        } else {
+            fragment.btn_add_photo?.hide()
         }
+
     }
 }

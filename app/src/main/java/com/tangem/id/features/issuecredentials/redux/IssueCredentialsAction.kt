@@ -41,4 +41,7 @@ sealed class IssueCredentialsAction : Action {
     }
 
     object ResetState : IssueCredentialsAction()
+
+    object ShowJson : IssueCredentialsAction()
+    object HideJson : IssueCredentialsAction()
 }

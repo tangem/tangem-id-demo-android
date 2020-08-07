@@ -5,21 +5,15 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.widget.Button
+import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.tangem.id.R
-import com.tangem.id.common.extensions.getDrawable
-import com.tangem.id.common.extensions.hide
-import com.tangem.id.common.extensions.setSystemBarTextColor
-import com.tangem.id.common.extensions.show
+import com.tangem.id.common.extensions.*
 import com.tangem.id.common.redux.*
 import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
@@ -31,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_holder.*
 import kotlinx.android.synthetic.main.layout_button.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_covid.*
-import kotlinx.android.synthetic.main.layout_json_dialog.*
+import kotlinx.android.synthetic.main.layout_dialog_json.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
@@ -136,18 +130,20 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
 
     private fun showDetails(state: HolderState) {
         if (state.jsonShown != null) {
-            dialog?.setContentView(R.layout.layout_json_dialog)
+            dialog?.setContentView(R.layout.layout_dialog_json)
             dialog?.tv_json?.text = state.jsonShown
+            dialog?.btn_share_json?.setOnClickListener { context?.shareText(state.jsonShown) }
             return
         }
         dialog = Dialog(requireContext())
         dialog?.setOnDismissListener { store.dispatch(HolderAction.HideCredentialDetails) }
         state.detailsOpened?.let { credential -> fillInCredentialDetails(dialog!!, credential) }
+        dialog?.window?.attributes?.width = WindowManager.LayoutParams.MATCH_PARENT
         dialog?.show()
     }
 
     private fun fillInCredentialDetails(dialog: Dialog, credential: Credential) {
-        var showJsonButton: Button? = null
+        var showJsonButton: MaterialButton? = null
         when (credential) {
             is Passport -> {
                 dialog.setContentView(R.layout.layout_passport)

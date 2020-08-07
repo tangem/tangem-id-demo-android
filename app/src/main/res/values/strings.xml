@@ -11,11 +11,14 @@
     <string name="credential_personal_info_gender_other">Other</string>
     <string name="credential_personal_info_date_of_birth">Date of birth</string>
     <string name="credential_ssn">SSN</string>
+    <string name="credential_ssn_hint" translatable="false">000-00-0000</string>
     <string name="credential_age_of_majority">Age Over 21</string>
     <string name="credential_valid">Valid</string>
     <string name="credential_valid_until">Valid until %s</string>
     <string name="credential_valid_from">Valid from %s</string>
     <string name="credential_covid">Covid 19 Immunity Passport</string>
+    <string name="credential_dialog_share">Share</string>
+    <string name="credential_dialog_hide">Hide</string>
 
 
     <string name="starting_screen_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -34,6 +37,8 @@
     <string name="holder_screen_notification_request_credential_success">New credential has been added</string>
     <string name="holder_screen_notification_save_changes_success">Changes have been saved</string>
     <string name="holder_screen_notification_change_passcode_success">Passcode has been changed</string>
+    <string name="holder_screen_dialog_show_json">Show JSON</string>
+
 
     
     <string name="issuer_screen_toolbar">Issuer\'s Details</string>
@@ -44,8 +49,10 @@
     <string name="issue_credentials_photo_btn_add">Add photo</string>
     <string name="issue_credentials_btn_sign">Sign</string>
     <string name="issue_credentials_btn_write">Write Credentials</string>
+    <string name="issue_credentials_btn_json">Show Credentials JSON</string>
     <string name="issue_credentials_notification_write_success">Credentials have been issued</string>
     <string name="issue_credentials_notification_sign_success">You have created and signed credentials. Now write them on a holder\'s card</string>
+    <string name="issue_credentials_dialog_go_back">Do you want to go back and cancel your input?</string>
 
 
     <string name="verifier_screen_toolbar">ID Validator</string>

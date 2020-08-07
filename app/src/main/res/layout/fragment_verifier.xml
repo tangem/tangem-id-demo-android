@@ -37,16 +37,19 @@
                 android:layout_height="wrap_content" />
 
             <include
+                android:id="@+id/layout_ssn"
                 layout="@layout/layout_ssn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <include
+                android:id="@+id/layout_age_of_majority"
                 layout="@layout/layout_checkbox_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <include
+                android:id="@+id/layout_covid"
                 layout="@layout/layout_covid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -63,6 +66,7 @@
                 android:layout_marginBottom="8dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
+                android:letterSpacing="0"
                 android:text="@string/verifier_screen_btn_json"
                 android:textAllCaps="false"
                 android:textColor="@color/blue"

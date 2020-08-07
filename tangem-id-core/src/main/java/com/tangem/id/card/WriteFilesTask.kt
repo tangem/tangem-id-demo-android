@@ -24,7 +24,7 @@ class WriteFilesTask(
     private val issuerKeys: KeyPair
 ) : CardSessionRunnable<WriteFilesResponse> {
 
-    override val requiresPin2 = false
+    override val requiresPin2 = true
     private val filesIndices = mutableListOf<Int>()
 
     override fun run(

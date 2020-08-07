@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="error_wrong_issuer_card_type">To issue credentials please use Ethereum Wallet card</string>
+    <string name="error_wrong_issuer_card_type">To issue credentials please use Ethereum ID Issuer card</string>
     <string name="error_wrong_holder_card_type">Use ID card</string>
     <string name="error_card_error">Something is wrong with your card</string>
     <string name="error_creating_credentials">Something went wrong while creating and signing credentials</string>
     <string name="error_writing_credentials">Something went wrong while writing credentials on a card</string>
     <string name="error_adding_new_credential">Something went wrong in making new credential</string>
     <string name="error_reading_card">Something went wrong in interaction with a card</string>
-    <string name="error_converting_credential">Unknown credential, cannot be converted</string>
+    <string name="error_converting_credential">Unknown credential</string>
     <string name="error_credential_already_issued">The holder already has this credential</string>
     <string name="error_no_credentials">The card contains no credentials</string>
 
-
+    <string name="sdk_view_delegate_message_holder">"Tap Holder's Card"</string>
+    <string name="sdk_view_delegate_message_issuer">"Tap Issuer's Card"</string>
 
 </resources>

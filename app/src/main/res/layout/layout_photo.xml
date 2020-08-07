@@ -62,25 +62,26 @@
                 app:layout_constraintTop_toBottomOf="@id/iv_photo" />
 
             <com.google.android.material.button.MaterialButton
-                android:layout_marginStart="46dp"
-                android:layout_marginTop="34dp"
-                android:layout_marginEnd="46dp"
-                android:layout_marginBottom="16dp"
                 android:id="@+id/btn_photo_json"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:elevation="3dp"
+                android:layout_height="48dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
+                android:text="@string/holder_screen_dialog_show_json"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
+                android:textColor="@color/blue"
                 android:textSize="16sp"
-                app:cornerRadius="4dp"
-                android:text="Show JSON"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/l_credential_status_photo"
-                android:visibility="gone"/>
+                app:layout_constraintTop_toBottomOf="@id/l_credential_status_photo" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

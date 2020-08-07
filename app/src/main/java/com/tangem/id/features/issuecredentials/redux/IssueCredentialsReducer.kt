@@ -5,6 +5,7 @@ import com.tangem.id.common.extensions.toDate
 import com.tangem.id.common.redux.AgeOfMajority
 import com.tangem.id.common.redux.AppState
 import com.tangem.id.common.redux.Photo
+import com.tangem.id.tangemIdSdk
 import org.rekotlin.Action
 
 fun issueCredentialsReducer(action: Action, state: AppState): IssueCredentialsState {
@@ -56,7 +57,14 @@ fun issueCredentialsReducer(action: Action, state: AppState): IssueCredentialsSt
         }
         is IssueCredentialsAction.AddHoldersAddress ->
             newState = newState.copy(holdersAddress = action.address)
+
+        is IssueCredentialsAction.ShowJson -> newState =
+            newState.copy(jsonShown = tangemIdSdk.showJsonWhileCreating())
+        is IssueCredentialsAction.HideJson -> newState =
+            newState.copy(jsonShown = null)
+
         is IssueCredentialsAction.ResetState -> newState = IssueCredentialsState()
+
     }
     return newState
 }

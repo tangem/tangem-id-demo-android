@@ -1,9 +1,10 @@
 package com.tangem.id.features.issuecredentials.ui.widgets
 
+import android.view.KeyEvent
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
-import com.tangem.id.common.extensions.hideKeyboard
 import com.tangem.id.common.redux.SecurityNumber
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
 import com.tangem.id.features.issuecredentials.ui.textwatchers.SsnTextWatcher
@@ -20,10 +21,17 @@ class EditableSsnWidget(private val fragment: Fragment) :
         credential.number?.let { fragment.et_ssn?.setText(it) }
         fragment.et_ssn.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
-                view.hideKeyboard()
+//                view.hideKeyboard()
                 val number = fragment.et_ssn.text.toString()
                 store.dispatch(IssueCredentialsAction.SaveSecurityNumber(number))
             }
+        }
+        fragment.et_ssn.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                fragment.et_ssn.clearFocus()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false;
         }
         fragment.et_ssn.isEnabled = editable
         fragment.et_ssn.addTextChangedListener(SsnTextWatcher())

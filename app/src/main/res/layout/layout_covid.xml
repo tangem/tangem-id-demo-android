@@ -26,11 +26,11 @@
                 android:lineSpacingExtra="6sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/credential_covid"
                 android:textColor="@color/darkGray6"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="@string/credential_covid" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_covid_description"
@@ -73,25 +73,27 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_covid_description" />
 
             <com.google.android.material.button.MaterialButton
-                android:layout_marginStart="46dp"
-                android:layout_marginTop="34dp"
-                android:layout_marginEnd="46dp"
-                android:layout_marginBottom="16dp"
                 android:id="@+id/btn_covid_json"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:elevation="3dp"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
+                android:text="@string/holder_screen_dialog_show_json"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
+                android:textColor="@color/blue"
                 android:textSize="16sp"
-                app:cornerRadius="4dp"
-                app:layout_constraintTop_toBottomOf="@id/l_credential_status_covid"
-                android:text="Show JSON"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@id/l_credential_status_covid" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

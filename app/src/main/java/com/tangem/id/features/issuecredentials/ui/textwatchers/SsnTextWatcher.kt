@@ -11,7 +11,7 @@ class SsnTextWatcher : TextWatcher {
     }
 
     override fun afterTextChanged(s: Editable?) {
-        if (s?.length ?: 0 > 10 ) s?.delete(10, s.length)
+        if (s?.length ?: 0 > 11 ) s?.delete(11, s.length)
 
         s?.apply {
 
@@ -23,7 +23,7 @@ class SsnTextWatcher : TextWatcher {
                                 ?.let { index -> insert(index, "-") }
                         }
                 else if ((get(lastIndex) == '-' && backspaced)
-                    || (lastIndexOf('-') in listOf(0, 1, 2, 4, 5, 7, 8, 9, 10))
+                    || (lastIndexOf('-') in listOf(0, 1, 2, 4, 5, 7, 8, 9, 10, 11))
                 )
                     delete(length - 1, length)
             }

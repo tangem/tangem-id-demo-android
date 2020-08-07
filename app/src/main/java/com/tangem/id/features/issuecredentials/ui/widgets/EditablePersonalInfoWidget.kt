@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.tangem.id.R
-import com.tangem.id.common.extensions.hideKeyboard
 import com.tangem.id.common.extensions.toDate
 import com.tangem.id.common.extensions.toMillis
 import com.tangem.id.common.redux.Gender
@@ -78,7 +77,7 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
     }
 
     private fun onEditEnded(view: View) {
-        view.hideKeyboard()
+//        view.hideKeyboard()
 
         val name = fragment.et_name?.text?.toString()
         val surname = fragment.et_surname?.text?.toString()

@@ -1,17 +1,14 @@
 package com.tangem.id.features.verifier
 
-import android.app.Dialog
 import android.os.Bundle
 import android.text.Spannable
 import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tangem.id.R
-import com.tangem.id.common.extensions.colorSegment
-import com.tangem.id.common.extensions.hide
-import com.tangem.id.common.extensions.setMargins
-import com.tangem.id.common.extensions.show
+import com.tangem.id.common.extensions.*
 import com.tangem.id.common.redux.*
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.verifier.redux.*
@@ -20,7 +17,6 @@ import kotlinx.android.synthetic.main.fragment_issuer.toolbar
 import kotlinx.android.synthetic.main.fragment_verifier.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_covid.*
-import kotlinx.android.synthetic.main.layout_json_dialog.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
@@ -55,10 +51,14 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         if (activity == null) return
 
         if (state.jsonShown != null) {
-            val dialog = Dialog(requireContext())
-            dialog.setOnDismissListener { store.dispatch(VerifierAction.HideJson) }
-            dialog.setContentView(R.layout.layout_json_dialog)
-            dialog.tv_json?.text = state.jsonShown
+            val builder = MaterialAlertDialogBuilder(context)
+            builder
+                .setMessage(state.jsonShown)
+                .setOnDismissListener { store.dispatch(VerifierAction.HideJson) }
+                .setPositiveButton(getText(R.string.credential_dialog_share))
+                { _, _ -> context?.shareText(state.jsonShown) }
+                .setNegativeButton(getText(R.string.credential_dialog_hide)) { dialog, _ -> dialog.cancel() }
+            val dialog = builder.create()
             dialog.show()
         }
 
@@ -100,6 +100,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         } else {
             fl_checkbox?.show()
             checkbox?.isChecked = state.ageOfMajority.credential.valid
+            checkbox?.isEnabled = false
             setCredentialsStatus(
                 state.ageOfMajority.credential,
                 state.ageOfMajority.credentialStatus
@@ -111,6 +112,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         } else {
             fl_covid?.show()
             checkbox_covid?.isChecked = state.immunityPassport.credential.valid
+            checkbox_covid?.isEnabled = false
             setCredentialsStatus(
                 state.immunityPassport.credential,
                 state.immunityPassport.credentialStatus

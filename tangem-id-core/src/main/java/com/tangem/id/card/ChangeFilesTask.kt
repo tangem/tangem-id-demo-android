@@ -18,7 +18,9 @@ class ChangeFilesTask(
     override val requiresPin2 = true
     private val filesToDelete = TreeSet(indicesToDelete)
     private val filesToChangeVisibility = LinkedList(indicesToChangeVisibility)
-    private val visibilities = LinkedList(currentVisibility.map { it.toggleVisibility() })
+    private val visibilities = LinkedList(
+        currentVisibility.map { it.toggleVisibility() }
+    )
 
     override fun run(
         session: CardSession, callback: (result: CompletionResult<SimpleResponse>) -> Unit

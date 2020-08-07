@@ -21,7 +21,8 @@ import kotlin.coroutines.resume
 
 class DemoCredentialsManager(
     private val issuerWalletManager: EthereumIssuerWalletManager,
-    private val androidContext: Context
+    private val androidContext: Context,
+    private val tangemSdk: TangemSdk
 ) {
     val issuer = "did:ethr:${issuerWalletManager.wallet.address}"
 
@@ -30,7 +31,7 @@ class DemoCredentialsManager(
     private var credentials: List<VerifiableCredential>? = null
 
     suspend fun createDemoCredentials(
-        personData: DemoPersonData, subjectEthereumAddress: String, signer: TransactionSigner
+        personData: DemoPersonData, subjectEthereumAddress: String, initialMessage: Message
     ): Result<List<VerifiableCredential>> {
 
         val credentialFactory = DemoCredentialFactory(
@@ -65,6 +66,7 @@ class DemoCredentialsManager(
 
         val arrayToSign = (approvalTransaction!!.hashes + credentialHashes).toTypedArray()
 
+        val signer = IdSigner(tangemSdk, initialMessage)
         val signatures =
             when (val signerResponse = signer.sign(arrayToSign, issuerWalletManager.cardId)) {
                 is CompletionResult.Success -> signerResponse.data.signature
@@ -101,7 +103,8 @@ class DemoCredentialsManager(
     suspend fun completeWithId(
         credentials: List<VerifiableCredential>,
         tangemSdk: TangemSdk,
-        initialMessage: Message
+        initialMessage: Message,
+        holdersCardId: String
     ): SimpleResult {
 
         if (approvalTransaction == null || transactionSignature == null) return SimpleResult.Failure(
@@ -118,7 +121,8 @@ class DemoCredentialsManager(
                     cborCredentials,
                     issuer().dataKeyPair
                 ),
-                initialMessage = initialMessage
+                initialMessage = initialMessage,
+                cardId = holdersCardId
             ) { result ->
                 when (result) {
                     is CompletionResult.Failure -> if (continuation.isActive) {
@@ -130,13 +134,15 @@ class DemoCredentialsManager(
                 }
             }
         }
-        return when (result) {
-            SimpleResult.Success -> issuerWalletManager.sendSignedTransaction(
-                approvalTransaction!!,
-                transactionSignature!!
-            )
-            is SimpleResult.Failure -> result
-        }
+        //TODO: enable when sending transactions will be needed
+//        return when (result) {
+//            SimpleResult.Success -> issuerWalletManager.sendSignedTransaction(
+//                approvalTransaction!!,
+//                transactionSignature!!
+//            )
+//            is SimpleResult.Failure -> result
+//        }
+        return result
     }
 
     companion object {
@@ -144,8 +150,12 @@ class DemoCredentialsManager(
     }
 }
 
-class IdSigner(private val tangemSdk: TangemSdk, private val initialMessage: Message) : TransactionSigner {
-    override suspend fun sign(hashes: Array<ByteArray>, cardId: String): CompletionResult<SignResponse> =
+class IdSigner(private val tangemSdk: TangemSdk, private val initialMessage: Message) :
+    TransactionSigner {
+    override suspend fun sign(
+        hashes: Array<ByteArray>,
+        cardId: String
+    ): CompletionResult<SignResponse> =
         suspendCancellableCoroutine { continuation ->
             tangemSdk.sign(hashes, cardId, initialMessage = initialMessage) { result ->
                 if (continuation.isActive) continuation.resume(result)

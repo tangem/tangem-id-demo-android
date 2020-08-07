@@ -37,7 +37,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="56dp"
         android:textColor="@color/darkGray6"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:textAlignment="center"
         android:layout_marginStart="46dp"
         android:layout_marginEnd="46dp"
@@ -56,6 +56,7 @@
         android:text="@string/starting_screen_btn_issuer"
         android:textSize="16sp"
         android:textAllCaps="false"
+        android:letterSpacing="0"
         android:textColor="@android:color/white"
         android:elevation="3dp"
         app:cornerRadius="4dp" />
@@ -74,6 +75,7 @@
         android:textAllCaps="false"
         android:textSize="16sp"
         android:elevation="3dp"
+        android:letterSpacing="0"
         android:textColor="@android:color/white"
         app:cornerRadius="4dp" />
 
@@ -90,6 +92,7 @@
         android:textColor="@color/darkGray6"
         android:text="@string/starting_screen_btn_holder"
         android:textAllCaps="false"
+        android:letterSpacing="0"
         app:cornerRadius="4dp" />
 
 

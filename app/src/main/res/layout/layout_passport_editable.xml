@@ -36,7 +36,6 @@
 
 
             <com.google.android.material.textfield.TextInputLayout
-                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/til_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,6 +44,8 @@
                 android:layout_marginEnd="12dp"
                 android:gravity="center"
                 android:hint="@string/credential_personal_info_name"
+                android:importantForAutofill="noExcludeDescendants"
+                android:nextFocusForward="@+id/til_surname"
                 android:textColorHint="@color/darkGray1"
                 app:boxStrokeColor="@color/text_input_underline_color">
 
@@ -60,15 +61,17 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/til_surname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:layout_gravity="center"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp"
                 android:gravity="center"
                 android:hint="@string/credential_personal_info_surname"
+                android:importantForAutofill="noExcludeDescendants"
+                android:nextFocusForward="@+id/et_date"
                 android:textColorHint="@color/darkGray1"
                 app:boxStrokeColor="@color/text_input_underline_color">
 
@@ -129,6 +132,8 @@
                     android:layout_marginBottom="16dp"
                     android:gravity="center"
                     android:hint="@string/credential_personal_info_date_of_birth"
+
+                    android:nextFocusForward="@+id/et_ssn"
                     android:textColorHint="@color/darkGray1"
                     app:boxStrokeColor="@color/text_input_underline_color">
 
@@ -147,15 +152,15 @@
                     android:id="@+id/iv_date_picker"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:paddingEnd="26dp"
-                    android:paddingStart="26dp"
+                    android:layout_gravity="end|center_vertical"
                     android:layout_marginBottom="16dp"
-                    android:src="@drawable/ic_calendar"
                     android:backgroundTint="@android:color/white"
-                    android:layout_gravity="end|center_vertical"/>
-                
+                    android:paddingStart="26dp"
+                    android:paddingEnd="26dp"
+                    android:src="@drawable/ic_calendar" />
+
             </FrameLayout>
-           
+
 
         </LinearLayout>
 

@@ -1,10 +1,13 @@
 package com.tangem.id
 
 import androidx.activity.ComponentActivity
+import com.example.tangem_id_core.R
 import com.tangem.*
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
+import com.tangem.blockchain.common.Blockchain
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
+import com.tangem.commands.Card
 import com.tangem.commands.Product
 import com.tangem.commands.file.FileSettings
 import com.tangem.common.CompletionResult
@@ -38,18 +41,24 @@ class TangemIdSdk(val activity: ComponentActivity) {
 
     private val config = Config(
         cardFilter = CardFilter(EnumSet.allOf(CardType::class.java)),
-        savePin2InStaticField = true
+        savePin1InStaticField = false
     )
     private val tangemSdk = TangemSdk.init(activity, config)
 
     private var issuerWallet: EthereumIssuerWalletManager? = null
     private var credentialsManager: DemoCredentialsManager? = null
     private var holderAddress: String? = null
+    private var holderCardId: String? = null
 
     private var holderCredentials: List<Pair<VerifiableDemoCredential, FileSettings>>? = null
     private var verifierCredentials: List<VerifiableDemoCredential>? = null
 
     private var credentials: List<VerifiableCredential>? = null
+
+    private val tapHolderCardMessage =
+        Message(activity.getString(R.string.sdk_view_delegate_message_holder))
+    private val tapIssuerCardMessage =
+        Message(activity.getString(R.string.sdk_view_delegate_message_issuer))
 
     private fun handleError(throwable: Throwable) {
         val sw = StringWriter()
@@ -60,24 +69,21 @@ class TangemIdSdk(val activity: ComponentActivity) {
 
     fun readIssuerCard(callback: (CompletionResult<String>) -> Unit) {
         tangemSdk.scanCard(
-            initialMessage = Message("Tap Issuer's Card")
+            initialMessage = tapIssuerCardMessage
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
                     callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
                 is CompletionResult.Success -> {
-                    if ((result.data.cardData?.productMask?.contains(Product.Note) != true &&
-                                result.data.cardData?.productMask?.contains(Product.IdIssuer) != true)
-                        || result.data.cardData?.productMask?.contains(Product.IdCard) == true
+                    if (result.data.cardData?.productMask?.contains(Product.IdIssuer) != true
+                        || !isValidCard(result.data)
                     ) {
                         callback(CompletionResult.Failure(TangemIdError.WrongIssuerCardType(activity)))
                         return@scanCard
                     }
+
                     issuerWallet = EthereumIssuerWalletManager(result.data)
-                    credentialsManager = DemoCredentialsManager(
-                        issuerWallet!!,
-                        activity
-                    )
+                    credentialsManager = DemoCredentialsManager(issuerWallet!!, activity, tangemSdk)
                     callback(CompletionResult.Success(issuerWallet!!.wallet.address))
                 }
             }
@@ -86,10 +92,15 @@ class TangemIdSdk(val activity: ComponentActivity) {
 
     }
 
+    private fun isValidCard(card: Card): Boolean {
+        return card.walletPublicKey != null
+                && card.cardData?.blockchainName == Blockchain.Ethereum.id
+    }
+
 
     fun getHolderAddress(callback: (CompletionResult<String>) -> Unit) {
         tangemSdk.scanCard(
-            initialMessage = Message("Tap Holder's Card")
+            initialMessage = tapHolderCardMessage
         ) { result ->
             when (result) {
                 is CompletionResult.Failure -> callback(
@@ -98,10 +109,13 @@ class TangemIdSdk(val activity: ComponentActivity) {
                     )
                 )
                 is CompletionResult.Success -> {
-                    if (result.data.cardData?.productMask?.contains(Product.IdCard) != true) {
+                    if (result.data.cardData?.productMask?.contains(Product.IdCard) != true
+                        || result.data.walletPublicKey == null
+                    ) {
                         callback(CompletionResult.Failure(TangemIdError.WrongHolderCardType(activity)))
                         return@scanCard
                     }
+                    holderCardId = result.data.cardId
                     holderAddress =
                         EthereumAddressService().makeAddress(result.data.walletPublicKey!!)
                     if (holderAddress != null) {
@@ -117,7 +131,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
     fun readCredentialsAsHolder(callback: (CompletionResult<HolderData>) -> Unit) {
         tangemSdk.startSessionWithRunnable(
             ReadFilesTask(true),
-            initialMessage = Message("Tap Holder's Card")
+            initialMessage = tapHolderCardMessage
         ) { result ->
             when (result) {
                 is CompletionResult.Failure -> {
@@ -181,6 +195,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
                             .mapNotNull {
                                 VerifiableDemoCredential.from(
                                     it
+//                                    ,
 //                                    it.simpleVerify(activity)
                                 )
                             }
@@ -197,9 +212,8 @@ class TangemIdSdk(val activity: ComponentActivity) {
         callback: (SimpleResponse) -> Unit
     ) {
         scope.launch {
-            val result = credentialsManager!!.createDemoCredentials(
-                personData, holdersAddress, IdSigner(tangemSdk, Message("Tap Issuer's Card"))
-            )
+            val result = credentialsManager!!
+                .createDemoCredentials(personData, holdersAddress, tapIssuerCardMessage)
             withContext(Dispatchers.Main) {
                 when (result) {
                     is Result.Success -> {
@@ -218,7 +232,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
     fun writeCredentialsAndSend(callback: (SimpleResponse) -> Unit) {
         scope.launch {
             val result = credentialsManager!!.completeWithId(
-                credentials!!, tangemSdk, Message("Tap Holder's Card")
+                credentials!!, tangemSdk, tapHolderCardMessage, holderCardId!!
             )
             withContext(Dispatchers.Main) {
                 when (result) {
@@ -236,13 +250,13 @@ class TangemIdSdk(val activity: ComponentActivity) {
         indicesToDelete: List<Int>, indicesToChangeVisibility: List<Int>,
         callback: (SimpleResponse) -> Unit
     ) {
-        val task = ChangeFilesTask(
-            indicesToDelete, indicesToChangeVisibility,
-            holderCredentials!!.unzip().second
-        )
+        val visibilities = holderCredentials!!
+            .map { it.second }
+            .filterIndexed { index, _ -> indicesToChangeVisibility.contains(index) }
+        val task = ChangeFilesTask(indicesToDelete, indicesToChangeVisibility, visibilities)
 
         tangemSdk.startSessionWithRunnable(
-            task, initialMessage = Message("Tap Holder's Card")
+            task, initialMessage = tapHolderCardMessage
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
@@ -296,7 +310,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
                     val encoded = JsonLdCborEncoder.encode(covidResult.data.toMap())
                     tangemSdk.writeFileDataTask(
                         data = encoded, issuerKeys = issuer().dataKeyPair,
-                        initialMessage = Message("Tap Holder's Card")
+                        initialMessage = tapHolderCardMessage
                     ) { result ->
                         when (result) {
                             is CompletionResult.Failure ->
@@ -328,7 +342,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
     }
 
     fun changePasscode(callback: (SimpleResponse) -> Unit) {
-        tangemSdk.changePin2(initialMessage = Message("Tap Holder's Card")) { result ->
+        tangemSdk.changePin2(initialMessage = tapHolderCardMessage) { result ->
             when (result) {
                 is CompletionResult.Failure ->
                     callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))

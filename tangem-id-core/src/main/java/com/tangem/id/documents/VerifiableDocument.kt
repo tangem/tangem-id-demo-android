@@ -7,9 +7,6 @@ import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.extensions.calculateSha256
 import com.tangem.id.proof.LinkedDataProof
 import com.tangem.id.proof.Secp256k1Proof
-import com.tangem.id.utils.normalizeJsonLd
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -51,64 +48,52 @@ abstract class VerifiableDocument(
 
         Log.i("TangemCredential", this.toJson())
 
-        return try {
-            coroutineScope<Result<ByteArray>> {
-                val documentNormalizationDeferred =
-                    retry {
-                        async {
-                            normalizeJsonLd(
-                                proofOptions,
-                                androidContext
-                            )
-                        }
-                    }
+        val documentHash = document.toString().calculateSha256()
+        val proofOptionsHash = proofOptions.toString().calculateSha256()
+        return Result.Success(proofOptionsHash + documentHash)
 
-                val proofOptionsNormalizationDeferred =
-                    retry {
-                        async {
-                            normalizeJsonLd(
-                                proofOptions,
-                                androidContext
-                            )
-                        }
-                    }
 
-                val documentNormalizationResult = documentNormalizationDeferred.await()
-                val proofOptionsNormalizationResult = proofOptionsNormalizationDeferred.await()
+//        return try {
+//            coroutineScope<Result<ByteArray>> {
+//                val documentNormalizationDeferred =
+//                    async {
+//                        normalizeJsonLd(
+//                            proofOptions,
+//                            androidContext
+//                        )
+//                    }
+//
+//
+//                val proofOptionsNormalizationDeferred =
+//                    async {
+//                        normalizeJsonLd(
+//                            proofOptions,
+//                            androidContext
+//                        )
+//                    }
+//
+//                val documentNormalizationResult = documentNormalizationDeferred.await()
+//                val proofOptionsNormalizationResult = proofOptionsNormalizationDeferred.await()
+//
+//                val normalizedDocument = when (documentNormalizationResult) {
+//                    is Result.Success -> documentNormalizationResult.data
+//                    is Result.Failure -> return@coroutineScope documentNormalizationResult
+//                }
+//                val normalizedProofOptions = when (proofOptionsNormalizationResult) {
+//                    is Result.Success -> proofOptionsNormalizationResult.data
+//                    is Result.Failure -> return@coroutineScope proofOptionsNormalizationResult
+//                }
+//                val documentHash = normalizedDocument.toByteArray().calculateSha256()
+//                val proofOptionsHash = normalizedProofOptions.toByteArray().calculateSha256()
 
-                val normalizedDocument = when (documentNormalizationResult) {
-                    is Result.Success -> documentNormalizationResult.data
-                    is Result.Failure -> return@coroutineScope documentNormalizationResult
-                }
-                val normalizedProofOptions = when (proofOptionsNormalizationResult) {
-                    is Result.Success -> proofOptionsNormalizationResult.data
-                    is Result.Failure -> return@coroutineScope proofOptionsNormalizationResult
-                }
-                val documentHash = normalizedDocument.toByteArray().calculateSha256()
-                val proofOptionsHash = normalizedProofOptions.toByteArray().calculateSha256()
-
-                Result.Success(proofOptionsHash + documentHash)
-            }
-        } catch (exception: Exception) {
-            Result.Failure(exception)
-        }
+//                 Result.Success(proofOptionsHash + documentHash)
+//            }
+//        } catch (exception: Exception) {
+//            Result.Failure(exception)
+//        }
     }
 
     companion object {
         const val DEFAULT_CONTEXT = "https://www.w3.org/2018/credentials/v1"
     }
-}
-
-suspend fun <T> retry(
-    times: Int = 5,
-    block: suspend () -> T
-): T {
-    repeat(times - 1) {
-        try {
-            return block()
-        } catch (e: Exception) {
-            e.localizedMessage
-        }
-    }
-    return block() // last attempt
 }

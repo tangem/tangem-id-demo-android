@@ -85,7 +85,7 @@ data class Passport(
 }
 
 data class SecurityNumber(val number: String? = null) : Credential {
-    override fun isDataPresent(): Boolean = number != null
+    override fun isDataPresent(): Boolean = !number.isNullOrBlank() && number.length == 11
 }
 
 data class AgeOfMajority(val valid: Boolean = false) : Credential {
