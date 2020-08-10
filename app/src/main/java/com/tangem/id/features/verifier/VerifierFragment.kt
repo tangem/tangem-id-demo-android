@@ -85,8 +85,9 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         }
 
         if (state.securityNumber == null) {
-            fl_ssn?.hide()
+            layout_ssn?.hide()
         } else {
+            layout_ssn?.show()
             tv_ssn?.text = state.securityNumber.credential.number
             setCredentialsStatus(
                 state.securityNumber.credential,
@@ -96,9 +97,9 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         }
 
         if (state.ageOfMajority == null) {
-            fl_checkbox?.hide()
+            layout_age_of_majority?.hide()
         } else {
-            fl_checkbox?.show()
+            layout_age_of_majority?.show()
             checkbox?.isChecked = state.ageOfMajority.credential.valid
             checkbox?.isEnabled = false
             setCredentialsStatus(
@@ -108,9 +109,9 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
             card_checkbox?.setMargins()
         }
         if (state.immunityPassport == null) {
-            fl_covid?.hide()
+            layout_covid?.hide()
         } else {
-            fl_covid?.show()
+            layout_covid?.show()
             checkbox_covid?.isChecked = state.immunityPassport.credential.valid
             checkbox_covid?.isEnabled = false
             setCredentialsStatus(

@@ -12,7 +12,7 @@
     <string name="error_credential_already_issued">The holder already has this credential</string>
     <string name="error_no_credentials">The card contains no credentials</string>
 
-    <string name="sdk_view_delegate_message_holder">"Tap Holder's Card"</string>
-    <string name="sdk_view_delegate_message_issuer">"Tap Issuer's Card"</string>
+    <string name="sdk_view_delegate_message_holder">Tap Holder\'s Card</string>
+    <string name="sdk_view_delegate_message_issuer">Tap Issuer\'s Card</string>
 
 </resources>

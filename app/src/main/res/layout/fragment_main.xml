@@ -34,14 +34,14 @@
         android:id="@+id/tv_credential_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="80dp"
         android:layout_marginTop="56dp"
         android:textColor="@color/darkGray6"
         android:textSize="13sp"
         android:textAlignment="center"
         android:layout_marginStart="46dp"
         android:layout_marginEnd="46dp"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare tellus tincidunt nunc convallis id viverra fermentum lacus, morbi. Massa pulvinar erat sit eu tellus dolor quis." />
+        android:text="@string/starting_screen_description" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_issuer"

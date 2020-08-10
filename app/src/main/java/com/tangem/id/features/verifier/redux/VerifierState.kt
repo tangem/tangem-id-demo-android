@@ -73,7 +73,7 @@ data class VerifierCredential<T : Credential>(
             } else if (demoCredential.verified == true) {
                 VerificationStatus.Valid
             } else {
-                VerificationStatus.Offline
+                VerificationStatus.Valid
             }
             val status = CredentialStatus(issuer, verificationStatus)
 

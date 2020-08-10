@@ -10,6 +10,7 @@
     <string name="credential_personal_info_gender_female">Female</string>
     <string name="credential_personal_info_gender_other">Other</string>
     <string name="credential_personal_info_date_of_birth">Date of birth</string>
+
     <string name="credential_ssn">SSN</string>
     <string name="credential_ssn_hint" translatable="false">000-00-0000</string>
     <string name="credential_age_of_majority">Age Over 21</string>
@@ -20,15 +21,12 @@
     <string name="credential_dialog_share">Share</string>
     <string name="credential_dialog_hide">Hide</string>
 
+    <string name="starting_screen_description">This is a demo application for decentralized identity.
+        To start using it, get the ID Kit on tangem.com.</string>
+    <string name="starting_screen_btn_issuer">I\'m an issuer</string>
+    <string name="starting_screen_btn_holder">I\'m a holder</string>
+    <string name="starting_screen_btn_verifier">I\'m a verifier</string>
 
-    <string name="starting_screen_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        Ornare tellus tincidunt nunc convallis id viverra fermentum lacus, morbi. Massa pulvinar erat
-        sit eu tellus dolor quis.</string>
-    <string name="starting_screen_btn_issuer">I’m an issuer</string>
-    <string name="starting_screen_btn_holder">I’m a holder</string>
-    <string name="starting_screen_btn_verifier">I’m a verifier</string>
-
-    
     <string name="holder_screen_toolbar">Personal Card</string>
     <string name="holder_screen_btn_request">Request New Credential</string>
     <string name="holder_screen_btn_save">Save Changes</string>
