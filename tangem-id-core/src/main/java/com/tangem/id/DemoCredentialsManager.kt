@@ -3,6 +3,7 @@ package com.tangem.id
 import android.content.Context
 import com.tangem.Message
 import com.tangem.TangemSdk
+import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.TransactionToSign
 import com.tangem.blockchain.common.TransactionSigner
 import com.tangem.blockchain.extensions.Result
@@ -70,12 +71,18 @@ class DemoCredentialsManager(
         val signatures =
             when (val signerResponse = signer.sign(arrayToSign, issuerWalletManager.cardId)) {
                 is CompletionResult.Success -> signerResponse.data.signature
-                is CompletionResult.Failure -> return Result.Failure(
-                    Exception(
-                        "TangemError: code: ${signerResponse.error.code}, " +
-                                "message: ${signerResponse.error.customMessage}"
-                    )
-                )
+                is CompletionResult.Failure -> {
+                    return if (signerResponse.error is TangemSdkError.UserCancelled) {
+                        Result.Failure(TangemIdError.UserCancelled(androidContext))
+                    } else {
+                        Result.Failure(
+                            Exception(
+                                "TangemError: code: ${signerResponse.error.code}, " +
+                                        "message: ${signerResponse.error.customMessage}"
+                            )
+                        )
+                    }
+                }
             }
         transactionSignature = signatures.sliceArray(0 until SIGNATURE_SIZE)
 

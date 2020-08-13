@@ -1,8 +1,8 @@
 package com.tangem.id.features.holder.redux
 
 import com.tangem.commands.file.FileSettings
-import com.tangem.id.common.redux.Button
-import com.tangem.id.common.redux.Credential
+import com.tangem.id.common.entities.Button
+import com.tangem.id.common.entities.Credential
 import org.rekotlin.StateType
 
 enum class AccessLevel {

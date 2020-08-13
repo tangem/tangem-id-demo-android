@@ -6,12 +6,12 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.tangem.id.R
+import com.tangem.id.common.entities.Gender
+import com.tangem.id.common.entities.Passport
 import com.tangem.id.common.extensions.toDate
 import com.tangem.id.common.extensions.toMillis
-import com.tangem.id.common.redux.Gender
-import com.tangem.id.common.redux.Passport
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
-import com.tangem.id.features.issuecredentials.ui.textwatchers.DateWatcher
+import com.tangem.id.features.issuecredentials.ui.textwatchers.DateFormattingTextWatcher
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.layout_passport_editable.*
 import java.time.Instant
@@ -57,7 +57,7 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
                 launchDatePicker()
             }
 
-            fragment.et_date.addTextChangedListener(DateWatcher())
+            fragment.et_date.addTextChangedListener(DateFormattingTextWatcher())
 
             if (credential.isDateValid() == false) {
                 fragment.til_date.error = "Date format is MM/dd/yyyy"
@@ -85,7 +85,7 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
             fragment.radio_group_gender?.checkedRadioButtonId, fragment
         )
         val date = fragment.et_date?.text?.toString()
-        store.dispatch(IssueCredentialsAction.SavePersonalInfo(name, surname, gender, date))
+        store.dispatch(IssueCredentialsAction.SaveInput(Passport(name, surname, gender, date)))
     }
 
     private fun Gender.toRadioButtonId(fragment: Fragment): Int {
@@ -116,7 +116,7 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         picker.addOnPositiveButtonClickListener { time ->
             val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault())
             val dateString = date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-            store.dispatch(IssueCredentialsAction.SavePersonalInfo(null, null, null, dateString))
+            store.dispatch(IssueCredentialsAction.SaveInput(Passport(null, null, null, dateString)))
         }
     }
 

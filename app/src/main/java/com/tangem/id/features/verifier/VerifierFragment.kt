@@ -8,8 +8,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tangem.id.R
+import com.tangem.id.common.entities.*
 import com.tangem.id.common.extensions.*
-import com.tangem.id.common.redux.*
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.verifier.redux.*
 import com.tangem.id.store

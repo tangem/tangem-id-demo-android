@@ -34,11 +34,23 @@ fun String.toQrCode(): Bitmap {
 }
 
 fun String.toDate(): LocalDate? =
-    try {
-        LocalDate.parse(this, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-    } catch (exception: Exception) {
-        null
+    if (this.contains("/")) {
+        try {
+            LocalDate.parse(this, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+        } catch (exception: Exception) {
+            null
+        }
+    } else {
+        try {
+            val builder = StringBuilder(this)
+            builder.insert(2, "/")
+            builder.insert(5, "/")
+            LocalDate.parse(builder.toString(), DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+        } catch (exception: Exception) {
+            null
+        }
     }
+
 
 fun LocalDate.toMillis(): Long {
     return this.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()

@@ -3,9 +3,9 @@ package com.tangem.id.features.issuecredentials.ui.widgets
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
+import com.tangem.id.common.entities.AgeOfMajority
 import com.tangem.id.common.extensions.hide
 import com.tangem.id.common.extensions.setMargins
-import com.tangem.id.common.redux.AgeOfMajority
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 
 class EditableAgeOfMajorityWidget(private val fragment: Fragment) :

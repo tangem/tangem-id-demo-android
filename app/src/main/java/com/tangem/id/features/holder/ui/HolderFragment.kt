@@ -1,9 +1,11 @@
 package com.tangem.id.features.holder.ui
 
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -11,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.tangem.id.R
+import com.tangem.id.common.entities.*
 import com.tangem.id.common.extensions.*
-import com.tangem.id.common.redux.*
 import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.holder.redux.HolderAction
@@ -188,32 +190,29 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
         showJsonButton?.setOnClickListener { store.dispatch(HolderAction.ShowJson(credential)) }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.change_passcode_menu -> {
+                store.dispatch(HolderAction.ChangePasscodeAction)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
-//    TODO: Uncomment when PINs are fixed
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.change_passcode_menu -> {
-//                store.dispatch(HolderAction.ChangePasscodeAction)
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
-
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.holder, menu)
-//        for (i in 0 until menu.size()) {
-//            val item = menu.getItem(i)
-//            val spanString = SpannableString(menu.getItem(i).title.toString())
-//            spanString.setSpan(
-//                ForegroundColorSpan(Color.WHITE),
-//                0,
-//                spanString.length,
-//                0
-//            ) //fix the color to white
-//            item.setTitle(spanString)
-//        }
-//    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.holder, menu)
+        for (i in 0 until menu.size()) {
+            val item = menu.getItem(i)
+            val spanString = SpannableString(menu.getItem(i).title.toString())
+            spanString.setSpan(
+                ForegroundColorSpan(Color.WHITE),
+                0,
+                spanString.length,
+                0
+            ) //fix the color to white
+            item.setTitle(spanString)
+        }
+    }
 
 }

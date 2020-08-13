@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tangem.id.R
+import com.tangem.id.common.entities.*
 import com.tangem.id.common.extensions.show
-import com.tangem.id.common.redux.*
 import com.tangem.id.features.holder.redux.AccessLevel
 import com.tangem.id.features.holder.redux.HolderAction
 import kotlinx.android.synthetic.main.layout_holder_credential.view.*

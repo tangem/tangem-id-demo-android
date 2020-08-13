@@ -68,5 +68,13 @@ sealed class TangemIdError(context: Context) : TangemError, Throwable() {
         override var customMessage = context.getString(messageResource)
     }
 
+    class UserCancelled(context: Context) : TangemIdError(context) {
+        override val code = 0
+        override val messageResource: Int = R.string.error_user_cancelled
+        override var customMessage = context.getString(messageResource)
+    }
+
+
+
 
 }
