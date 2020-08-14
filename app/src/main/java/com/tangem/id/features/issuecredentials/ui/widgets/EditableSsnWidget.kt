@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
-import com.tangem.id.common.redux.SecurityNumber
+import com.tangem.id.common.entities.SecurityNumber
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
-import com.tangem.id.features.issuecredentials.ui.textwatchers.SsnTextWatcher
+import com.tangem.id.features.issuecredentials.ui.textwatchers.SsnFormattingTextWatcher
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.layout_ssn_editable.*
 
@@ -23,7 +23,7 @@ class EditableSsnWidget(private val fragment: Fragment) :
             if (!hasFocus) {
 //                view.hideKeyboard()
                 val number = fragment.et_ssn.text.toString()
-                store.dispatch(IssueCredentialsAction.SaveSecurityNumber(number))
+                store.dispatch(IssueCredentialsAction.SaveInput(ssn = number))
             }
         }
         fragment.et_ssn.setOnEditorActionListener { v, actionId, event ->
@@ -34,7 +34,7 @@ class EditableSsnWidget(private val fragment: Fragment) :
             return@setOnEditorActionListener false;
         }
         fragment.et_ssn.isEnabled = editable
-        fragment.et_ssn.addTextChangedListener(SsnTextWatcher())
+        fragment.et_ssn.addTextChangedListener(SsnFormattingTextWatcher())
 //        val listener = MaskedTextChangedListener("[000]-[00]-[000]", fragment.et_ssn)
 
 //        fragment.et_ssn.addTextChangedListener(listener)

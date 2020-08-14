@@ -2,7 +2,7 @@ package com.tangem.id.features.holder.redux
 
 import com.tangem.TangemError
 import com.tangem.id.R
-import com.tangem.id.common.redux.Credential
+import com.tangem.id.common.entities.Credential
 import com.tangem.id.common.redux.ErrorAction
 import com.tangem.id.common.redux.NotificationAction
 import org.rekotlin.Action

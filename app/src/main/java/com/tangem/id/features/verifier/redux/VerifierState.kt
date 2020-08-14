@@ -1,7 +1,7 @@
 package com.tangem.id.features.verifier.redux
 
 import com.tangem.id.R
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.entities.*
 import com.tangem.id.demo.VerifiableDemoCredential
 import org.rekotlin.StateType
 

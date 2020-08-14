@@ -50,6 +50,7 @@
     <string name="issue_credentials_btn_json">Show Credentials JSON</string>
     <string name="issue_credentials_notification_write_success">Credentials have been issued</string>
     <string name="issue_credentials_notification_sign_success">You have created and signed credentials. Now write them on a holder\'s card</string>
+    <string name="issue_credentials_notification_no_camera_permission">You must grant camera permission to take photo</string>
     <string name="issue_credentials_dialog_go_back">Do you want to go back and cancel your input?</string>
 
 

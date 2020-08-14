@@ -71,7 +71,7 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
     // Camera
-    implementation 'com.otaliastudios:cameraview:2.6.1'
+    implementation 'com.otaliastudios:cameraview:2.6.3'
 
     implementation 'com.redmadrobot:input-mask-android:6.0.0'
 
@@ -81,4 +81,4 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 }
-apply from: new File(rootProject.projectDir, '.liquidcore/liquidcore.build.gradle')
+//apply from: new File(rootProject.projectDir, '.liquidcore/liquidcore.build.gradle')

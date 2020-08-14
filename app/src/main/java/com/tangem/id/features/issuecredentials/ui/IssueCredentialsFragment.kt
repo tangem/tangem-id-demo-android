@@ -10,11 +10,14 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.tangem.id.R
+import com.tangem.id.common.entities.Passport
 import com.tangem.id.common.extensions.hide
 import com.tangem.id.common.extensions.hideKeyboard
 import com.tangem.id.common.extensions.shareText
 import com.tangem.id.common.extensions.show
+import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
+import com.tangem.id.common.utils.CameraPermissionManager
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsButton
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsState
@@ -22,7 +25,9 @@ import com.tangem.id.features.issuecredentials.ui.widgets.CredentialWidgetFactor
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.fragment_issue_credentials.*
 import kotlinx.android.synthetic.main.layout_button.*
+import kotlinx.android.synthetic.main.layout_passport_editable.*
 import kotlinx.android.synthetic.main.layout_show_json_button.*
+import kotlinx.android.synthetic.main.layout_ssn_editable.*
 import org.rekotlin.StoreSubscriber
 
 
@@ -39,13 +44,22 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
     }
 
     private fun handleExit() {
-        if (store.state.issueCredentialsState == IssueCredentialsState()
-            || !store.state.issueCredentialsState.editable
-        ) {
+        store.dispatch(
+            IssueCredentialsAction.SaveInput(
+                Passport(
+                    et_name?.text?.toString(), et_surname?.text?.toString(),
+                    null,
+                    et_date?.text?.toString()
+                ),
+                et_ssn?.text?.toString()
+            )
+        )
+
+        if (store.state.issueCredentialsState.isInputDataModified()) {
+            showConfirmationDialog()
+        } else {
             store.dispatch(IssueCredentialsAction.ResetState)
             store.dispatch(NavigationAction.PopBackTo())
-        } else {
-            showConfirmationDialog()
         }
     }
 
@@ -93,15 +107,14 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
     }
 
     private fun setupUI(view: View) {
-        // Set up touch listener for non-text box views to hide keyboard.
         if (view !is EditText) {
             view.setOnTouchListener { v, event ->
                 view.hideKeyboard()
+                v.performClick()
                 return@setOnTouchListener false
             }
         }
 
-        //If a layout container, iterate over children and seed recursion.
         if (view is ViewGroup) {
             for (i in 0 until view.childCount) {
                 val innerView = view.getChildAt(i)
@@ -118,15 +131,6 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         ) {
             ll_root.hideKeyboard()
         }
-
-
-
-        if (state.issueCredentialsCompleted) {
-//            store.dispatch(IssueCredentialsAction.ResetState)
-//            store.dispatch(NavigationAction.PopBackTo(AppScreen.Home))
-//            return
-        }
-
 
         val credentialWidgetFactory =
             CredentialWidgetFactory(
@@ -185,6 +189,17 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
                 .setNegativeButton(getText(R.string.credential_dialog_hide)) { dialog, _ -> dialog.cancel() }
             val dialog = builder.create()
             dialog.show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CameraPermissionManager.handleRequestPermissionResult(requestCode, grantResults) {
+            store.dispatch(NavigationAction.NavigateTo(AppScreen.Camera))
         }
     }
 }

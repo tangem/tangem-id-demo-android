@@ -11,6 +11,7 @@
     <string name="error_converting_credential">Unknown credential</string>
     <string name="error_credential_already_issued">The holder already has this credential</string>
     <string name="error_no_credentials">The card contains no credentials</string>
+    <string name="error_user_cancelled">Interaction with the card was stopped</string>
 
     <string name="sdk_view_delegate_message_holder">Tap Holder\'s Card</string>
     <string name="sdk_view_delegate_message_issuer">Tap Issuer\'s Card</string>

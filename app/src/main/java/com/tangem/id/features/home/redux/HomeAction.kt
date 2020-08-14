@@ -1,4 +1,4 @@
-package com.tangem.id.features.home
+package com.tangem.id.features.home.redux
 
 import com.tangem.TangemError
 import com.tangem.id.common.redux.ErrorAction

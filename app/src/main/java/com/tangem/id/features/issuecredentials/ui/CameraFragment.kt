@@ -55,9 +55,4 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             cvCamera?.facing = Facing.BACK
         }
     }
-
-    companion object {
-        const val PHOTO_KEY = "photo"
-    }
-
 }

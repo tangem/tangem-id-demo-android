@@ -53,7 +53,7 @@ class ChangeFilesTask(
         session: CardSession,
         callback: (result: CompletionResult<SimpleResponse>) -> Unit
     ) {
-        val index = filesToDelete.pollFirst()
+        val index = filesToDelete.pollLast()
         if (index == null) {
             callback(
                 CompletionResult.Success(

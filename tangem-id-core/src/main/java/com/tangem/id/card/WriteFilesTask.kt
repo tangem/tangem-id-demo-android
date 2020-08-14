@@ -6,6 +6,7 @@ import com.tangem.KeyPair
 import com.tangem.TangemSdkError
 import com.tangem.commands.CommandResponse
 import com.tangem.commands.file.DeleteFileCommand
+import com.tangem.commands.file.File
 import com.tangem.commands.file.ReadFileDataCommand
 import com.tangem.commands.file.WriteFileDataCommand
 import com.tangem.commands.personalization.entities.Issuer
@@ -13,11 +14,19 @@ import com.tangem.common.CompletionResult
 import com.tangem.common.extensions.hexToBytes
 import com.tangem.common.extensions.toByteArray
 import com.tangem.crypto.sign
+import com.tangem.id.documents.VerifiableCredential
+import com.tangem.id.utils.JsonLdCborEncoder
 
 class WriteFilesResponse(
     val cardId: String,
     val filesIndices: List<Int>
 ) : CommandResponse
+
+fun List<File>.toVerifiableCredentials(): List<VerifiableCredential> {
+    return this.map { it.fileData }
+        .map { JsonLdCborEncoder.decode(it) }
+        .map { VerifiableCredential.fromMap((it as Map<String, String>)) }
+}
 
 class WriteFilesTask(
     private val data: List<ByteArray>,

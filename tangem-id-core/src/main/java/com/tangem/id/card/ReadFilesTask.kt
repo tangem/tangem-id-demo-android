@@ -4,6 +4,7 @@ import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
 import com.tangem.TangemSdkError
 import com.tangem.commands.CommandResponse
+import com.tangem.commands.Product
 import com.tangem.commands.file.File
 import com.tangem.commands.file.ReadFileDataTask
 import com.tangem.common.CompletionResult
@@ -22,6 +23,9 @@ class ReadFilesTask(private val readPrivateFiles: Boolean = false) :
     override fun run(
         session: CardSession, callback: (result: CompletionResult<FilesResponse>) -> Unit
     ) {
+        if (session.environment.card?.cardData?.productMask?.contains(Product.IdCard) != true) {
+            callback(CompletionResult.Failure(TangemSdkError.CardError()))
+        }
         val command = ReadFileDataTask(readPrivateFiles)
         command.run(session) { result ->
             when (result) {

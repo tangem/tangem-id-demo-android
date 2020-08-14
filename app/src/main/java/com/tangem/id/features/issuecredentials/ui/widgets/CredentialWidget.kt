@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.entities.*
 
 abstract class CredentialWidget<in T : Credential>(private val context: Context?) {
     protected abstract val viewToInflate: Int

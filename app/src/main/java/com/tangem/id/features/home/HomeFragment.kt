@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.tangem.id.R
+import com.tangem.id.features.home.redux.HomeAction
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.fragment_main.*
 
