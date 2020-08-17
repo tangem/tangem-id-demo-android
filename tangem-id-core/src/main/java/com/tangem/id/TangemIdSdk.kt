@@ -24,8 +24,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
     private val scope = CoroutineScope(coroutineContext)
 
     private val config = Config(
-        cardFilter = CardFilter(EnumSet.allOf(CardType::class.java)),
-        savePin1InStaticField = false
+        cardFilter = CardFilter(EnumSet.allOf(CardType::class.java))
     )
     private val tangemSdk = TangemSdk.init(activity, config)
 

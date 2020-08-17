@@ -33,6 +33,6 @@ data class IssueCredentialsState(
         if (!editable) return true
 
         return photo?.isDataPresent() == true || passport?.isInputDataModified() == true
-                || securityNumber?.number != null
+                || !securityNumber?.number.isNullOrBlank()
     }
 }

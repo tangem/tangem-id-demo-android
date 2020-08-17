@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import com.example.tangem_id_core.R
 import com.tangem.Message
 import com.tangem.TangemSdk
+import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.common.Blockchain
 import com.tangem.blockchain.extensions.Result
@@ -45,7 +46,9 @@ class TangemIdIssuer(
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
-                    callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    if (result.error !is TangemSdkError.UserCancelled) {
+                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    }
                 is CompletionResult.Success -> {
                     if (result.data.cardData?.productMask?.contains(Product.IdIssuer) != true
                         || !isValidCard(result.data)
@@ -75,11 +78,10 @@ class TangemIdIssuer(
             initialMessage = tapHolderCardMessage
         ) { result ->
             when (result) {
-                is CompletionResult.Failure -> callback(
-                    CompletionResult.Failure(
-                        TangemIdError.ReadingCardError(activity)
-                    )
-                )
+                is CompletionResult.Failure ->
+                    if (result.error !is TangemSdkError.UserCancelled) {
+                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    }
                 is CompletionResult.Success -> {
                     if (result.data.cardData?.productMask?.contains(Product.IdCard) != true
                         || result.data.walletPublicKey == null

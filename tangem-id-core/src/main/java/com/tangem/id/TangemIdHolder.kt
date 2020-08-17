@@ -44,8 +44,9 @@ class TangemIdHolder(
     fun changePasscode(callback: (SimpleResponse) -> Unit) {
         tangemSdk.changePin2(initialMessage = tapHolderCardMessage) { result ->
             when (result) {
-                is CompletionResult.Failure ->
+                is CompletionResult.Failure -> if (result.error !is TangemSdkError.UserCancelled) {
                     callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))
+                }
                 is CompletionResult.Success -> callback(SimpleResponse.Success)
             }
         }
@@ -62,7 +63,9 @@ class TangemIdHolder(
                         callback(CompletionResult.Failure(TangemIdError.WrongHolderCardType(activity)))
                         return@startSessionWithRunnable
                     }
-                    callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    if (result.error !is TangemSdkError.UserCancelled) {
+                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    }
                 }
                 is CompletionResult.Success -> {
                     if (result.data.files.isEmpty() || result.data.files[0].fileData.isEmpty()) {
@@ -110,8 +113,9 @@ class TangemIdHolder(
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
-                    callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))
-
+                    if (result.error !is TangemSdkError.UserCancelled) {
+                        callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))
+                    }
                 is CompletionResult.Success -> {
                     holderCredentials = holderCredentials
                         ?.mapIndexed { index, pair ->
@@ -167,9 +171,9 @@ class TangemIdHolder(
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
-                    callback(
-                        CompletionResult.Failure(TangemIdError.ReadingCardError(activity))
-                    )
+                    if (result.error !is TangemSdkError.UserCancelled) {
+                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    }
                 is CompletionResult.Success -> {
                     val demoCredential = VerifiableDemoCredential.from(credential)
                     if (demoCredential != null) {

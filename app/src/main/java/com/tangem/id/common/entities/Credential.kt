@@ -54,7 +54,8 @@ data class Passport(
     }
 
     fun isInputDataModified(): Boolean {
-        return name != null || surname != null || gender != null
+        return !name.isNullOrBlank() || !surname.isNullOrBlank() || gender != null
+                || !birthDate.isNullOrBlank()
     }
 
     fun dateFormatted(): String? {
@@ -90,6 +91,7 @@ data class SecurityNumber(val number: String? = null) : Credential {
         builder.insert(6, "-")
         return builder.toString()
     }
+
     override fun isDataPresent(): Boolean = !number.isNullOrBlank() && number.length == 9
 }
 

@@ -40,7 +40,9 @@ class TangemIdVerifier(
                             callback(CompletionResult.Failure(TangemIdError.WrongHolderCardType(activity)))
                             return@launch
                         }
-                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                        if (result.error !is TangemSdkError.UserCancelled) {
+                            callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                        }
                     }
                     is CompletionResult.Success -> {
                         if (result.data.files.isEmpty() || result.data.files[0].fileData.isEmpty()) {
