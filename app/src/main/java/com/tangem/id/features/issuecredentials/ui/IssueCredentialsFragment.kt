@@ -93,7 +93,10 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbar.setNavigationOnClickListener { handleExit() }
+        toolbar.setNavigationOnClickListener {
+            view.hideKeyboard()
+            handleExit()
+        }
         setupUI(ll_root)
     }
 

@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
@@ -15,6 +16,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
@@ -35,6 +37,15 @@ import com.tangem.id.features.verifier.VerifierFragment
 fun Fragment.getDrawable(@DrawableRes drawableResId: Int): Drawable? {
     return ContextCompat.getDrawable(requireContext(), drawableResId)
 }
+
+fun Fragment.getColor(@ColorRes colorResId: Int): Int {
+    return ContextCompat.getColor(requireContext(), colorResId)
+}
+
+fun Fragment.getColorStateList(@ColorRes colorResId: Int): ColorStateList? {
+    return ContextCompat.getColorStateList(requireContext(), colorResId)
+}
+
 
 fun View.show(show: Boolean) {
     if (show) this.visibility = View.VISIBLE else this.visibility = View.GONE

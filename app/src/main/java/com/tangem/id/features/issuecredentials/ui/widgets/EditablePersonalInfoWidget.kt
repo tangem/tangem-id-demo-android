@@ -1,6 +1,5 @@
 package com.tangem.id.features.issuecredentials.ui.widgets
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.datepicker.CalendarConstraints
@@ -8,11 +7,13 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.tangem.id.R
 import com.tangem.id.common.entities.Gender
 import com.tangem.id.common.entities.Passport
+import com.tangem.id.common.extensions.getColorStateList
 import com.tangem.id.common.extensions.toDate
 import com.tangem.id.common.extensions.toMillis
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
 import com.tangem.id.features.issuecredentials.ui.textwatchers.DateFormattingTextWatcher
 import com.tangem.id.store
+import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_passport_editable.*
 import java.time.Instant
 import java.time.LocalDateTime
@@ -35,25 +36,25 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         if (editable) {
             fragment.et_name.setOnFocusChangeListener { view, hasFocus ->
                 if (!hasFocus) {
-                    onEditEnded(view)
+                    onEditEnded()
                 }
             }
             fragment.et_surname.setOnFocusChangeListener { view, hasFocus ->
                 if (!hasFocus) {
-                    onEditEnded(view)
+                    onEditEnded()
                 }
             }
             fragment.radio_group_gender?.setOnCheckedChangeListener { radioGroup, checkedId ->
-                onEditEnded(radioGroup)
+                onEditEnded()
             }
             fragment.et_date.setOnFocusChangeListener { view, hasFocus ->
                 if (!hasFocus) {
-                    onEditEnded(view)
+                    onEditEnded()
                 }
             }
 
             fragment.iv_date_picker.setOnClickListener {
-                onEditEnded(fragment.iv_date_picker)
+                onEditEnded()
                 launchDatePicker()
             }
 
@@ -74,18 +75,23 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         fragment.radio_gender_male.isEnabled = editable
         fragment.radio_gender_other.isEnabled = editable
         fragment.et_date.isEnabled = editable
+        fragment.iv_date_picker.isEnabled = editable
+
+        if (editable) {
+            fragment.checkbox?.buttonTintList = fragment.getColorStateList(R.color.checkbox_always_accent)
+        }  else {
+            fragment.checkbox?.buttonTintList = fragment.getColorStateList(R.color.checkbox_unselected_grayed)
+        }
     }
 
-    private fun onEditEnded(view: View) {
-//        view.hideKeyboard()
-
+    private fun onEditEnded(date: String? = null) {
         val name = fragment.et_name?.text?.toString()
         val surname = fragment.et_surname?.text?.toString()
         val gender = radioButtonIdToGender(
             fragment.radio_group_gender?.checkedRadioButtonId, fragment
         )
-        val date = fragment.et_date?.text?.toString()
-        store.dispatch(IssueCredentialsAction.SaveInput(Passport(name, surname, gender, date)))
+        val dateToSave = date ?: fragment.et_date?.text?.toString()
+        store.dispatch(IssueCredentialsAction.SaveInput(Passport(name, surname, gender, dateToSave)))
     }
 
     private fun Gender.toRadioButtonId(fragment: Fragment): Int {
@@ -115,8 +121,8 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         picker.show(fragment.childFragmentManager, picker.toString())
         picker.addOnPositiveButtonClickListener { time ->
             val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault())
-            val dateString = date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-            store.dispatch(IssueCredentialsAction.SaveInput(Passport(null, null, null, dateString)))
+            val dateString = date.format(DateTimeFormatter.ofPattern("MMddyyyy"))
+            onEditEnded(dateString)
         }
     }
 

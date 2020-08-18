@@ -41,8 +41,8 @@ class TangemIdHolder(
         return holderCredentials!![index].first.verifiableCredential.toPrettyJson()
     }
 
-    fun changePasscode(callback: (SimpleResponse) -> Unit) {
-        tangemSdk.changePin2(initialMessage = tapHolderCardMessage) { result ->
+    fun changePasscode(cardId: String?, callback: (SimpleResponse) -> Unit) {
+        tangemSdk.changePin2(cardId = cardId, initialMessage = tapHolderCardMessage) { result ->
             when (result) {
                 is CompletionResult.Failure -> if (result.error !is TangemSdkError.UserCancelled) {
                     callback(SimpleResponse.Failure(TangemIdError.ReadingCardError(activity)))
@@ -100,7 +100,7 @@ class TangemIdHolder(
     }
 
     fun changeHoldersCredentials(
-        indicesToDelete: List<Int>, indicesToChangeVisibility: List<Int>,
+        cardId: String?, indicesToDelete: List<Int>, indicesToChangeVisibility: List<Int>,
         callback: (SimpleResponse) -> Unit
     ) {
         val visibilitiesToChange = holderCredentials!!
@@ -109,7 +109,7 @@ class TangemIdHolder(
         val task = ChangeFilesTask(indicesToDelete, indicesToChangeVisibility, visibilitiesToChange)
 
         tangemSdk.startSessionWithRunnable(
-            task, initialMessage = tapHolderCardMessage
+            task, initialMessage = tapHolderCardMessage, cardId = cardId
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->

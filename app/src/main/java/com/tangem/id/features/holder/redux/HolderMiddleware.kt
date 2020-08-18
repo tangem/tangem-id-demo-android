@@ -33,6 +33,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                             } else null
                         }.filterNotNull()
                         tangemIdSdk.holder.changeHoldersCredentials(
+                            store.state.holderState.cardId,
                             indicesToDelete, indicesWithNewVisibility
                         ) { result ->
                             mainThread.post {
@@ -46,7 +47,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                     }
                 }
                 is HolderAction.ChangePasscodeAction -> {
-                    tangemIdSdk.holder.changePasscode { result ->
+                    tangemIdSdk.holder.changePasscode(store.state.holderState.cardId) { result ->
                         mainThread.post {
                             when (result) {
                                 SimpleResponse.Success ->

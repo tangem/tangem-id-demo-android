@@ -40,7 +40,7 @@ class VerifiableDemoCredential(
                             null
                         }
                     }
-                    verifiableCredential.type.contains(DemoCredentialFactory.TANGEM_AGE_OVER_18_CREDENTIAL) -> {
+                    verifiableCredential.type.contains(DemoCredentialFactory.TANGEM_AGE_OVER_21_CREDENTIAL) -> {
                         val validFrom = verifiableCredential.validFrom?.substringBefore("T")
                         val dateValidFrom = validFrom?.toDate()
                         val valid = if (dateValidFrom != null) {

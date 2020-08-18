@@ -27,7 +27,7 @@ class DemoCredentialSubjectFactory(val subjectId: String, val personData: DemoPe
         "photoHash" to photoHash
     )
 
-    fun createAgeOver18CredentialSubject() = mapOf(
+    fun createAgeOver21CredentialSubject() = mapOf(
         "id" to subjectId,
         "photoHash" to photoHash
     )

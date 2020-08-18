@@ -21,16 +21,15 @@ class MainActivity : AppCompatActivity() {
         store.dispatch(NavigationAction.ActivityCreated(WeakReference(this)))
 
         tangemIdSdk = TangemIdSdk(this)
+    }
 
+    override fun onResume() {
+        super.onResume()
         if (supportFragmentManager.backStackEntryCount == 0) {
             store.dispatch(
                 NavigationAction.NavigateTo(AppScreen.Home)
             )
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
         notificationsHandler = NotificationsHandler(fragment_container)
     }
 

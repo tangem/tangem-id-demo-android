@@ -52,9 +52,9 @@ class DemoCredentialFactory(
         )
     }
 
-    private fun createAgeOver18Credential(): VerifiableCredential {
+    private fun createAgeOver21Credential(): VerifiableCredential {
         val credentialSubject =
-            credentialSubjectFactory.createAgeOver18CredentialSubject()
+            credentialSubjectFactory.createAgeOver21CredentialSubject()
 
         val bornDate = personData.born.toDate()!!
         val over21Date = bornDate.plusYears(21)
@@ -65,7 +65,7 @@ class DemoCredentialFactory(
             credentialSubject = credentialSubject,
             issuer = issuer,
 //            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
-            extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_AGE_OVER_18_CREDENTIAL),
+            extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_AGE_OVER_21_CREDENTIAL),
             validFrom = validFrom
         )
     }
@@ -75,7 +75,7 @@ class DemoCredentialFactory(
             createPhotoCredential(),
             createPersonalInformationCredential(),
             createSsnCredential(),
-            createAgeOver18Credential()
+            createAgeOver21Credential()
         )
 
         val credentialJsonArray = JSONArray()
@@ -98,7 +98,7 @@ class DemoCredentialFactory(
         const val TANGEM_PHOTO_CREDENTIAL = "TangemPhotoCredential"
         const val TANGEM_PERSONAL_INFORMATION_CREDENTIAL = "TangemPersonalInformationCredential"
         const val TANGEM_SSN_CREDENTIAL = "TangemSsnCredential"
-        const val TANGEM_AGE_OVER_18_CREDENTIAL = "TangemAgeOver18Credential"
+        const val TANGEM_AGE_OVER_21_CREDENTIAL = "TangemAgeOver21Credential"
     }
 }
 
