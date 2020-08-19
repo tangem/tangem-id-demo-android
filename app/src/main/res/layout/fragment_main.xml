@@ -31,7 +31,7 @@
         />
 
     <TextView
-        android:id="@+id/tv_credential_status"
+        android:id="@+id/tv_app_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"

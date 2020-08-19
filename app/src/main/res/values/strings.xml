@@ -21,8 +21,9 @@
     <string name="credential_dialog_share">Share</string>
     <string name="credential_dialog_hide">Hide</string>
 
-    <string name="starting_screen_description">This is a demo application for decentralized identity.
-        To start using it, get the ID Kit on tangem.com.</string>
+    <string name="starting_screen_description">This application demonstrates the Tangem ID solution.
+        Conformant with W3C DID and Verifiable Credential. Try for yourself! Get ID cards kit at %s</string>
+    <string name="starting_screen_store_address">shop.tangem.com</string>
     <string name="starting_screen_btn_issuer">I\'m an issuer</string>
     <string name="starting_screen_btn_holder">I\'m a holder</string>
     <string name="starting_screen_btn_verifier">I\'m a verifier</string>
