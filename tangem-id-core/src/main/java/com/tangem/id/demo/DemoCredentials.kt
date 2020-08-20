@@ -7,7 +7,6 @@ import com.tangem.id.documents.VerifiableCredential.Companion.TANGEM_ETH_CREDENT
 import com.tangem.id.extensions.calculateSha3v512
 import org.json.JSONArray
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class DemoCredentialFactory(
     private val issuer: String,
@@ -53,20 +52,20 @@ class DemoCredentialFactory(
         )
     }
 
-    private fun createAgeOver18Credential(): VerifiableCredential {
+    private fun createAgeOver21Credential(): VerifiableCredential {
         val credentialSubject =
-            credentialSubjectFactory.createAgeOver18CredentialSubject()
+            credentialSubjectFactory.createAgeOver21CredentialSubject()
 
-        val bornDate = LocalDate.parse(personData.born, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-        val over18Date = bornDate.plusYears(18)
+        val bornDate = personData.born.toDate()!!
+        val over21Date = bornDate.plusYears(21)
         val validFrom =
-            if (over18Date > LocalDate.now()) "${over18Date}T00:00:00Z" else null // TODO: maybe use start of the day in current time zone?
+            if (over21Date > LocalDate.now()) "${over21Date}\"${over21Date}T00:00:00Z\"" else null // TODO: maybe use start of the day in current time zone?
 
         return VerifiableCredential(
             credentialSubject = credentialSubject,
             issuer = issuer,
 //            extraContexts = setOf(TANGEM_DEMO_CONTEXT),
-            extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_AGE_OVER_18_CREDENTIAL),
+            extraTypes = setOf(TANGEM_ETH_CREDENTIAL, TANGEM_AGE_OVER_21_CREDENTIAL),
             validFrom = validFrom
         )
     }
@@ -76,7 +75,7 @@ class DemoCredentialFactory(
             createPhotoCredential(),
             createPersonalInformationCredential(),
             createSsnCredential(),
-            createAgeOver18Credential()
+            createAgeOver21Credential()
         )
 
         val credentialJsonArray = JSONArray()
@@ -99,7 +98,7 @@ class DemoCredentialFactory(
         const val TANGEM_PHOTO_CREDENTIAL = "TangemPhotoCredential"
         const val TANGEM_PERSONAL_INFORMATION_CREDENTIAL = "TangemPersonalInformationCredential"
         const val TANGEM_SSN_CREDENTIAL = "TangemSsnCredential"
-        const val TANGEM_AGE_OVER_18_CREDENTIAL = "TangemAgeOver18Credential"
+        const val TANGEM_AGE_OVER_21_CREDENTIAL = "TangemAgeOver21Credential"
     }
 }
 
@@ -111,3 +110,28 @@ class DemoPersonData(
     val ssn: String,
     val photo: ByteArray
 )
+
+
+sealed class DemoCredential {
+    data class PhotoCredential(val photo: ByteArray) : DemoCredential()
+    data class PersonalInfoCredential(
+        val name: String,
+        val surname: String,
+        val gender: String,
+        val birthDate: String
+    ) : DemoCredential()
+
+    data class SsnCredential(val ssn: String) : DemoCredential()
+    data class AgeOfMajorityCredential(val valid: Boolean) : DemoCredential()
+    data class CovidCredential(val result: CovidStatus) : DemoCredential()
+}
+
+enum class CovidStatus {
+    Negative, Positive;
+
+    companion object {
+        fun fromString(status: String?): CovidStatus {
+            return if (status.isNullOrBlank() || status == "negative") Negative else Positive
+        }
+    }
+}

@@ -5,18 +5,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fl_button"
-    android:layout_height="wrap_content"
     android:layout_width="match_parent"
->
+    android:layout_height="wrap_content">
+
+    <ProgressBar
+        android:id="@+id/progress_btn"
+        android:visibility="gone"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:elevation="18dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@android:color/white" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_filled"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
         android:layout_marginStart="46dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="46dp"
         android:layout_marginBottom="16dp"
-        android:id="@+id/btn_filled"
-        android:layout_width="match_parent"
-        android:layout_height="42dp"
         android:elevation="3dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -24,6 +34,7 @@
         android:textColor="@android:color/white"
         android:textSize="16sp"
         app:cornerRadius="4dp"
+        android:letterSpacing="0"
         tools:text="Issue Credentials" />
 
 </FrameLayout>

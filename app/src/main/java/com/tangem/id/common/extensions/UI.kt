@@ -1,7 +1,13 @@
 package com.tangem.id.common.extensions
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.Spannable
@@ -10,11 +16,13 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import com.google.android.material.card.MaterialCardView
 import com.tangem.id.R
 import com.tangem.id.common.redux.navigation.AppScreen
@@ -29,6 +37,15 @@ import com.tangem.id.features.verifier.VerifierFragment
 fun Fragment.getDrawable(@DrawableRes drawableResId: Int): Drawable? {
     return ContextCompat.getDrawable(requireContext(), drawableResId)
 }
+
+fun Fragment.getColor(@ColorRes colorResId: Int): Int {
+    return ContextCompat.getColor(requireContext(), colorResId)
+}
+
+fun Fragment.getColorStateList(@ColorRes colorResId: Int): ColorStateList? {
+    return ContextCompat.getColorStateList(requireContext(), colorResId)
+}
+
 
 fun View.show(show: Boolean) {
     if (show) this.visibility = View.VISIBLE else this.visibility = View.GONE
@@ -91,8 +108,9 @@ fun FragmentActivity.openFragment(screen: AppScreen, addToBackStack: Boolean = t
     transaction.commit();
 }
 
-fun FragmentActivity.popBackTo(screen: AppScreen?) {
-    this.supportFragmentManager.popBackStack(screen?.name, 0)
+fun FragmentActivity.popBackTo(screen: AppScreen?, inclusive: Boolean = false) {
+    val inclusiveFlag = if (inclusive) POP_BACK_STACK_INCLUSIVE else 0
+    this.supportFragmentManager.popBackStack(screen?.name, inclusiveFlag)
 }
 
 fun FragmentActivity.getPreviousScreen(): AppScreen? {
@@ -137,4 +155,29 @@ fun String.colorSegment(
 fun View.hideKeyboard() {
     val inputMethodManager = context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? InputMethodManager
     inputMethodManager?.hideSoftInputFromWindow(this.windowToken, 0)
+}
+
+fun ByteArray.toBitmap(): Bitmap {
+    return BitmapFactory.decodeByteArray(this, 0, this.size)
+}
+
+fun Context.copyToClipboard(value: Any, label: String = "") {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager ?: return
+
+    val clip: ClipData = ClipData.newPlainText(label, value.toString())
+    clipboard.setPrimaryClip(clip)
+}
+
+fun Context.shareText(text: String) {
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, text)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    startActivity(shareIntent)
+}
+
+fun Fragment.shareText(text: String) {
+    requireContext().shareText(text)
 }

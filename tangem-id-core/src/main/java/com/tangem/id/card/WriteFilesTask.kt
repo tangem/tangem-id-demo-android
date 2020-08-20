@@ -1,10 +1,12 @@
-package com.tangem.id
+package com.tangem.id.card
 
 import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
 import com.tangem.KeyPair
 import com.tangem.TangemSdkError
 import com.tangem.commands.CommandResponse
+import com.tangem.commands.file.DeleteFileCommand
+import com.tangem.commands.file.File
 import com.tangem.commands.file.ReadFileDataCommand
 import com.tangem.commands.file.WriteFileDataCommand
 import com.tangem.commands.personalization.entities.Issuer
@@ -12,23 +14,57 @@ import com.tangem.common.CompletionResult
 import com.tangem.common.extensions.hexToBytes
 import com.tangem.common.extensions.toByteArray
 import com.tangem.crypto.sign
+import com.tangem.id.documents.VerifiableCredential
+import com.tangem.id.utils.JsonLdCborEncoder
 
 class WriteFilesResponse(
     val cardId: String,
     val filesIndices: List<Int>
 ) : CommandResponse
 
+fun List<File>.toVerifiableCredentials(): List<VerifiableCredential> {
+    return this.map { it.fileData }
+        .map { JsonLdCborEncoder.decode(it) }
+        .map { VerifiableCredential.fromMap((it as Map<String, String>)) }
+}
+
 class WriteFilesTask(
     private val data: List<ByteArray>,
     private val issuerKeys: KeyPair
 ) : CardSessionRunnable<WriteFilesResponse> {
 
-    override val requiresPin2 = false
+    override val requiresPin2 = true
     private val filesIndices = mutableListOf<Int>()
 
-    override fun run(session: CardSession, callback: (result: CompletionResult<WriteFilesResponse>) -> Unit) {
-        val command = ReadFileDataCommand()
-        command.run(session) { readResponse ->
+    override fun run(
+        session: CardSession,
+        callback: (result: CompletionResult<WriteFilesResponse>) -> Unit
+    ) {
+        deleteFile(session, callback)
+    }
+
+    private fun deleteFile(
+        session: CardSession, callback: (result: CompletionResult<WriteFilesResponse>) -> Unit
+    ) {
+        DeleteFileCommand(0).run(session) { result ->
+            when (result) {
+                is CompletionResult.Success -> deleteFile(session, callback)
+                is CompletionResult.Failure ->
+                    if (result.error is TangemSdkError.ErrorProcessingCommand) {
+                        getFilesCounter(session, callback)
+                    } else {
+                        callback(CompletionResult.Failure(result.error))
+                    }
+            }
+
+        }
+
+    }
+
+    private fun getFilesCounter(
+        session: CardSession, callback: (result: CompletionResult<WriteFilesResponse>) -> Unit
+    ) {
+        ReadFileDataCommand().run(session) { readResponse ->
             when (readResponse) {
                 is CompletionResult.Failure -> callback(CompletionResult.Failure(readResponse.error))
                 is CompletionResult.Success -> {
@@ -52,7 +88,8 @@ class WriteFilesTask(
         if (currentFileIndex > data.lastIndex) {
             callback(
                 CompletionResult.Success(
-                WriteFilesResponse(cardId, filesIndices))
+                    WriteFilesResponse(cardId, filesIndices)
+                )
             )
             return
         }

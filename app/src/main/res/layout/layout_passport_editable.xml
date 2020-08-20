@@ -44,6 +44,7 @@
                 android:layout_marginEnd="12dp"
                 android:gravity="center"
                 android:hint="@string/credential_personal_info_name"
+                android:importantForAutofill="noExcludeDescendants"
                 android:textColorHint="@color/darkGray1"
                 app:boxStrokeColor="@color/text_input_underline_color">
 
@@ -52,7 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:inputType="textPersonName|textCapWords"
+                    android:inputType="textCapWords|textPersonName"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp" />
 
@@ -62,11 +63,13 @@
                 android:id="@+id/til_surname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:layout_gravity="center"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp"
                 android:gravity="center"
                 android:hint="@string/credential_personal_info_surname"
+                android:importantForAutofill="noExcludeDescendants"
                 android:textColorHint="@color/darkGray1"
                 app:boxStrokeColor="@color/text_input_underline_color">
 
@@ -75,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
-                    android:inputType="textPersonName|textCapWords"
+                    android:inputType="textCapWords|textPersonName"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp" />
 
@@ -145,15 +148,15 @@
                     android:id="@+id/iv_date_picker"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:paddingEnd="26dp"
-                    android:paddingStart="26dp"
+                    android:layout_gravity="end|center_vertical"
                     android:layout_marginBottom="16dp"
-                    android:src="@drawable/ic_calendar"
                     android:backgroundTint="@android:color/white"
-                    android:layout_gravity="end|center_vertical"/>
-                
+                    android:paddingStart="26dp"
+                    android:paddingEnd="26dp"
+                    android:src="@drawable/ic_calendar" />
+
             </FrameLayout>
-           
+
 
         </LinearLayout>
 

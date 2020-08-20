@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.google.zxing.Result
-import com.tangem.id.common.redux.ImmunityPassport
-import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.holder.redux.HolderAction
 import com.tangem.id.store
@@ -48,11 +46,8 @@ class QrScanFragment : Fragment(0), ZXingScannerView.ResultHandler {
     }
 
     override fun handleResult(result: Result) {
-//      result.text
-        store.dispatch(HolderAction.RequestNewCredential.Success(ImmunityPassport()))
-        store.dispatch(
-            NavigationAction.PopBackTo(AppScreen.Holder)
-        )
+        store.dispatch(NavigationAction.PopBackTo())
+        store.dispatch(HolderAction.RequestNewCredential)
     }
 
 }

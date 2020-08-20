@@ -1,6 +1,7 @@
 package com.tangem.id.features.holder.redux
 
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.redux.AppState
+import com.tangem.id.tangemIdSdk
 import org.rekotlin.Action
 
 fun holderReducer(action: Action, state: AppState): HolderState {
@@ -13,106 +14,81 @@ fun holderReducer(action: Action, state: AppState): HolderState {
         is HolderAction.CredentialsRead -> {
             newState = HolderState(
                 cardId = action.cardId,
-                accessLevelsFromCard = action.accessLevels,
-                passport = action.credentials.find { it is Passport } as? Passport,
-                photo = action.credentials.find { it is Photo } as? Photo,
-                securityNumber = action.credentials.find { it is SecurityNumber } as? SecurityNumber,
-                ageOfMajority = action.credentials.find { it is AgeOfMajority } as? AgeOfMajority
+                credentials = action.credentials,
+                credentialsOnCard = action.credentials
             )
         }
 
         HolderAction.ToggleEditCredentials -> {
             val editActivated = newState.editActivated
 
-            if (editActivated && newState.credentialsToDelete.isNotEmpty()) {
-                for (credential in newState.credentialsToDelete) {
-                    when (credential) {
-                        is Photo -> {
-                            newState = newState.copy(photo = credential)
-                        }
-                        is Passport -> {
-                            newState = newState.copy(passport = credential)
-                        }
-                        is SecurityNumber -> {
-                            newState = newState.copy(securityNumber = credential)
-                        }
-                        is AgeOfMajority -> {
-                            newState = newState.copy(ageOfMajority = credential)
-                        }
-                        is ImmunityPassport -> {
-                            newState = newState.copy(immunityPassport = credential)
-                        }
-                    }
-                }
-            }
-
-            if (editActivated) newState =
-                newState.copy(accessLevelsModified = newState.accessLevelsFromCard)
-
             newState =
-                newState.copy(editActivated = !editActivated, credentialsToDelete = arrayListOf())
+                newState.copy(
+                    editActivated = !editActivated,
+                    credentials = newState.credentialsOnCard
+                )
         }
         is HolderAction.RequestNewCredential.Success -> {
-            newState = newState.copy(immunityPassport = action.immunityPassport)
+            newState = newState.copy(
+                credentials = action.allCredentials,
+                credentialsOnCard = action.allCredentials
+            )
         }
         HolderAction.SaveChanges -> {
-
+            if (newState.credentialsOnCard == newState.credentials) {
+                newState = newState.copy(editActivated = false)
+            }
         }
         HolderAction.SaveChanges.Success -> {
-
+            newState = newState.copy(
+                editActivated = false,
+                credentialsOnCard = newState.credentials,
+                credentialsToDelete = listOf()
+            )
         }
-        HolderAction.SaveChanges.Failure -> {
-
+        is HolderAction.SaveChanges.Failure -> {
+            newState = newState.copy(
+                editActivated = false,
+                credentials = newState.credentialsOnCard,
+                credentialsToDelete = listOf()
+            )
         }
         is HolderAction.ChangeCredentialAccessLevel -> {
             if (newState.editActivated) {
-                val credentialsAccessLevel =
-                    newState.accessLevelsModified.toggleAccessLevel(action.credential)
-                newState = newState.copy(accessLevelsModified = credentialsAccessLevel)
+                val editedCredentials = newState.credentials
+                    .map {
+                        if (it.first == action.credential) {
+                            it.first to it.second.toggleVisibility()
+                        } else {
+                            it
+                        }
+                    }
+                newState = newState.copy(credentials = editedCredentials)
             }
 
         }
         is HolderAction.RemoveCredential -> {
             if (newState.editActivated) {
-                val credentialsToDelete = newState.credentialsToDelete + action.credential
-                when (action.credential) {
-                    is Photo -> {
-                        newState = newState.copy(
-                            photo = null,
-                            credentialsToDelete = ArrayList(credentialsToDelete)
-                        )
-                    }
-                    is Passport -> {
-                        newState = newState.copy(
-                            passport = null,
-                            credentialsToDelete = ArrayList(credentialsToDelete)
-                        )
-                    }
-                    is SecurityNumber -> {
-                        newState = newState.copy(
-                            securityNumber = null,
-                            credentialsToDelete = ArrayList(credentialsToDelete)
-                        )
-                    }
-                    is AgeOfMajority -> {
-                        newState = newState.copy(
-                            ageOfMajority = null,
-                            credentialsToDelete = ArrayList(credentialsToDelete)
-                        )
-                    }
-                    is ImmunityPassport -> {
-                        newState = newState.copy(
-                            immunityPassport = null,
-                            credentialsToDelete = ArrayList(credentialsToDelete)
-                        )
-                    }
-                }
+                val editedCredentials =
+                    newState.credentials.filter { it.first != action.credential }
+                newState = newState.copy(
+                    credentials = editedCredentials,
+                    credentialsToDelete = newState.credentialsToDelete + action.credential
+                )
             }
         }
         is HolderAction.ShowCredentialDetails -> {
             newState = newState.copy(detailsOpened = action.credential)
         }
+        HolderAction.HideCredentialDetails -> {
+            newState = newState.copy(detailsOpened = null, jsonShown = null)
+        }
+
         is HolderAction.ShowJson -> {
+
+            val index = newState.credentialsOnCard.indexOfFirst { it.first == action.credential }
+            val json = tangemIdSdk.holder.showHoldersCredential(index)
+            newState = newState.copy(jsonShown = json)
 
         }
     }

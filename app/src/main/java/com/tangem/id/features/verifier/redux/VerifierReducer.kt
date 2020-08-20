@@ -1,6 +1,8 @@
 package com.tangem.id.features.verifier.redux
 
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.entities.*
+import com.tangem.id.common.redux.AppState
+import com.tangem.id.tangemIdSdk
 import org.rekotlin.Action
 
 fun verifierReducer(action: Action, state: AppState): VerifierState {
@@ -13,17 +15,24 @@ fun verifierReducer(action: Action, state: AppState): VerifierState {
         is VerifierAction.CredentialsRead -> {
             newState = VerifierState(
                 passport = action.credentials.find { it.credential is Passport }
-                        as? VerifierCredential<Passport>?,
+                        as? VerifierCredential<Passport>,
                 photo = action.credentials.find { it.credential is Photo }
                         as? VerifierCredential<Photo>,
                 securityNumber = action.credentials.find { it.credential is SecurityNumber }
                         as? VerifierCredential<SecurityNumber>,
                 ageOfMajority = action.credentials.find { it.credential is AgeOfMajority }
-                        as? VerifierCredential<AgeOfMajority>
+                        as? VerifierCredential<AgeOfMajority>,
+                immunityPassport = action.credentials.find { it.credential is ImmunityPassport }
+                        as? VerifierCredential<ImmunityPassport>
             )
         }
         is VerifierAction.ToggleIssuerStatus -> TODO()
-        VerifierAction.ShowJson -> TODO()
+        VerifierAction.ShowJson -> {
+            newState = newState.copy(jsonShown = tangemIdSdk.verifier.getCredentialsPrettyJson())
+        }
+        VerifierAction.HideJson -> {
+            newState = newState.copy(jsonShown = null)
+        }
     }
     return newState
 }

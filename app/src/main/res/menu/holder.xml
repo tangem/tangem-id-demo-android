@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/change_passcode_menu"
-        android:title="Change Passcode"
+        android:title="@string/holder_screen_menu_change_pin"
         app:showAsAction="never" />
 </menu>

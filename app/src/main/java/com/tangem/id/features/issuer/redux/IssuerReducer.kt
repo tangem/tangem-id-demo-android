@@ -11,5 +11,8 @@ fun issuerReducer(action: Action, state: AppState): IssuerState {
         is IssuerAction.ReadHoldersCard -> {
             state.issuerState
         }
+        is IssuerAction.ReadHoldersCard.Failure -> {
+            state.issuerState
+        }
     }
 }

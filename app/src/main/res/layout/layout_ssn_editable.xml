@@ -38,10 +38,11 @@
 
                 <EditText
                     android:id="@+id/et_ssn"
-                    android:hint="000-00-000"
+                    android:hint="@string/credential_ssn_hint"
                     android:layout_width="140dp"
                     android:layout_height="match_parent"
                     android:background="@android:color/white"
+                    android:imeOptions="actionDone"
                     android:inputType="number"
                     android:digits="0123456789-"
                     android:gravity="center"

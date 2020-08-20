@@ -46,7 +46,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="000-00-000" />
-            
+
             <View
                 android:id="@+id/v_separator_ssn"
                 android:layout_width="match_parent"
@@ -54,7 +54,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:background="@color/separatorGrey"
-                app:layout_constraintTop_toBottomOf="@id/tv_ssn_title"/>
+                app:layout_constraintTop_toBottomOf="@id/tv_ssn_title" />
 
             <include
                 android:id="@+id/l_credential_status_ssn"
@@ -63,6 +63,27 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_ssn_title" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_ssn_json"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/holder_screen_dialog_show_json"
+                android:textAllCaps="false"
+                android:textColor="@color/blue"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/l_credential_status_ssn" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

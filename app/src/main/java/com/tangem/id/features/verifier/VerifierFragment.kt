@@ -6,18 +6,17 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tangem.id.R
-import com.tangem.id.common.extensions.colorSegment
-import com.tangem.id.common.extensions.hide
-import com.tangem.id.common.extensions.setMargins
-import com.tangem.id.common.extensions.show
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.entities.*
+import com.tangem.id.common.extensions.*
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.verifier.redux.*
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.fragment_issuer.toolbar
 import kotlinx.android.synthetic.main.fragment_verifier.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
+import kotlinx.android.synthetic.main.layout_covid.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
@@ -51,6 +50,18 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
     override fun newState(state: VerifierState) {
         if (activity == null) return
 
+        if (state.jsonShown != null) {
+            val builder = MaterialAlertDialogBuilder(context)
+            builder
+                .setMessage(state.jsonShown)
+                .setOnDismissListener { store.dispatch(VerifierAction.HideJson) }
+                .setPositiveButton(getText(R.string.credential_dialog_share))
+                { _, _ -> context?.shareText(state.jsonShown) }
+                .setNegativeButton(getText(R.string.credential_dialog_hide)) { dialog, _ -> dialog.cancel() }
+            val dialog = builder.create()
+            dialog.show()
+        }
+
         if (state.photo == null) {
             layout_photo?.hide()
         } else {
@@ -74,8 +85,9 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         }
 
         if (state.securityNumber == null) {
-            fl_ssn?.hide()
+            layout_ssn?.hide()
         } else {
+            layout_ssn?.show()
             tv_ssn?.text = state.securityNumber.credential.number
             setCredentialsStatus(
                 state.securityNumber.credential,
@@ -85,15 +97,28 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         }
 
         if (state.ageOfMajority == null) {
-            fl_checkbox?.hide()
+            layout_age_of_majority?.hide()
         } else {
-            fl_checkbox?.show()
-            checkbox?.isChecked = state.ageOfMajority.credential.valid ?: false
+            layout_age_of_majority?.show()
+            checkbox?.isChecked = state.ageOfMajority.credential.valid
+            checkbox?.isEnabled = false
             setCredentialsStatus(
                 state.ageOfMajority.credential,
                 state.ageOfMajority.credentialStatus
             )
             card_checkbox?.setMargins()
+        }
+        if (state.immunityPassport == null) {
+            layout_covid?.hide()
+        } else {
+            layout_covid?.show()
+            checkbox_covid?.isChecked = state.immunityPassport.credential.valid
+            checkbox_covid?.isEnabled = false
+            setCredentialsStatus(
+                state.immunityPassport.credential,
+                state.immunityPassport.credentialStatus
+            )
+            card_covid?.setMargins()
         }
     }
 
@@ -139,6 +164,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
             is Passport -> l_credential_status_passport
             is SecurityNumber -> l_credential_status_ssn
             is AgeOfMajority -> l_credential_status_age_of_majority
+            is ImmunityPassport -> l_credential_status_covid
             else -> null
         }
     }

@@ -1,21 +1,19 @@
 package com.tangem.id.documents
 
 import android.content.Context
+import com.tangem.Log
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.extensions.calculateSha256
 import com.tangem.id.proof.LinkedDataProof
 import com.tangem.id.proof.Secp256k1Proof
-import com.tangem.id.utils.normalizeJsonLd
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import org.json.JSONArray
 import org.json.JSONObject
 
 abstract class VerifiableDocument(
     val context: MutableSet<String>,
     val type: MutableSet<String>,
-    var proof: LinkedDataProof?
+    var proof: Secp256k1Proof?
 ) {
     abstract fun toJson(): String
 
@@ -48,42 +46,51 @@ abstract class VerifiableDocument(
         val document = this.toJSONObject()
         document.remove("proof")
 
-        return try {
-            coroutineScope<Result<ByteArray>> {
-                val documentNormalizationDeferred =
-                    async {
-                        normalizeJsonLd(
-                            document,
-                            androidContext
-                        )
-                    }
-                val proofOptionsNormalizationDeferred =
-                    async {
-                        normalizeJsonLd(
-                            proofOptions,
-                            androidContext
-                        )
-                    }
+        Log.i("TangemCredential", this.toJson())
 
-                val documentNormalizationResult = documentNormalizationDeferred.await()
-                val proofOptionsNormalizationResult = proofOptionsNormalizationDeferred.await()
+        val documentHash = document.toString().calculateSha256()
+        val proofOptionsHash = proofOptions.toString().calculateSha256()
+        return Result.Success(proofOptionsHash + documentHash)
 
-                val normalizedDocument = when (documentNormalizationResult) {
-                    is Result.Success -> documentNormalizationResult.data
-                    is Result.Failure -> return@coroutineScope documentNormalizationResult
-                }
-                val normalizedProofOptions = when (proofOptionsNormalizationResult) {
-                    is Result.Success -> proofOptionsNormalizationResult.data
-                    is Result.Failure -> return@coroutineScope proofOptionsNormalizationResult
-                }
-                val documentHash = normalizedDocument.toByteArray().calculateSha256()
-                val proofOptionsHash = normalizedProofOptions.toByteArray().calculateSha256()
 
-                Result.Success(proofOptionsHash + documentHash)
-            }
-        } catch (exception: Exception) {
-            Result.Failure(exception)
-        }
+//        return try {
+//            coroutineScope<Result<ByteArray>> {
+//                val documentNormalizationDeferred =
+//                    async {
+//                        normalizeJsonLd(
+//                            proofOptions,
+//                            androidContext
+//                        )
+//                    }
+//
+//
+//                val proofOptionsNormalizationDeferred =
+//                    async {
+//                        normalizeJsonLd(
+//                            proofOptions,
+//                            androidContext
+//                        )
+//                    }
+//
+//                val documentNormalizationResult = documentNormalizationDeferred.await()
+//                val proofOptionsNormalizationResult = proofOptionsNormalizationDeferred.await()
+//
+//                val normalizedDocument = when (documentNormalizationResult) {
+//                    is Result.Success -> documentNormalizationResult.data
+//                    is Result.Failure -> return@coroutineScope documentNormalizationResult
+//                }
+//                val normalizedProofOptions = when (proofOptionsNormalizationResult) {
+//                    is Result.Success -> proofOptionsNormalizationResult.data
+//                    is Result.Failure -> return@coroutineScope proofOptionsNormalizationResult
+//                }
+//                val documentHash = normalizedDocument.toByteArray().calculateSha256()
+//                val proofOptionsHash = normalizedProofOptions.toByteArray().calculateSha256()
+
+//                 Result.Success(proofOptionsHash + documentHash)
+//            }
+//        } catch (exception: Exception) {
+//            Result.Failure(exception)
+//        }
     }
 
     companion object {

@@ -3,14 +3,14 @@ package com.tangem.id.documents
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
-import com.tangem.id.proof.LinkedDataProof
+import com.tangem.id.proof.Secp256k1Proof
 
 @JsonClass(generateAdapter = true)
 class VerifiablePresentation internal constructor(
     @Json(name = "verifiableCredential") val credentials: Collection<VerifiableCredential>,
     @Json(name = "@context") context: Collection<String>,
     type: Collection<String>,
-    proof: LinkedDataProof?
+    proof: Secp256k1Proof?
 ) : VerifiableDocument(context.toMutableSet(), type.toMutableSet(), proof) {
 
     constructor(

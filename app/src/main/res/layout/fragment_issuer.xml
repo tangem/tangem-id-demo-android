@@ -31,7 +31,7 @@
         android:maxWidth="240dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        tools:text="Ministry of Internal Affairs"
+        android:text="@string/issuer_screen_title"
         android:textColor="@color/darkGray5"
         android:textSize="20sp"/>
 

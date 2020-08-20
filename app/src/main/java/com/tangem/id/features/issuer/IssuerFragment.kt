@@ -42,7 +42,7 @@ class IssuerFragment : Fragment(R.layout.fragment_issuer), StoreSubscriber<Issue
 
         iv_issuer_qr?.setImageBitmap(state.getIssuerQrCode())
         tv_issuer_address?.text = state.issuerAddress
-        tv_issuer_title?.text = state.issuerName
+//        tv_issuer_title?.text = state.issuerName
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

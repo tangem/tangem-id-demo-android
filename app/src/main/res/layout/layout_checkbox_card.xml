@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fl_checkbox"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -27,11 +26,11 @@
                 android:lineSpacingExtra="6sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:text="@string/credential_age_of_majority"
                 android:textColor="@color/darkGray6"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Age of Majority" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_checkbox_description"
@@ -53,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="58dp"
                 android:layout_gravity="center"
-                app:buttonTint="@color/checkbox_tint"
+                app:buttonTint="@color/checkbox_always_accent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_checkbox_title" />
 
@@ -72,6 +71,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_checkbox_description" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_age_of_majority_json"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/holder_screen_dialog_show_json"
+                android:textAllCaps="false"
+                android:textColor="@color/blue"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/l_credential_status_age_of_majority" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

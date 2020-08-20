@@ -1,7 +1,8 @@
 package com.tangem.id.features.verifier.redux
 
 import com.tangem.id.R
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.entities.*
+import com.tangem.id.demo.VerifiableDemoCredential
 import org.rekotlin.StateType
 
 data class CredentialStatus(val issuer: Issuer, val verificationStatus: VerificationStatus)
@@ -51,7 +52,8 @@ data class VerifierState(
         VerifierCredential(SecurityNumber("000-00-000"), credentialStatus),
     val ageOfMajority: VerifierCredential<AgeOfMajority>? =
         VerifierCredential(AgeOfMajority(true), credentialStatus),
-    val immunityPassport: VerifierCredential<ImmunityPassport>? = null
+    val immunityPassport: VerifierCredential<ImmunityPassport>? = null,
+    val jsonShown: String? = null
 ) : StateType {
     fun getCredentials() =
         listOfNotNull(photo, passport, securityNumber, ageOfMajority, immunityPassport)
@@ -60,7 +62,25 @@ data class VerifierState(
 data class VerifierCredential<T : Credential>(
     val credential: T,
     val credentialStatus: CredentialStatus
-)
+) {
+    companion object {
+        fun from(demoCredential: VerifiableDemoCredential): VerifierCredential<*>? {
+
+            val issuerAddress = demoCredential.verifiableCredential.issuer
+            val issuer = Issuer(issuerAddress, true)
+            val verificationStatus = if (demoCredential.verified == false)  {
+                VerificationStatus.Invalid
+            } else if (demoCredential.verified == true) {
+                VerificationStatus.Valid
+            } else {
+                VerificationStatus.Valid
+            }
+            val status = CredentialStatus(issuer, verificationStatus)
+
+            return VerifierCredential(Credential.from(demoCredential.decodedCredential), status)
+        }
+    }
+}
 
 
 

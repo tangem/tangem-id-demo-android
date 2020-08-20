@@ -1,16 +1,17 @@
 package com.tangem.id.features.issuecredentials.redux
 
 import com.tangem.Log
-import com.tangem.id.common.redux.*
+import com.tangem.id.common.entities.*
 import org.rekotlin.StateType
 
 sealed class IssueCredentialsButton(enabled: Boolean) : Button(enabled) {
-    class Sign(enabled: Boolean = true) : IssueCredentialsButton(enabled)
+    class Sign(enabled: Boolean = true, val progress: Boolean = false) : IssueCredentialsButton(enabled)
     class WriteCredentials(enabled: Boolean = true) : IssueCredentialsButton(enabled)
 }
 
 data class IssueCredentialsState(
     val editable: Boolean = true,
+    val jsonShown: String? = null,
     val holdersAddress: String? = null,
     val photo: Photo? = Photo(),
     val passport: Passport? = Passport(),
@@ -27,4 +28,11 @@ data class IssueCredentialsState(
     fun getCredentials() = listOfNotNull(photo, passport, securityNumber, ageOfMajority)
     fun isInputDataReady() =
         !getCredentials().map { it.isDataPresent() }.contains(false)
+
+    fun isInputDataModified(): Boolean {
+        if (!editable) return true
+
+        return photo?.isDataPresent() == true || passport?.isInputDataModified() == true
+                || !securityNumber?.number.isNullOrBlank()
+    }
 }

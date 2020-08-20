@@ -1,6 +1,7 @@
 package com.tangem.id.proof
 
 import android.content.Context
+import com.squareup.moshi.JsonClass
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
@@ -10,9 +11,9 @@ import org.apache.commons.codec.binary.Base64
 import org.bitcoinj.core.ECKey
 import org.kethereum.crypto.CryptoAPI
 import org.kethereum.crypto.api.ec.ECDSASignature
-import java.lang.Exception
 import java.math.BigInteger
 
+@JsonClass(generateAdapter = true)
 class Secp256k1Proof(
     verificationMethod: String,
     challenge: String? = null

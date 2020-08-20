@@ -10,8 +10,8 @@ android {
         applicationId "com.tangem.id"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,7 +51,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 
-    implementation 'com.tangem:blockchain:1.20.0'
+    implementation 'com.tangem:blockchain:1.25.0'
 
     //lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime:2.2.0"
@@ -60,9 +60,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
 
     //koin - di
-    implementation "org.koin:koin-android:2.1.5"
-    implementation "org.koin:koin-android-scope:2.1.5"
-    implementation "org.koin:koin-android-viewmodel:2.1.5"
+//    implementation "org.koin:koin-android:2.1.5"
+//    implementation "org.koin:koin-android-scope:2.1.5"
+//    implementation "org.koin:koin-android-viewmodel:2.1.5"
 
     implementation "org.rekotlin:rekotlin:1.0.4"
 
@@ -71,9 +71,7 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
     // Camera
-    implementation 'com.otaliastudios:cameraview:2.6.1'
-
-    implementation 'com.redmadrobot:input-mask-android:6.0.0'
+    implementation 'com.otaliastudios:cameraview:2.6.3'
 
     testImplementation 'junit:junit:4.13'
     testImplementation "com.google.truth:truth:1.0.1"
@@ -81,4 +79,4 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 }
-apply from: new File(rootProject.projectDir, '.liquidcore/liquidcore.build.gradle')
+//apply from: new File(rootProject.projectDir, '.liquidcore/liquidcore.build.gradle')

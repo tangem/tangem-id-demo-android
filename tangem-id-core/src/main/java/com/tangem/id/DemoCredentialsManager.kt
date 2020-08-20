@@ -1,12 +1,17 @@
 package com.tangem.id
 
 import android.content.Context
+import com.tangem.Message
 import com.tangem.TangemSdk
+import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.TransactionToSign
 import com.tangem.blockchain.common.TransactionSigner
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
+import com.tangem.commands.SignResponse
 import com.tangem.common.CompletionResult
+import com.tangem.id.card.WriteFilesTask
+import com.tangem.id.card.issuer
 import com.tangem.id.demo.DemoCredentialFactory
 import com.tangem.id.demo.DemoPersonData
 import com.tangem.id.documents.VerifiableCredential
@@ -17,15 +22,17 @@ import kotlin.coroutines.resume
 
 class DemoCredentialsManager(
     private val issuerWalletManager: EthereumIssuerWalletManager,
-    private val androidContext: Context
+    private val androidContext: Context,
+    private val tangemSdk: TangemSdk
 ) {
     val issuer = "did:ethr:${issuerWalletManager.wallet.address}"
 
     private var approvalTransaction: TransactionToSign? = null
     private var transactionSignature: ByteArray? = null
+    private var credentials: List<VerifiableCredential>? = null
 
     suspend fun createDemoCredentials(
-        personData: DemoPersonData, subjectEthereumAddress: String, signer: TransactionSigner
+        personData: DemoPersonData, subjectEthereumAddress: String, initialMessage: Message
     ): Result<List<VerifiableCredential>> {
 
         val credentialFactory = DemoCredentialFactory(
@@ -35,7 +42,8 @@ class DemoCredentialsManager(
             androidContext = androidContext
         )
 
-        val credentials = credentialFactory.createCredentials().drop(0)
+        val credentials = credentialFactory.createCredentials()
+        this.credentials = credentials
 
         val credentialHashes = credentials
             .map { credential ->
@@ -50,24 +58,31 @@ class DemoCredentialsManager(
                 }
             }
 
-        val approvalTransaction =
+        approvalTransaction =
             when (val result =
                 issuerWalletManager.buildTransaction(credentials[0].ethCredentialStatus!!)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return Result.Failure(result.error)
             }
 
-        val arrayToSign = (approvalTransaction.hashes + credentialHashes).toTypedArray()
+        val arrayToSign = (approvalTransaction!!.hashes + credentialHashes).toTypedArray()
 
+        val signer = IdSigner(tangemSdk, initialMessage)
         val signatures =
             when (val signerResponse = signer.sign(arrayToSign, issuerWalletManager.cardId)) {
                 is CompletionResult.Success -> signerResponse.data.signature
-                is CompletionResult.Failure -> return Result.Failure(
-                    Exception(
-                        "TangemError: code: ${signerResponse.error.code}, " +
-                                "message: ${signerResponse.error.customMessage}"
-                    )
-                )
+                is CompletionResult.Failure -> {
+                    return if (signerResponse.error is TangemSdkError.UserCancelled) {
+                        Result.Failure(TangemIdError.UserCancelled(androidContext))
+                    } else {
+                        Result.Failure(
+                            Exception(
+                                "TangemError: code: ${signerResponse.error.code}, " +
+                                        "message: ${signerResponse.error.customMessage}"
+                            )
+                        )
+                    }
+                }
             }
         transactionSignature = signatures.sliceArray(0 until SIGNATURE_SIZE)
 
@@ -88,9 +103,15 @@ class DemoCredentialsManager(
 
     }
 
+    fun showCredentials(): List<String> {
+        return credentials!!.map { it.toPrettyJson() }
+    }
+
     suspend fun completeWithId(
         credentials: List<VerifiableCredential>,
-        tangemSdk: TangemSdk
+        tangemSdk: TangemSdk,
+        initialMessage: Message,
+        holdersCardId: String
     ): SimpleResult {
 
         if (approvalTransaction == null || transactionSignature == null) return SimpleResult.Failure(
@@ -103,7 +124,12 @@ class DemoCredentialsManager(
 
         val result = suspendCancellableCoroutine<SimpleResult> { continuation ->
             tangemSdk.startSessionWithRunnable(
-                WriteFilesTask(cborCredentials, issuer().dataKeyPair)
+                WriteFilesTask(
+                    cborCredentials,
+                    issuer().dataKeyPair
+                ),
+                initialMessage = initialMessage,
+                cardId = holdersCardId
             ) { result ->
                 when (result) {
                     is CompletionResult.Failure -> if (continuation.isActive) {
@@ -115,16 +141,31 @@ class DemoCredentialsManager(
                 }
             }
         }
-        return when (result) {
-            SimpleResult.Success -> issuerWalletManager.sendSignedTransaction(
-                approvalTransaction!!,
-                transactionSignature!!
-            )
-            is SimpleResult.Failure -> result
-        }
+        //TODO: enable when sending transactions will be needed
+//        return when (result) {
+//            SimpleResult.Success -> issuerWalletManager.sendSignedTransaction(
+//                approvalTransaction!!,
+//                transactionSignature!!
+//            )
+//            is SimpleResult.Failure -> result
+//        }
+        return result
     }
 
     companion object {
         const val SIGNATURE_SIZE = 64
     }
+}
+
+class IdSigner(private val tangemSdk: TangemSdk, private val initialMessage: Message) :
+    TransactionSigner {
+    override suspend fun sign(
+        hashes: Array<ByteArray>,
+        cardId: String
+    ): CompletionResult<SignResponse> =
+        suspendCancellableCoroutine { continuation ->
+            tangemSdk.sign(hashes, cardId, initialMessage = initialMessage) { result ->
+                if (continuation.isActive) continuation.resume(result)
+            }
+        }
 }
