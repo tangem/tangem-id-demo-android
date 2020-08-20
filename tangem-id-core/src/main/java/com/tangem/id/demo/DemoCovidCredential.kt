@@ -59,6 +59,6 @@ class DemoCovidCredential {
             return gen.generateKeyPair()
         }
 
-        const val TANGEM_COVID_CREDENTIAL = "TangemCovidCredential"
+        const val TANGEM_COVID_CREDENTIAL = "TangemCovidTestResult"
     }
 }
