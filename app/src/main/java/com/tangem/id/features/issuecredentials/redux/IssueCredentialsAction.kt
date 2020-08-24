@@ -36,7 +36,7 @@ sealed class IssueCredentialsAction : Action {
         class Success() : IssueCredentialsAction(), NotificationAction {
             override val messageResource = R.string.issue_credentials_notification_write_success
         }
-
+        object Cancelled : IssueCredentialsAction()
         class Failure(override val error: TangemError) : IssueCredentialsAction(), ErrorAction
     }
 
