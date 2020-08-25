@@ -7,7 +7,6 @@ import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.TransactionToSign
 import com.tangem.blockchain.common.TransactionSigner
 import com.tangem.blockchain.extensions.Result
-import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.commands.SignResponse
 import com.tangem.common.CompletionResult
 import com.tangem.id.card.WriteFilesTask
@@ -112,17 +111,17 @@ class DemoCredentialsManager(
         tangemSdk: TangemSdk,
         initialMessage: Message,
         holdersCardId: String
-    ): SimpleResult {
+    ): SimpleResponse {
 
-        if (approvalTransaction == null || transactionSignature == null) return SimpleResult.Failure(
-            Error()
+        if (approvalTransaction == null || transactionSignature == null) return SimpleResponse.Failure(
+            TangemIdError.ErrorWritingCredentials(androidContext)
         )
 
         val cborCredentials = credentials.map { credential ->
             JsonLdCborEncoder.encode(credential.toMap())
         }
 
-        val result = suspendCancellableCoroutine<SimpleResult> { continuation ->
+        val result = suspendCancellableCoroutine<SimpleResponse> { continuation ->
             tangemSdk.startSessionWithRunnable(
                 WriteFilesTask(
                     cborCredentials,
@@ -133,10 +132,10 @@ class DemoCredentialsManager(
             ) { result ->
                 when (result) {
                     is CompletionResult.Failure -> if (continuation.isActive) {
-                        continuation.resume(SimpleResult.failure(result.error))
+                        continuation.resume(SimpleResponse.Failure(result.error))
                     }
                     is CompletionResult.Success -> {
-                        if (continuation.isActive) continuation.resume(SimpleResult.Success)
+                        if (continuation.isActive) continuation.resume(SimpleResponse.Success)
                     }
                 }
             }

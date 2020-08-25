@@ -56,9 +56,13 @@ val issueCredentialsMiddleware: Middleware<AppState> = { dispatch, state ->
                                         IssueCredentialsAction.WriteCredentials.Success()
                                     )
                                 }
-                                is SimpleResponse.Failure -> store.dispatch(
-                                    IssueCredentialsAction.WriteCredentials.Failure(result.error)
-                                )
+                                is SimpleResponse.Failure -> if (result.error is TangemIdError.UserCancelled) {
+                                    store.dispatch(IssueCredentialsAction.WriteCredentials.Cancelled)
+                                } else {
+                                    store.dispatch(
+                                        IssueCredentialsAction.WriteCredentials.Failure(result.error)
+                                    )
+                                }
                             }
                         }
                     }
