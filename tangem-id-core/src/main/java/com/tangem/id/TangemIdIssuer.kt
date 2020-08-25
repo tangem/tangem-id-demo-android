@@ -6,9 +6,9 @@ import com.tangem.Message
 import com.tangem.TangemSdk
 import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
-import com.tangem.blockchain.common.Blockchain
 import com.tangem.blockchain.extensions.Result
 import com.tangem.commands.Card
+import com.tangem.commands.EllipticCurve
 import com.tangem.commands.Product
 import com.tangem.common.CompletionResult
 import com.tangem.id.demo.DemoPersonData
@@ -67,8 +67,7 @@ class TangemIdIssuer(
     }
 
     private fun isValidCard(card: Card): Boolean {
-        return card.walletPublicKey != null
-                && card.cardData?.blockchainName == Blockchain.Ethereum.id
+        return card.walletPublicKey != null && card.curve == EllipticCurve.Secp256k1
     }
 
 
