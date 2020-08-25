@@ -1,8 +1,11 @@
 package com.tangem.id.features.holder.redux
 
+import com.tangem.commands.file.File
 import com.tangem.commands.file.FileSettings
+import com.tangem.id.card.toggleVisibility
 import com.tangem.id.common.entities.Button
 import com.tangem.id.common.entities.Credential
+import com.tangem.id.demo.HolderDemoCredential
 import org.rekotlin.StateType
 
 enum class AccessLevel {
@@ -22,6 +25,27 @@ enum class AccessLevel {
     }
 }
 
+data class HolderCredential(
+    val credential: Credential,
+    val accessLevel: AccessLevel,
+    val file: File
+) {
+    fun toggleVisibility(): HolderCredential {
+        return this.copy(
+            accessLevel = accessLevel.toggleVisibility(),
+            file = file.copy(fileSettings = file.fileSettings?.toggleVisibility())
+        )
+    }
+}
+
+fun HolderDemoCredential.toHolderCredential(): HolderCredential {
+    return HolderCredential(
+        Credential.from(this.demoCredential),
+        AccessLevel.from(this.file.fileSettings!!),
+        this.file
+    )
+}
+
 sealed class HolderScreenButton(enabled: Boolean) : Button(enabled) {
     class RequestNewCredential(enabled: Boolean = true) : HolderScreenButton(enabled)
     class SaveChanges(enabled: Boolean = true) : HolderScreenButton(enabled)
@@ -32,9 +56,9 @@ data class HolderState(
     val editActivated: Boolean = false,
     val detailsOpened: Credential? = null,
     val jsonShown: String? = null,
-    val credentials: List<Pair<Credential, AccessLevel>> = listOf(),
-    val credentialsOnCard: List<Pair<Credential, AccessLevel>> = listOf(),
-    val credentialsToDelete: List<Credential> = listOf()
+    val credentials: List<HolderCredential> = listOf(),
+    val credentialsOnCard: List<HolderCredential> = listOf(),
+    val credentialsToDelete: List<File> = listOf()
 ) : StateType {
 
     val button: HolderScreenButton = if (editActivated) {

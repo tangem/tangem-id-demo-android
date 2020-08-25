@@ -3,12 +3,11 @@ package com.tangem.id.features.home.redux
 import android.os.Handler
 import android.os.Looper
 import com.tangem.common.CompletionResult
-import com.tangem.id.common.entities.Credential
 import com.tangem.id.common.redux.AppState
 import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
-import com.tangem.id.features.holder.redux.AccessLevel
 import com.tangem.id.features.holder.redux.HolderAction
+import com.tangem.id.features.holder.redux.toHolderCredential
 import com.tangem.id.features.issuer.redux.IssuerAction
 import com.tangem.id.features.verifier.redux.VerifierAction
 import com.tangem.id.features.verifier.redux.VerifierCredential
@@ -66,15 +65,11 @@ val homeMiddleware: Middleware<AppState> = { dispatch, state ->
                                     store.dispatch(HomeAction.ReadCredentialsAsHolder.Failure(result.error))
                                 is CompletionResult.Success -> {
                                     val holdersCredentials =
-                                        result.data.credentials.map {
-                                            Credential.from(it.first.decodedCredential)
-                                        }
-                                    val visibility =
-                                        result.data.credentials.map { AccessLevel.from(it.second) }
+                                        result.data.credentials.map { it.toHolderCredential() }
 
                                     store.dispatch(
                                         HolderAction.CredentialsRead(
-                                            result.data.cardId, holdersCredentials.zip(visibility)
+                                            result.data.cardId, holdersCredentials
                                         )
                                     )
                                     store.dispatch(NavigationAction.NavigateTo(AppScreen.Holder))
