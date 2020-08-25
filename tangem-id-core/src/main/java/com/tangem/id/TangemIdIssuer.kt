@@ -8,7 +8,6 @@ import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.common.Blockchain
 import com.tangem.blockchain.extensions.Result
-import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.commands.Card
 import com.tangem.commands.Product
 import com.tangem.common.CompletionResult
@@ -134,11 +133,17 @@ class TangemIdIssuer(
             )
             withContext(Dispatchers.Main) {
                 when (result) {
-                    is SimpleResult.Success -> callback(SimpleResponse.Success)
-                    is SimpleResult.Failure ->
-                        callback(
-                            SimpleResponse.Failure(TangemIdError.ErrorWritingCredentials(activity))
-                        )
+                    is SimpleResponse.Success -> callback(SimpleResponse.Success)
+                    is SimpleResponse.Failure ->
+                        if (result.error is TangemSdkError.UserCancelled) {
+                            callback(SimpleResponse.Failure(TangemIdError.UserCancelled(activity)))
+                        } else {
+                            callback(
+                                SimpleResponse.Failure(
+                                    TangemIdError.ErrorWritingCredentials(activity)
+                                )
+                            )
+                        }
                 }
             }
         }
