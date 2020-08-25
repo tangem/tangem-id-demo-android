@@ -51,7 +51,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
         if (activity == null) return
 
         if (state.jsonShown != null) {
-            val builder = MaterialAlertDialogBuilder(context)
+            val builder = MaterialAlertDialogBuilder(requireContext())
             builder
                 .setMessage(state.jsonShown)
                 .setOnDismissListener { store.dispatch(VerifierAction.HideJson) }

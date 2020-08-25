@@ -48,7 +48,7 @@
                 android:textColorHint="@color/darkGray1"
                 app:boxStrokeColor="@color/text_input_underline_color">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.tangem.id.features.issuecredentials.ui.ClearFocusEditText
                     android:id="@+id/et_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                 android:textColorHint="@color/darkGray1"
                 app:boxStrokeColor="@color/text_input_underline_color">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.tangem.id.features.issuecredentials.ui.ClearFocusEditText
                     android:id="@+id/et_surname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -133,7 +133,7 @@
                     android:textColorHint="@color/darkGray1"
                     app:boxStrokeColor="@color/text_input_underline_color">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <com.tangem.id.features.issuecredentials.ui.ClearFocusEditText
                         android:id="@+id/et_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
