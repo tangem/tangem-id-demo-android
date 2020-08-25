@@ -12,11 +12,11 @@ sealed class HolderAction : Action {
 
     data class CredentialsRead(
         val cardId: String,
-        val credentials: List<Pair<Credential, AccessLevel>>
+        val credentials: List<HolderCredential>
     ) : HolderAction()
 
     object RequestNewCredential : HolderAction() {
-        data class Success(val allCredentials: List<Pair<Credential, AccessLevel>>) :
+        data class Success(val allCredentials: List<HolderCredential>) :
             HolderAction(), NotificationAction {
             override val messageResource = R.string.holder_screen_notification_request_credential_success
         }

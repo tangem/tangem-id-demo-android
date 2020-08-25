@@ -12,19 +12,20 @@ import com.tangem.id.common.entities.*
 import com.tangem.id.common.extensions.show
 import com.tangem.id.features.holder.redux.AccessLevel
 import com.tangem.id.features.holder.redux.HolderAction
+import com.tangem.id.features.holder.redux.HolderCredential
 import kotlinx.android.synthetic.main.layout_holder_credential.view.*
 
 class HolderCredentialsAdapter(
     private val itemClickListener: (HolderAction) -> Unit
 ) : RecyclerView.Adapter<HolderCredentialsAdapter.CredentialViewHolder>() {
 
-    private var items: List<Pair<Credential, AccessLevel>> = listOf()
+    private var items: List<HolderCredential> = listOf()
     private var isEditActivated = false
 
     override fun getItemCount() = items.size
 
     fun setItems(
-        credentials: List<Pair<Credential, AccessLevel>>,
+        credentials: List<HolderCredential>,
         isEditActivated: Boolean = false
     ) {
         items = credentials
@@ -43,8 +44,9 @@ class HolderCredentialsAdapter(
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
 
-        val credential = items[position].first
-        val accessLevel = items[position].second
+        val holderCredential = items[position]
+        val credential = holderCredential.credential
+        val accessLevel = holderCredential.accessLevel
         val context = holder.ivAccess.context
 
         holder.tvCredential.text =

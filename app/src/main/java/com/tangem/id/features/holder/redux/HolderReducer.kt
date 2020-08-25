@@ -25,7 +25,8 @@ fun holderReducer(action: Action, state: AppState): HolderState {
             newState =
                 newState.copy(
                     editActivated = !editActivated,
-                    credentials = newState.credentialsOnCard
+                    credentials = newState.credentialsOnCard,
+                    credentialsToDelete = listOf()
                 )
         }
         is HolderAction.RequestNewCredential.Success -> {
@@ -57,8 +58,8 @@ fun holderReducer(action: Action, state: AppState): HolderState {
             if (newState.editActivated) {
                 val editedCredentials = newState.credentials
                     .map {
-                        if (it.first == action.credential) {
-                            it.first to it.second.toggleVisibility()
+                        if (it.credential == action.credential) {
+                            it.toggleVisibility()
                         } else {
                             it
                         }
@@ -69,13 +70,23 @@ fun holderReducer(action: Action, state: AppState): HolderState {
         }
         is HolderAction.RemoveCredential -> {
             if (newState.editActivated) {
-                val editedCredentials =
-                    newState.credentials.filter { it.first != action.credential }
-                newState = newState.copy(
-                    credentials = editedCredentials,
-                    credentialsToDelete = newState.credentialsToDelete + action.credential
-                )
+                val credentialToDelete =
+                    newState.credentials.find { it.credential == action.credential }
+                if (credentialToDelete != null) {
+                    val editedCredentials =
+                        newState.credentials.filter { it != credentialToDelete }
+                    newState = newState.copy(
+                        credentials = editedCredentials,
+                        credentialsToDelete = newState.credentialsToDelete + credentialToDelete.file
+                    )
+                }
             }
+        }
+        is HolderAction.ChangePasscodeAction -> {
+            newState = newState.copy(
+                    editActivated = false, credentials = newState.credentialsOnCard,
+                    credentialsToDelete = listOf()
+                )
         }
         is HolderAction.ShowCredentialDetails -> {
             newState = newState.copy(detailsOpened = action.credential)
@@ -83,10 +94,9 @@ fun holderReducer(action: Action, state: AppState): HolderState {
         HolderAction.HideCredentialDetails -> {
             newState = newState.copy(detailsOpened = null, jsonShown = null)
         }
-
         is HolderAction.ShowJson -> {
-
-            val index = newState.credentialsOnCard.indexOfFirst { it.first == action.credential }
+            val index =
+                newState.credentialsOnCard.indexOfFirst { it.credential == action.credential }
             val json = tangemIdSdk.holder.showHoldersCredential(index)
             newState = newState.copy(jsonShown = json)
 

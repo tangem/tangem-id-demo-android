@@ -2,9 +2,9 @@ package com.tangem.id.features.holder.redux
 
 import android.os.Handler
 import android.os.Looper
+import com.tangem.commands.file.File
 import com.tangem.common.CompletionResult
 import com.tangem.id.SimpleResponse
-import com.tangem.id.common.entities.Credential
 import com.tangem.id.common.redux.AppState
 import com.tangem.id.store
 import com.tangem.id.tangemIdSdk
@@ -21,20 +21,10 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                     val credentialsWithChanges = store.state.holderState.credentials
                     val credentialsToDelete = store.state.holderState.credentialsToDelete
                     if (credentialsOnCard != credentialsWithChanges) {
-                        val indicesToDelete: List<Int> = if (credentialsToDelete.isNotEmpty()) {
-                            val originalCredentials = credentialsOnCard.unzip().first
-                            credentialsToDelete.map { originalCredentials.indexOf(it) }
-                        } else {
-                            listOf()
-                        }
-                        val indicesWithNewVisibility = credentialsOnCard.mapIndexed { index, pair ->
-                            if (credentialsWithChanges.find { it.first == pair.first && it.second != pair.second } != null) {
-                                index
-                            } else null
-                        }.filterNotNull()
+                        val filesToChangeVisibility: List<File> =
+                            credentialsWithChanges.map { it.file }
                         tangemIdSdk.holder.changeHoldersCredentials(
-                            store.state.holderState.cardId,
-                            indicesToDelete, indicesWithNewVisibility
+                            store.state.holderState.cardId, credentialsToDelete, filesToChangeVisibility
                         ) { result ->
                             mainThread.post {
                                 when (result) {
@@ -64,11 +54,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                             when (result) {
                                 is CompletionResult.Success -> {
                                     val holdersCredentials =
-                                        result.data.map {
-                                            Credential.from(it.first.decodedCredential) to AccessLevel.from(
-                                                it.second
-                                            )
-                                        }
+                                        result.data.map { it.toHolderCredential() }
                                     store.dispatch(
                                         HolderAction.RequestNewCredential.Success(holdersCredentials)
                                     )
