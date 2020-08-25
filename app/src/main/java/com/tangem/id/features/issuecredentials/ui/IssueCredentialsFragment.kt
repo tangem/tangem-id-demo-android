@@ -64,7 +64,7 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
     }
 
     private fun showConfirmationDialog() {
-        val builder = MaterialAlertDialogBuilder(context)
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder
             .setMessage(R.string.issue_credentials_dialog_go_back)
             .setPositiveButton(com.tangem.tangem_sdk_new.R.string.general_ok)
@@ -183,7 +183,7 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
             btn_show_json.setOnClickListener { store.dispatch(IssueCredentialsAction.ShowJson) }
         }
         if (!state.editable && state.jsonShown != null) {
-            val builder = MaterialAlertDialogBuilder(context)
+            val builder = MaterialAlertDialogBuilder(requireContext())
             builder
                 .setMessage(state.jsonShown)
                 .setOnDismissListener { store.dispatch(IssueCredentialsAction.HideJson) }

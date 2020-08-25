@@ -21,7 +21,6 @@ class EditableSsnWidget(private val fragment: Fragment) :
         credential.number?.let { fragment.et_ssn?.setText(it) }
         fragment.et_ssn.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
-//                view.hideKeyboard()
                 val number = fragment.et_ssn.text.toString()
                 store.dispatch(IssueCredentialsAction.SaveInput(ssn = number))
             }
@@ -35,8 +34,5 @@ class EditableSsnWidget(private val fragment: Fragment) :
         }
         fragment.et_ssn.isEnabled = editable
         fragment.et_ssn.addTextChangedListener(SsnFormattingTextWatcher())
-//        val listener = MaskedTextChangedListener("[000]-[00]-[000]", fragment.et_ssn)
-
-//        fragment.et_ssn.addTextChangedListener(listener)
     }
 }

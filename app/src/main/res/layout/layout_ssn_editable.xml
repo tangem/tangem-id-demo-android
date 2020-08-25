@@ -36,7 +36,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
 
-                <EditText
+                <com.tangem.id.features.issuecredentials.ui.ClearFocusEditText
                     android:id="@+id/et_ssn"
                     android:hint="@string/credential_ssn_hint"
                     android:layout_width="140dp"
