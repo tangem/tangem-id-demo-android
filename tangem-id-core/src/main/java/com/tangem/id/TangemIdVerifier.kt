@@ -46,7 +46,7 @@ class TangemIdVerifier(
                     }
                     is CompletionResult.Success -> {
                         if (result.data.files.isEmpty() || result.data.files[0].fileData.isEmpty()) {
-                            callback(CompletionResult.Failure(TangemIdError.NoCredentials(activity)))
+                            callback(CompletionResult.Failure(TangemIdError.NoVisibleCredentials(activity)))
                             return@launch
                         }
 
