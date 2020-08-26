@@ -17,6 +17,8 @@ class EditableSsnWidget(private val fragment: Fragment) :
     override val rootView: ViewGroup? = fragment.fl_ssn_editable
 
     override fun setup(credential: SecurityNumber, editable: Boolean) {
+        fragment.et_ssn.addTextChangedListener(SsnFormattingTextWatcher())
+
         credential.number?.let { fragment.et_ssn?.setText(it) }
         fragment.et_ssn.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
@@ -32,7 +34,6 @@ class EditableSsnWidget(private val fragment: Fragment) :
             return@setOnEditorActionListener false;
         }
         fragment.et_ssn.isEnabled = editable
-        fragment.et_ssn.addTextChangedListener(SsnFormattingTextWatcher())
 
         if (!credential.number.isNullOrBlank() && !credential.isDataPresent()) {
             fragment.et_ssn.error = fragment.getString(R.string.issue_credentials_ssn_error)
