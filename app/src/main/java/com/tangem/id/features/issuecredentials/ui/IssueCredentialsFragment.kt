@@ -44,22 +44,11 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
     }
 
     private fun handleExit() {
-        store.dispatch(
-            IssueCredentialsAction.SaveInput(
-                Passport(
-                    et_name?.text?.toString(), et_surname?.text?.toString(),
-                    null,
-                    et_date?.text?.toString()
-                ),
-                et_ssn?.text?.toString()
-            )
-        )
-
+        saveEditableInputData()
         if (store.state.issueCredentialsState.isInputDataModified()) {
             showConfirmationDialog()
         } else {
-            store.dispatch(IssueCredentialsAction.ResetState)
-            store.dispatch(NavigationAction.PopBackTo())
+            leaveIssueCredentialsScreen()
         }
     }
 
@@ -67,14 +56,15 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         val builder = MaterialAlertDialogBuilder(requireContext())
         builder
             .setMessage(R.string.issue_credentials_dialog_go_back)
-            .setPositiveButton(com.tangem.tangem_sdk_new.R.string.general_ok)
-            { _, _ ->
-                store.dispatch(IssueCredentialsAction.ResetState)
-                store.dispatch(NavigationAction.PopBackTo())
-            }
+            .setPositiveButton(com.tangem.tangem_sdk_new.R.string.general_ok) { _, _ -> leaveIssueCredentialsScreen() }
             .setNegativeButton(com.tangem.tangem_sdk_new.R.string.dialog_cancel) { dialog, _ -> dialog.cancel() }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    private fun leaveIssueCredentialsScreen() {
+        store.dispatch(IssueCredentialsAction.ResetState)
+        store.dispatch(NavigationAction.PopBackTo())
     }
 
     override fun onStart() {
@@ -135,10 +125,7 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
             ll_root.hideKeyboard()
         }
 
-        val credentialWidgetFactory =
-            CredentialWidgetFactory(
-                this
-            )
+        val credentialWidgetFactory = CredentialWidgetFactory(this)
         state.getCredentials().map { credential ->
             credentialWidgetFactory.createFrom(credential)
                 ?.inflateAndSetup(credential, ll_root, state.editable)
@@ -152,13 +139,14 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
             is IssueCredentialsButton.Sign -> {
                 progress_btn?.hide()
                 btn_filled?.text = getString(R.string.issue_credentials_btn_sign)
-                if (state.isInputDataReady()) {
-                    btn_filled?.isEnabled = true
-                    btn_filled?.setOnClickListener {
+                btn_filled?.isEnabled = true
+                btn_filled?.setOnClickListener {
+                    saveEditableInputData()
+                    if (state.isInputDataReady()) {
                         store.dispatch(IssueCredentialsAction.Sign(requireContext().applicationContext))
+                    } else {
+                        store.dispatch(IssueCredentialsAction.FormIncomplete)
                     }
-                } else {
-                    btn_filled?.isEnabled = false
                 }
                 if (state.button.progress) {
                     btn_filled?.text = null
@@ -193,6 +181,19 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
             val dialog = builder.create()
             dialog.show()
         }
+    }
+
+    private fun saveEditableInputData() {
+        store.dispatch(
+            IssueCredentialsAction.SaveInput(
+                Passport(
+                    et_name?.text?.toString(), et_surname?.text?.toString(),
+                    null,
+                    et_date?.text?.toString()
+                ),
+                et_ssn?.text?.toString()
+            )
+        )
     }
 
     override fun onRequestPermissionsResult(

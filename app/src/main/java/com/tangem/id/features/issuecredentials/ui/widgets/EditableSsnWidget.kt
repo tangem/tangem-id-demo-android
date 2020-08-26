@@ -11,7 +11,6 @@ import com.tangem.id.features.issuecredentials.ui.textwatchers.SsnFormattingText
 import com.tangem.id.store
 import kotlinx.android.synthetic.main.layout_ssn_editable.*
 
-
 class EditableSsnWidget(private val fragment: Fragment) :
     CredentialWidget<SecurityNumber>(fragment.context) {
     override val viewToInflate = R.layout.layout_ssn_editable
@@ -34,5 +33,11 @@ class EditableSsnWidget(private val fragment: Fragment) :
         }
         fragment.et_ssn.isEnabled = editable
         fragment.et_ssn.addTextChangedListener(SsnFormattingTextWatcher())
+
+        if (!credential.number.isNullOrBlank() && !credential.isDataPresent()) {
+            fragment.et_ssn.error = fragment.getString(R.string.issue_credentials_ssn_error)
+        } else {
+            fragment.et_ssn.error = null
+        }
     }
 }

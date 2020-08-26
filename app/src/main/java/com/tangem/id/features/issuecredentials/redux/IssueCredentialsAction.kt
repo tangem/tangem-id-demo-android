@@ -19,6 +19,10 @@ sealed class IssueCredentialsAction : Action {
         override val messageResource = R.string.issue_credentials_notification_no_camera_permission
     }
 
+    object FormIncomplete : IssueCredentialsAction(), NotificationAction {
+        override val messageResource = R.string.issue_credentials_notification_incomplete_form
+    }
+
     data class AddHoldersAddress(val address: String) : IssueCredentialsAction()
 
     data class SaveInput(val passport: Passport? = null, val ssn: String? = null) : IssueCredentialsAction()

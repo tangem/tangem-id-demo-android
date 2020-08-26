@@ -26,6 +26,8 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
     override val viewToInflate = R.layout.layout_passport_editable
     override val rootView: ViewGroup? = fragment.fl_passport_editable
 
+    private var picker: MaterialDatePicker<Long>? = null
+
     override fun setup(credential: Passport, editable: Boolean) {
 
         credential.name?.let { fragment.et_name?.setText(it) }
@@ -55,13 +57,13 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
 
             fragment.iv_date_picker.setOnClickListener {
                 onEditEnded()
-                launchDatePicker()
+                if (picker == null) launchDatePicker()
             }
 
             fragment.et_date.addTextChangedListener(DateFormattingTextWatcher())
 
             if (credential.isDateValid() == false) {
-                fragment.til_date.error = "Date format is MM/dd/yyyy"
+                fragment.til_date.error = fragment.getString(R.string.issuer_credentials_date_error)
             } else {
                 fragment.til_date.error = null
             }
@@ -78,9 +80,11 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         fragment.iv_date_picker.isEnabled = editable
 
         if (editable) {
-            fragment.checkbox?.buttonTintList = fragment.getColorStateList(R.color.checkbox_always_accent)
-        }  else {
-            fragment.checkbox?.buttonTintList = fragment.getColorStateList(R.color.checkbox_unselected_grayed)
+            fragment.checkbox?.buttonTintList =
+                fragment.getColorStateList(R.color.checkbox_always_accent)
+        } else {
+            fragment.checkbox?.buttonTintList =
+                fragment.getColorStateList(R.color.checkbox_unselected_grayed)
         }
     }
 
@@ -117,13 +121,14 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         val builder = MaterialDatePicker.Builder.datePicker()
             .setCalendarConstraints(limitRange(selectedDate))
         if (selectedDate != null) builder.setSelection(selectedDate)
-        val picker = builder.build()
-        picker.show(fragment.childFragmentManager, picker.toString())
-        picker.addOnPositiveButtonClickListener { time ->
+        picker = builder.build()
+        picker?.show(fragment.childFragmentManager, picker.toString())
+        picker?.addOnPositiveButtonClickListener { time ->
             val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault())
             val dateString = date.format(DateTimeFormatter.ofPattern("MMddyyyy"))
             onEditEnded(dateString)
         }
+        picker?.addOnDismissListener { picker = null }
     }
 
     private fun limitRange(selectAt: Long?): CalendarConstraints {
