@@ -29,6 +29,7 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
     private var picker: MaterialDatePicker<Long>? = null
 
     override fun setup(credential: Passport, editable: Boolean) {
+        fragment.et_date.addTextChangedListener(DateFormattingTextWatcher())
 
         credential.name?.let { fragment.et_name?.setText(it) }
         credential.surname?.let { fragment.et_surname?.setText(it) }
@@ -59,8 +60,6 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
                 onEditEnded()
                 if (picker == null) launchDatePicker()
             }
-
-            fragment.et_date.addTextChangedListener(DateFormattingTextWatcher())
 
             if (credential.isDateValid() == false) {
                 fragment.til_date.error = fragment.getString(R.string.issuer_credentials_date_error)
