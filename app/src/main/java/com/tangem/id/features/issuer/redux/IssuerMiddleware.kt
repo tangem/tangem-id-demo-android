@@ -20,6 +20,7 @@ val issuerMiddleware: Middleware<AppState> = { dispatch, state ->
                 is IssuerAction.ReadHoldersCard -> {
                     tangemIdSdk.issuer.getHolderAddress { result ->
                         mainThread.post {
+                            store.dispatch(IssueCredentialsAction.ResetState)
                             when (result) {
                                 is CompletionResult.Success -> {
                                     store.dispatch(IssueCredentialsAction.AddHoldersAddress(result.data))

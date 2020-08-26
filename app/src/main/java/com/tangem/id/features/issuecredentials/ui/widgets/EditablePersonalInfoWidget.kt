@@ -63,7 +63,7 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
             fragment.et_date.addTextChangedListener(DateFormattingTextWatcher())
 
             if (credential.isDateValid() == false) {
-                fragment.til_date.error = "Date format is MM/dd/yyyy"
+                fragment.til_date.error = fragment.getString(R.string.issuer_credentials_date_error)
             } else {
                 fragment.til_date.error = null
             }
@@ -80,9 +80,11 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         fragment.iv_date_picker.isEnabled = editable
 
         if (editable) {
-            fragment.checkbox?.buttonTintList = fragment.getColorStateList(R.color.checkbox_always_accent)
-        }  else {
-            fragment.checkbox?.buttonTintList = fragment.getColorStateList(R.color.checkbox_unselected_grayed)
+            fragment.checkbox?.buttonTintList =
+                fragment.getColorStateList(R.color.checkbox_always_accent)
+        } else {
+            fragment.checkbox?.buttonTintList =
+                fragment.getColorStateList(R.color.checkbox_unselected_grayed)
         }
     }
 

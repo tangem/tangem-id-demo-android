@@ -52,8 +52,10 @@
     <string name="issue_credentials_notification_write_success">Credentials have been issued</string>
     <string name="issue_credentials_notification_sign_success">You have created and signed credentials. Now write them on a holder\'s card</string>
     <string name="issue_credentials_notification_no_camera_permission">You must grant camera permission to take photo</string>
+    <string name="issue_credentials_notification_incomplete_form">You must fill in all data in the form</string>
     <string name="issue_credentials_dialog_go_back">Do you want to go back and cancel your input?</string>
-
+    <string name="issuer_credentials_date_error">Date format is MM/dd/yyyy</string>
+    <string name="issue_credentials_ssn_error">SSN is XXX-XX-XXXX</string>
 
     <string name="verifier_screen_toolbar">ID Validator</string>
     <string name="verifier_screen_status">Status: %s</string>
