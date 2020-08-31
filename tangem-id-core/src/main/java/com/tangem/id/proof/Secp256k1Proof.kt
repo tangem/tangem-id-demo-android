@@ -1,13 +1,13 @@
 package com.tangem.id.proof
 
 import android.content.Context
+import android.util.Base64
 import com.squareup.moshi.JsonClass
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.extensions.calculateSha256
 import com.tangem.id.documents.VerifiableDocument
-import org.apache.commons.codec.binary.Base64
 import org.bitcoinj.core.ECKey
 import org.kethereum.crypto.CryptoAPI
 import org.kethereum.crypto.api.ec.ECDSASignature
@@ -52,12 +52,12 @@ class Secp256k1Proof(
         val jwsHeader = jwsParts[0]
         val jwsSignature = jwsParts[1]
 
-        val decodedHeader = String(Base64.decodeBase64(jwsSignature))
+        val decodedHeader = String(Base64.decode(jwsSignature, Base64.URL_SAFE))
         if (decodedHeader != jwsHeader) {
             return SimpleResult.Failure(Exception("Invalid JWS header"))
         }
 
-        val decodedSignature = Base64.decodeBase64(jwsSignature)
+        val decodedSignature = Base64.decode(jwsSignature, Base64.URL_SAFE)
 
         return when (checkEthSignature(decodedSignature, hash, issuerEthereumAddress)) {
             true -> SimpleResult.Success
@@ -72,8 +72,8 @@ class Secp256k1Proof(
         val canonicalS = ECKey.ECDSASignature(r, s).toCanonicalised().s
         val canonicalSignature = rBytes + canonicalS.toByteArray()
 
-        val encodedHeader = Base64.encodeBase64URLSafeString(JWS_HEADER.toByteArray())
-        val encodedSignature = Base64.encodeBase64URLSafeString(canonicalSignature)
+        val encodedHeader = Base64.encodeToString(JWS_HEADER.toByteArray(), Base64.URL_SAFE)
+        val encodedSignature = Base64.encodeToString(canonicalSignature, Base64.URL_SAFE)
 
         jws = "$encodedHeader..$encodedSignature"
     }

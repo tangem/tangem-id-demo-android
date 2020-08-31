@@ -1,7 +1,7 @@
 package com.tangem.id.demo
 
+import android.util.Base64
 import com.tangem.id.documents.VerifiableCredential
-import org.apache.commons.codec.binary.Base64
 import java.time.LocalDate
 
 class DemoPersonData(
@@ -43,7 +43,7 @@ fun VerifiableCredential.toDemoCredential(): DemoCredential? {
         this.type.contains(DemoCredentialFactory.TANGEM_PHOTO_CREDENTIAL) -> {
             val photoBase64 =
                 (this.credentialSubject["photo"] as? String)
-            val photo = photoBase64?.let { Base64.decodeBase64(it) }
+            val photo = photoBase64?.let { Base64.decode(it, Base64.URL_SAFE) }
             if (photo != null) DemoCredential.PhotoCredential(photo) else null
         }
         this.type.contains(DemoCredentialFactory.TANGEM_PERSONAL_INFORMATION_CREDENTIAL) -> {

@@ -6,6 +6,7 @@ import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.extensions.calculateSha3v512
 import org.json.JSONArray
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class DemoCredentialFactory(
     private val issuer: String,
@@ -58,7 +59,13 @@ class DemoCredentialFactory(
         val bornDate = personData.born.toDate()!!
         val over21Date = bornDate.plusYears(21)
         val validFrom =
-            if (over21Date > LocalDate.now()) "${over21Date}\"${over21Date}T00:00:00Z\"" else null // TODO: maybe use start of the day in current time zone?
+            if (over21Date > LocalDate.now()) {
+                val formattedDate =
+                    over21Date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                "${formattedDate}T00:00:00Z\""
+            } else {
+                null
+            }
 
         return VerifiableCredential(
             credentialSubject = credentialSubject,
