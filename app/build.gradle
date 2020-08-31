@@ -51,7 +51,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 
-    implementation 'com.tangem:blockchain:1.25.0'
+    implementation 'com.tangem:blockchain:1.27.0'
 
     //lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime:2.2.0"
@@ -71,7 +71,7 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
     // Camera
-    implementation 'com.otaliastudios:cameraview:2.6.3'
+    implementation 'com.otaliastudios:cameraview:2.6.2'
 
     testImplementation 'junit:junit:4.13'
     testImplementation "com.google.truth:truth:1.0.1"

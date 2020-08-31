@@ -1,15 +1,15 @@
 package com.tangem.id.demo
 
+import android.util.Base64
 import com.tangem.id.extensions.calculateSha3v256
-import org.apache.commons.codec.binary.Base64
 
 class DemoCredentialSubjectFactory(val subjectId: String, val personData: DemoPersonData) {
 
-    val photoHash = Base64.encodeBase64URLSafeString(personData.photo.calculateSha3v256())
+    val photoHash = Base64.encodeToString(personData.photo.calculateSha3v256(), Base64.URL_SAFE)
 
     fun createPhotoCredentialSubject() = mapOf(
         "id" to subjectId,
-        "photo" to Base64.encodeBase64URLSafeString(personData.photo)
+        "photo" to Base64.encodeToString(personData.photo, Base64.URL_SAFE)
     )
 
     fun createPersonalInformationCredentialSubject() = mapOf(

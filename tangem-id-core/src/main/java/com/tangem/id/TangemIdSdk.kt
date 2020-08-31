@@ -37,6 +37,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
         throwable.printStackTrace(PrintWriter(sw))
         val exceptionAsString: String = sw.toString()
         Log.e("TangemIdSdk", exceptionAsString)
+        throw throwable
     }
 }
 
