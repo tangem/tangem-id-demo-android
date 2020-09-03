@@ -123,7 +123,7 @@ class TangemIdHolder(
     }
 
     fun addCovidCredential(
-        callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
+        cardId: String?, callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
     ) {
         if (holderCredentials?.find { it.demoCredential is DemoCredential.CovidCredential } != null) {
             callback(CompletionResult.Failure(TangemIdError.CredentialAlreadyIssued(activity)))
@@ -153,7 +153,8 @@ class TangemIdHolder(
         val writeFileDataTask = WriteFileDataTask(encoded, issuer().dataKeyPair)
         tangemSdk.startSessionWithRunnable(
             writeFileDataTask,
-            initialMessage = tapHolderCardMessage
+            initialMessage = tapHolderCardMessage,
+            cardId = cardId
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
