@@ -21,8 +21,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                     val credentialsWithChanges = store.state.holderState.credentials
                     val credentialsToDelete = store.state.holderState.credentialsToDelete
                     if (credentialsOnCard != credentialsWithChanges) {
-                        val filesToChangeVisibility: List<File> =
-                            credentialsWithChanges.map { it.file }
+                        val filesToChangeVisibility = store.state.holderState.getFilesToChangeVisibility()
                         tangemIdSdk.holder.changeHoldersCredentials(
                             store.state.holderState.cardId, credentialsToDelete, filesToChangeVisibility
                         ) { result ->
