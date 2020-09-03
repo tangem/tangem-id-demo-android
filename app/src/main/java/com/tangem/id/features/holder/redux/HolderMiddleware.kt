@@ -2,7 +2,6 @@ package com.tangem.id.features.holder.redux
 
 import android.os.Handler
 import android.os.Looper
-import com.tangem.commands.file.File
 import com.tangem.common.CompletionResult
 import com.tangem.id.SimpleResponse
 import com.tangem.id.common.redux.AppState
@@ -48,7 +47,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                     }
                 }
                 is HolderAction.RequestNewCredential -> {
-                    tangemIdSdk.holder.addCovidCredential { result ->
+                    tangemIdSdk.holder.addCovidCredential(store.state.holderState.cardId) { result ->
                         mainThread.post {
                             when (result) {
                                 is CompletionResult.Success -> {
