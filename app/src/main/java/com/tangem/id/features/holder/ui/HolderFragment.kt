@@ -227,7 +227,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         CameraPermissionManager.handleRequestPermissionResult(requestCode, grantResults,
             actionIfNotGranted = { store.dispatch(HolderAction.NoCameraPermission) },
-            actionIfGranted = { store.dispatch(NavigationAction.NavigateTo(AppScreen.Camera)) })
+            actionIfGranted = { store.dispatch(NavigationAction.NavigateTo(AppScreen.QrScan)) })
     }
 
 }
