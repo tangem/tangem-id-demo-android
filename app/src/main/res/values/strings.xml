@@ -36,6 +36,7 @@
     <string name="holder_screen_notification_request_credential_success">New credential has been added</string>
     <string name="holder_screen_notification_save_changes_success">Changes have been saved</string>
     <string name="holder_screen_notification_change_passcode_success">Passcode has been changed</string>
+    <string name="holder_screen_notification_no_camera_permission">You must grant camera permission to scan QR Code</string>
     <string name="holder_screen_dialog_show_json">Show JSON</string>
 
 

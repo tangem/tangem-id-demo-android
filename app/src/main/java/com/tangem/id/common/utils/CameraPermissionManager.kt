@@ -5,8 +5,6 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
-import com.tangem.id.features.issuecredentials.redux.IssueCredentialsAction
-import com.tangem.id.store
 
 class CameraPermissionManager {
 
@@ -16,13 +14,16 @@ class CameraPermissionManager {
                     PermissionChecker.PERMISSION_GRANTED
         }
 
-        fun handleRequestPermissionResult(requestCode: Int, grantResults: IntArray, action: () -> Unit) {
+        fun handleRequestPermissionResult(
+            requestCode: Int, grantResults: IntArray,
+            actionIfNotGranted: () -> Unit, actionIfGranted: () -> Unit
+        ) {
             when (requestCode) {
                 1 -> {
                     if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        store.dispatch(IssueCredentialsAction.NoCameraPermission)
+                        actionIfNotGranted()
                     } else {
-                        action.invoke()
+                        actionIfGranted()
                     }
                 }
             }

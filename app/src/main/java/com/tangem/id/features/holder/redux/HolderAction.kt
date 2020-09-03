@@ -23,6 +23,10 @@ sealed class HolderAction : Action {
         class Failure(override val error: TangemError) : HolderAction(), ErrorAction
     }
 
+    object NoCameraPermission : HolderAction(), NotificationAction {
+        override val messageResource = R.string.holder_screen_notification_no_camera_permission
+    }
+
     object SaveChanges : HolderAction() {
         object Success : HolderAction(), NotificationAction {
             override val messageResource = R.string.holder_screen_notification_save_changes_success
