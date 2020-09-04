@@ -66,5 +66,14 @@ data class HolderState(
     } else {
         HolderScreenButton.RequestNewCredential()
     }
+
+    fun getFilesToChangeVisibility(): List<File> {
+            return credentials.filter { credential ->
+                val credentialOnCard = credentialsOnCard.find {
+                    it.file.fileIndex == credential.file.fileIndex
+                }
+                credential.file.fileSettings != credentialOnCard?.file?.fileSettings
+            }.map { it.file }
+    }
 }
 

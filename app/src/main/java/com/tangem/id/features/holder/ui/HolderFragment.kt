@@ -17,6 +17,7 @@ import com.tangem.id.common.entities.*
 import com.tangem.id.common.extensions.*
 import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.common.redux.navigation.NavigationAction
+import com.tangem.id.common.utils.CameraPermissionManager
 import com.tangem.id.features.holder.redux.HolderAction
 import com.tangem.id.features.holder.redux.HolderScreenButton
 import com.tangem.id.features.holder.redux.HolderState
@@ -112,8 +113,11 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
             is HolderScreenButton.RequestNewCredential -> {
                 btn_filled?.text = getString(R.string.holder_screen_btn_request)
                 btn_filled?.setOnClickListener {
-//                    store.dispatch(HolderAction.RequestNewCredential)
-                    store.dispatch(NavigationAction.NavigateTo(AppScreen.QrScan))
+                    if (CameraPermissionManager.isPermissionGranted(this)) {
+                        store.dispatch(NavigationAction.NavigateTo(AppScreen.QrScan))
+                    } else {
+                        CameraPermissionManager.requirePermission(this)
+                    }
                 }
             }
         }
@@ -213,6 +217,17 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
             ) //fix the color to white
             item.setTitle(spanString)
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        CameraPermissionManager.handleRequestPermissionResult(requestCode, grantResults,
+            actionIfNotGranted = { store.dispatch(HolderAction.NoCameraPermission) },
+            actionIfGranted = { store.dispatch(NavigationAction.NavigateTo(AppScreen.QrScan)) })
     }
 
 }

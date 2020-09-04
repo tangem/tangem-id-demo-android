@@ -202,9 +202,9 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        CameraPermissionManager.handleRequestPermissionResult(requestCode, grantResults) {
-            store.dispatch(NavigationAction.NavigateTo(AppScreen.Camera))
-        }
+        CameraPermissionManager.handleRequestPermissionResult(requestCode, grantResults,
+            actionIfNotGranted = { store.dispatch(IssueCredentialsAction.NoCameraPermission) },
+            actionIfGranted = { store.dispatch(NavigationAction.NavigateTo(AppScreen.Camera)) })
     }
 }
 

@@ -1,5 +1,6 @@
 package com.tangem.id
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import com.example.tangem_id_core.R
 import com.tangem.Message
@@ -91,6 +92,10 @@ class TangemIdHolder(
         cardId: String?, filesToDelete: List<File>, filesToChangeVisibility: List<File>,
         callback: (SimpleResponse) -> Unit
     ) {
+        Log.i(this::class.java.simpleName, "Files to delete: ${filesToDelete.map { "Index ${it.fileIndex}"}}")
+        Log.i(this::class.java.simpleName,
+            "Files to change visibility: " +
+                    "${filesToChangeVisibility.map { "Index ${it.fileIndex}, status: ${it.fileSettings?.name}"}}")
 
         val task = ChangeFilesTask(filesToDelete, filesToChangeVisibility)
         tangemSdk.startSessionWithRunnable(
@@ -116,6 +121,7 @@ class TangemIdHolder(
                             credential
                         }
                     }
+                    Log.i(this::class.java.simpleName, "ChangedHolderCredentials: ${holderCredentials?.toString()}")
                     callback(SimpleResponse.Success)
                 }
             }
@@ -123,7 +129,7 @@ class TangemIdHolder(
     }
 
     fun addCovidCredential(
-        callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
+        cardId: String?, callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
     ) {
         if (holderCredentials?.find { it.demoCredential is DemoCredential.CovidCredential } != null) {
             callback(CompletionResult.Failure(TangemIdError.CredentialAlreadyIssued(activity)))
@@ -135,7 +141,7 @@ class TangemIdHolder(
                 holderAddress!!, activity.applicationContext
             )
             when (covidResult) {
-                is Result.Success -> writeNewCredential(covidResult.data, callback)
+                is Result.Success -> writeNewCredential(covidResult.data, cardId, callback)
                 is Result.Failure ->
                     callback(
                         CompletionResult.Failure(TangemIdError.ErrorAddingNewCredential(activity))
@@ -145,7 +151,7 @@ class TangemIdHolder(
     }
 
     private fun writeNewCredential(
-        credential: VerifiableCredential,
+        credential: VerifiableCredential, cardId: String?,
         callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
     ) {
         val encoded = JsonLdCborEncoder.encode(credential.toMap())
@@ -153,7 +159,8 @@ class TangemIdHolder(
         val writeFileDataTask = WriteFileDataTask(encoded, issuer().dataKeyPair)
         tangemSdk.startSessionWithRunnable(
             writeFileDataTask,
-            initialMessage = tapHolderCardMessage
+            initialMessage = tapHolderCardMessage,
+            cardId = cardId
         ) { result ->
             when (result) {
                 is CompletionResult.Failure ->
@@ -165,9 +172,13 @@ class TangemIdHolder(
                     if (demoCredential != null) {
                         val holderCredential = HolderDemoCredential(
                             demoCredential, credential,
-                            File(result.data.fileIndex ?: 0, FileSettings.Public, encoded)
+                            File(
+                                result.data.fileIndex ?: holderCredentials!!.size,
+                                FileSettings.Public, encoded
+                            )
                         )
                         holderCredentials = holderCredentials!! + holderCredential
+                        Log.i(this::class.java.simpleName, holderCredentials?.toString())
                         callback(CompletionResult.Success(holderCredentials!!))
                     } else {
                         callback(

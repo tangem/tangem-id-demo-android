@@ -26,8 +26,6 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
     override val viewToInflate = R.layout.layout_passport_editable
     override val rootView: ViewGroup? = fragment.fl_passport_editable
 
-    private var picker: MaterialDatePicker<Long>? = null
-
     override fun setup(credential: Passport, editable: Boolean) {
         fragment.et_date.addTextChangedListener(DateFormattingTextWatcher())
 
@@ -58,7 +56,8 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
 
             fragment.iv_date_picker.setOnClickListener {
                 onEditEnded()
-                if (picker == null) launchDatePicker()
+                fragment.iv_date_picker.isEnabled = false
+                launchDatePicker()
             }
 
             if (credential.isDateValid() == false) {
@@ -120,14 +119,14 @@ class EditablePersonalInfoWidget(private val fragment: Fragment) :
         val builder = MaterialDatePicker.Builder.datePicker()
             .setCalendarConstraints(limitRange(selectedDate))
         if (selectedDate != null) builder.setSelection(selectedDate)
-        picker = builder.build()
-        picker?.show(fragment.childFragmentManager, picker.toString())
-        picker?.addOnPositiveButtonClickListener { time ->
+        val picker = builder.build()
+        picker.show(fragment.childFragmentManager, picker.toString())
+        picker.addOnPositiveButtonClickListener { time ->
             val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault())
             val dateString = date.format(DateTimeFormatter.ofPattern("MMddyyyy"))
             onEditEnded(dateString)
         }
-        picker?.addOnDismissListener { picker = null }
+        picker.addOnDismissListener { fragment.iv_date_picker.isEnabled = true }
     }
 
     private fun limitRange(selectAt: Long?): CalendarConstraints {

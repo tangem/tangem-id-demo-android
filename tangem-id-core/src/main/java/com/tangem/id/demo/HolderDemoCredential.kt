@@ -13,6 +13,11 @@ data class HolderDemoCredential(
     fun toggleVisibility(): HolderDemoCredential {
         return this.copy(file = file.copy(fileSettings = file.fileSettings?.toggleVisibility()))
     }
+
+    override fun toString(): String {
+        return "Credential: ${demoCredential::class.java.simpleName}," +
+                " fileIndex: ${file.fileIndex}, fileStatus: ${file.fileSettings?.name}"
+    }
 }
 
 fun File.toHolderCredential(): HolderDemoCredential? {

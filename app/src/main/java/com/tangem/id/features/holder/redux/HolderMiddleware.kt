@@ -2,7 +2,6 @@ package com.tangem.id.features.holder.redux
 
 import android.os.Handler
 import android.os.Looper
-import com.tangem.commands.file.File
 import com.tangem.common.CompletionResult
 import com.tangem.id.SimpleResponse
 import com.tangem.id.common.redux.AppState
@@ -21,8 +20,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                     val credentialsWithChanges = store.state.holderState.credentials
                     val credentialsToDelete = store.state.holderState.credentialsToDelete
                     if (credentialsOnCard != credentialsWithChanges) {
-                        val filesToChangeVisibility: List<File> =
-                            credentialsWithChanges.map { it.file }
+                        val filesToChangeVisibility = store.state.holderState.getFilesToChangeVisibility()
                         tangemIdSdk.holder.changeHoldersCredentials(
                             store.state.holderState.cardId, credentialsToDelete, filesToChangeVisibility
                         ) { result ->
@@ -49,7 +47,7 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                     }
                 }
                 is HolderAction.RequestNewCredential -> {
-                    tangemIdSdk.holder.addCovidCredential { result ->
+                    tangemIdSdk.holder.addCovidCredential(store.state.holderState.cardId) { result ->
                         mainThread.post {
                             when (result) {
                                 is CompletionResult.Success -> {
