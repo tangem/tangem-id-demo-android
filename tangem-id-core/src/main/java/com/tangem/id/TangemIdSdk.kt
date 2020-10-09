@@ -26,7 +26,7 @@ class TangemIdSdk(val activity: ComponentActivity) {
     private val config = Config(
         cardFilter = CardFilter(EnumSet.allOf(CardType::class.java))
     )
-    private val tangemSdk = TangemSdk.init(activity, config)
+    val tangemSdk = TangemSdk.init(activity, config)
 
     val issuer = TangemIdIssuer(tangemSdk, scope, activity)
     val holder = TangemIdHolder(tangemSdk, scope, activity)

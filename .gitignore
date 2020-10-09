@@ -27,3 +27,6 @@ local.properties
 **/fastlane/Preview.html
 **/fastlane/screenshots
 **/fastlane/test_output
+
+# NodeJS modules
+/node_modules/
