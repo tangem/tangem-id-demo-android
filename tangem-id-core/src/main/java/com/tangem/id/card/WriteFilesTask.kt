@@ -74,10 +74,29 @@ class WriteFilesTask(
                         callback(CompletionResult.Failure(TangemSdkError.MissingPreflightRead()))
                         return@run
                     }
+                    if (readResponse.data.fileData.isNotEmpty()) {
+                        fixFilesNotDeletedProblem(counter, cardId, session, callback)
+                        return@run
+                    }
                     writeData(0, counter.inc(), cardId, session, callback)
                 }
             }
         }
+    }
+
+    private fun fixFilesNotDeletedProblem(
+        counter: Int, cardId: String,
+        session: CardSession, callback: (result: CompletionResult<WriteFilesResponse>) -> Unit
+    ) {
+        createWriteFileCommand(byteArrayOf(0), counter + 1, cardId)
+            .run(session) { result ->
+                when (result) {
+                    is CompletionResult.Success -> {
+                        deleteFile(session, callback)
+                    }
+                    is CompletionResult.Failure -> callback(CompletionResult.Failure(result.error))
+                }
+            }
     }
 
     private fun writeData(
@@ -86,29 +105,32 @@ class WriteFilesTask(
         callback: (result: CompletionResult<WriteFilesResponse>) -> Unit
     ) {
         if (currentFileIndex > data.lastIndex) {
-            callback(
-                CompletionResult.Success(
-                    WriteFilesResponse(cardId, filesIndices)
-                )
-            )
+            callback(CompletionResult.Success(WriteFilesResponse(cardId, filesIndices)))
             return
         }
-
         val currentFile = data[currentFileIndex]
-        val writeCommand = WriteFileDataCommand(
-            currentFile,
-            getStartingSignature(currentFile, counter, cardId),
-            getFinalizingSignature(currentFile, counter, cardId),
+        createWriteFileCommand(currentFile, counter, cardId)
+            .run(session) { result ->
+                when (result) {
+                    is CompletionResult.Success -> {
+                        writeData(currentFileIndex.inc(), counter.inc(), cardId, session, callback)
+                    }
+                    is CompletionResult.Failure -> callback(CompletionResult.Failure(result.error))
+                }
+            }
+    }
+
+    private fun createWriteFileCommand(
+        data: ByteArray,
+        counter: Int,
+        cardId: String
+    ): WriteFileDataCommand {
+        return WriteFileDataCommand(
+            data,
+            getStartingSignature(data, counter, cardId),
+            getFinalizingSignature(data, counter, cardId),
             counter, issuerKeys.publicKey
         )
-        writeCommand.run(session) { result ->
-            when (result) {
-                is CompletionResult.Success -> {
-                    writeData(currentFileIndex.inc(), counter.inc(), cardId, session, callback)
-                }
-                is CompletionResult.Failure -> callback(CompletionResult.Failure(result.error))
-            }
-        }
     }
 
     private fun getStartingSignature(data: ByteArray, counter: Int, cardId: String): ByteArray {
