@@ -5,33 +5,38 @@ import com.tangem.Log
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.common.extensions.calculateSha256
+import com.tangem.common.extensions.calculateSha512
+import com.tangem.id.proof.Ed25519Proof
 import com.tangem.id.proof.LinkedDataProof
 import com.tangem.id.proof.Secp256k1Proof
+import org.bouncycastle.crypto.tls.HashAlgorithm
 import org.json.JSONArray
 import org.json.JSONObject
 
 abstract class VerifiableDocument(
     val context: MutableSet<String>,
     val type: MutableSet<String>,
-    var proof: Secp256k1Proof?
+    var proof: LinkedDataProof?
 ) {
     abstract fun toJson(): String
 
     fun toJSONObject() = JSONObject(this.toJson())
 
-    // TODO: check issuer DID for verification method key
-    suspend fun verify(androidContext: Context): SimpleResult {
+    suspend fun verifyProof(requiredSignerDid: String? = null): SimpleResult {
         val proofType = proof?.type ?: return SimpleResult.Failure(Exception("Proof not found"))
-        if (proofType != Secp256k1Proof.TYPE) {
-            return SimpleResult.Failure(Exception("Unknown proof type"))
-        }
 
-        return (proof as Secp256k1Proof).verify(this, androidContext)
+        return when (proofType) {
+            Secp256k1Proof.TYPE -> (proof as Secp256k1Proof).verify(this) // TODO: check issuer DID for verification method key
+            Ed25519Proof.TYPE -> {
+                (proof as Ed25519Proof).verify(this, requiredSignerDid)
+            }
+            else -> SimpleResult.Failure(Exception("Unknown proof type"))
+        }
     }
 
     suspend fun calculateVerifyHash(
-        androidContext: Context,
-        inputProofOptions: LinkedDataProof? = null
+        inputProofOptions: LinkedDataProof? = null,
+        hashAlgorithm: ProofHashAlgorithm = ProofHashAlgorithm.Sha256
     ): Result<ByteArray> {
 
         val proofOptions = inputProofOptions?.toJSONObject()
@@ -48,8 +53,9 @@ abstract class VerifiableDocument(
 
         Log.i("TangemCredential", this.toJson())
 
-        val documentHash = document.toString().calculateSha256()
-        val proofOptionsHash = proofOptions.toString().calculateSha256()
+
+        val documentHash = hashAlgorithm.calculateHash(document.toString())
+        val proofOptionsHash = hashAlgorithm.calculateHash(proofOptions.toString())
         return Result.Success(proofOptionsHash + documentHash)
 
 
@@ -95,5 +101,13 @@ abstract class VerifiableDocument(
 
     companion object {
         const val DEFAULT_CONTEXT = "https://www.w3.org/2018/credentials/v1"
+    }
+}
+
+enum class ProofHashAlgorithm {
+    Sha256, Sha512;
+    fun calculateHash(data: String) = when (this) {
+        Sha256 -> data.calculateSha256()
+        Sha512 -> data.calculateSha512()
     }
 }

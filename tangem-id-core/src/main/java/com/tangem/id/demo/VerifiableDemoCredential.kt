@@ -32,7 +32,7 @@ class VerifiableDemoCredential(
 }
 
 suspend fun VerifiableDocument.simpleVerify(androidContext: Context): Boolean {
-    val result = this.verify(androidContext)
+    val result = this.verifyProof(androidContext)
     return result is SimpleResult.Success
 }
 

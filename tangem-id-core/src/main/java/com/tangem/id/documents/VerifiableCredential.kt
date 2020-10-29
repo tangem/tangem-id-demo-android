@@ -13,7 +13,7 @@ open class VerifiableCredential(
     val issuanceDate: String,
     val validFrom: String?,
     val id: String?,
-    var ethCredentialStatus: String?,
+    var credentialStatus: Map<String, Any>?,
     @Json(name = "@context") context: Collection<String>,
     type: Collection<String>,
     proof: Secp256k1Proof?
@@ -25,14 +25,15 @@ open class VerifiableCredential(
         extraContexts: Collection<String>? = null,
         extraTypes: Collection<String>? = null,
         validFrom: String? = null,
-        id: String? = null
+        id: String? = null,
+        credentialStatus: Map<String, Any>? = null
     ) : this(
         credentialSubject = credentialSubject,
         issuer = issuer,
         issuanceDate = Instant.now().toString(),
         validFrom = validFrom,
         id = id,
-        ethCredentialStatus = null,
+        credentialStatus = null,
         context = setOf(DEFAULT_CONTEXT),
         type = setOf(DEFAULT_TYPE),
         proof = null

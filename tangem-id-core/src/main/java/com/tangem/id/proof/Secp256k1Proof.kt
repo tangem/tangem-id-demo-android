@@ -20,11 +20,10 @@ class Secp256k1Proof(
 ) : LinkedDataProof(TYPE, verificationMethod, challenge) {
 
     suspend fun calculateHashToSign(
-        document: VerifiableDocument,
-        androidContext: Context
+        document: VerifiableDocument
     ): Result<ByteArray> {
         val verifyHash =
-            when (val result = document.calculateVerifyHash(androidContext, this)) {
+            when (val result = document.calculateVerifyHash( this)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return result
             }
@@ -32,8 +31,7 @@ class Secp256k1Proof(
     }
 
     suspend fun verify(
-        document: VerifiableDocument,
-        androidContext: Context
+        document: VerifiableDocument
     ): SimpleResult {
         if (!verificationMethod.startsWith("did:ethr:")) {
             return SimpleResult.Failure(Exception("Unknown verification method"))
@@ -42,7 +40,7 @@ class Secp256k1Proof(
             verificationMethod.removePrefix("did:ethr:").removeSuffix("#owner")
 
         val hash =
-            when (val result = calculateHashToSign(document, androidContext)) {
+            when (val result = calculateHashToSign(document)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return SimpleResult.Failure(result.error)
             }
@@ -52,8 +50,8 @@ class Secp256k1Proof(
         val jwsHeader = jwsParts[0]
         val jwsSignature = jwsParts[1]
 
-        val decodedHeader = String(Base64.decode(jwsSignature, Base64.URL_SAFE))
-        if (decodedHeader != jwsHeader) {
+        val decodedHeader = String(Base64.decode(jwsHeader, Base64.URL_SAFE))
+        if (decodedHeader != JWS_HEADER) {
             return SimpleResult.Failure(Exception("Invalid JWS header"))
         }
 
