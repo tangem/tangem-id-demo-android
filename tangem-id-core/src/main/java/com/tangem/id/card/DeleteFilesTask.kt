@@ -4,8 +4,8 @@ import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
 import com.tangem.commands.SimpleResponse
 import com.tangem.commands.file.DeleteFileCommand
-import com.tangem.commands.file.File
 import com.tangem.common.CompletionResult
+import com.tangem.tasks.file.File
 import java.util.*
 
 class DeleteFilesTask(

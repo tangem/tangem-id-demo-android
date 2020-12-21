@@ -3,9 +3,9 @@ package com.tangem.id.card
 import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
 import com.tangem.commands.SimpleResponse
-import com.tangem.commands.file.File
 import com.tangem.commands.file.FileSettings
 import com.tangem.common.CompletionResult
+import com.tangem.tasks.file.File
 
 class ChangeFilesTask(
     private val filesToDelete: List<File>,

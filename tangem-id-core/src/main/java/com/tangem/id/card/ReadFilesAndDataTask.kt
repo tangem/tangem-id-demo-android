@@ -4,29 +4,31 @@ import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
 import com.tangem.TangemSdkError
 import com.tangem.commands.CommandResponse
-import com.tangem.commands.Product
-import com.tangem.commands.file.File
-import com.tangem.commands.file.ReadFileDataTask
+import com.tangem.commands.common.card.masks.Product
 import com.tangem.common.CompletionResult
+import com.tangem.tasks.file.File
+import com.tangem.tasks.file.ReadFilesTask
 
-class FilesResponse(
+// TODO: refactor?
+
+class FilesAndDataResponse(
     val cardId: String,
     val walletPublicKey: ByteArray,
     val files: List<File>
 ) : CommandResponse
 
-class ReadFilesTask(private val readPrivateFiles: Boolean = false) :
-    CardSessionRunnable<FilesResponse> {
+class ReadFilesAndDataTask(private val readPrivateFiles: Boolean = false) :
+    CardSessionRunnable<FilesAndDataResponse> {
 
     override val requiresPin2 = readPrivateFiles
 
     override fun run(
-        session: CardSession, callback: (result: CompletionResult<FilesResponse>) -> Unit
+        session: CardSession, callback: (result: CompletionResult<FilesAndDataResponse>) -> Unit
     ) {
         if (session.environment.card?.cardData?.productMask?.contains(Product.IdCard) != true) {
             callback(CompletionResult.Failure(TangemSdkError.CardError()))
         }
-        val command = ReadFileDataTask(readPrivateFiles)
+        val command = ReadFilesTask(readPrivateFiles)
         command.run(session) { result ->
             when (result) {
                 is CompletionResult.Success -> {
@@ -38,7 +40,7 @@ class ReadFilesTask(private val readPrivateFiles: Boolean = false) :
                     }
                     callback(
                         CompletionResult.Success(
-                            FilesResponse(cardId, walletPublicKey, result.data.files)
+                            FilesAndDataResponse(cardId, walletPublicKey, result.data.files)
                         )
                     )
                 }

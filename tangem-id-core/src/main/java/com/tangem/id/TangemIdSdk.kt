@@ -2,7 +2,7 @@ package com.tangem.id
 
 import androidx.activity.ComponentActivity
 import com.tangem.*
-import com.tangem.common.extensions.CardType
+import com.tangem.commands.common.card.CardType
 import com.tangem.tangem_sdk_new.extensions.init
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope

@@ -2,10 +2,11 @@ package com.tangem.id.demo
 
 import android.util.Base64
 import com.tangem.id.extensions.calculateSha3v256
+import com.tangem.id.proof.LinkedDataProof.Companion.BASE64_JWS_OPTIONS
 
 class DemoCredentialSubjectFactory(val subjectId: String, val personData: DemoPersonData) {
 
-    val photoHash = Base64.encodeToString(personData.photo.calculateSha3v256(), Base64.URL_SAFE)
+    val photoHash = Base64.encodeToString(personData.photo.calculateSha3v256(), BASE64_JWS_OPTIONS)
 
     fun createPhotoCredentialSubject() = mapOf(
         "id" to subjectId,

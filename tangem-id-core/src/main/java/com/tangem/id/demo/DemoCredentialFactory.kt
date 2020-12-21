@@ -11,8 +11,7 @@ import java.time.format.DateTimeFormatter
 class DemoCredentialFactory(
     private val issuer: String,
     private val personData: DemoPersonData,
-    subjectId: String,
-    private val androidContext: Context
+    subjectId: String
 ) {
     private val credentialSubjectFactory = DemoCredentialSubjectFactory(subjectId, personData)
 

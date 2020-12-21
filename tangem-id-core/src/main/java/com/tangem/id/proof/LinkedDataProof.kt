@@ -1,5 +1,6 @@
 package com.tangem.id.proof
 
+import android.util.Base64
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import org.json.JSONObject
@@ -39,6 +40,7 @@ open class LinkedDataProof internal constructor(
 
     companion object {
         const val ASSERTION_METHOD = "assertionMethod"
+        const val BASE64_JWS_OPTIONS = Base64.URL_SAFE + Base64.NO_PADDING + Base64.NO_WRAP
 
         private val jsonAdapter =
             Moshi.Builder().build().adapter(LinkedDataProof::class.java)

@@ -56,8 +56,8 @@ class IssueCredentialsFragment : Fragment(R.layout.fragment_issue_credentials),
         val builder = MaterialAlertDialogBuilder(requireContext())
         builder
             .setMessage(R.string.issue_credentials_dialog_go_back)
-            .setPositiveButton(com.tangem.tangem_sdk_new.R.string.general_ok) { _, _ -> leaveIssueCredentialsScreen() }
-            .setNegativeButton(com.tangem.tangem_sdk_new.R.string.general_cancel) { dialog, _ -> dialog.cancel() }
+            .setPositiveButton(com.tangem.tangem_sdk_new.R.string.common_ok) { _, _ -> leaveIssueCredentialsScreen() }
+            .setNegativeButton(com.tangem.tangem_sdk_new.R.string.common_cancel) { dialog, _ -> dialog.cancel() }
         val dialog = builder.create()
         dialog.show()
     }

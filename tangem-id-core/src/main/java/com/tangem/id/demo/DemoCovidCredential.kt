@@ -15,10 +15,10 @@ import java.security.SecureRandom
 
 class DemoCovidCredential {
     companion object {
-        suspend fun createCovidCredential(subjectEthereumAddress: String, androidContext: Context): Result<VerifiableCredential> {
+        suspend fun createCovidCredential(subjectEthereumAddress: String): Result<VerifiableCredential> {
             val keyPair = generateKeyPair()
             val privateKey = keyPair.private as ECPrivateKeyParameters
-            val publicKey = keyPair.public as ECPublicKeyParameters;
+            val publicKey = keyPair.public as ECPublicKeyParameters
 
             val issuerEthAddress = EthereumAddressService().makeAddress(publicKey.q.getEncoded(false))
             val issuer = "did:ethr:$issuerEthAddress"
@@ -40,7 +40,7 @@ class DemoCovidCredential {
             credential.proof = proof
 
             val hashToSign =
-                when (val result = proof.calculateHashToSign(credential, androidContext)) {
+                when (val result = proof.calculateHashToSign(credential)) {
                     is Result.Success -> result.data
                     is Result.Failure -> return result
                 }

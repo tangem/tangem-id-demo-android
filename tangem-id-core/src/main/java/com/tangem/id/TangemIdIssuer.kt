@@ -7,9 +7,9 @@ import com.tangem.TangemSdk
 import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
-import com.tangem.commands.Card
-import com.tangem.commands.EllipticCurve
-import com.tangem.commands.Product
+import com.tangem.commands.common.card.Card
+import com.tangem.commands.common.card.EllipticCurve
+import com.tangem.commands.common.card.masks.Product
 import com.tangem.common.CompletionResult
 import com.tangem.id.demo.DemoPersonData
 import com.tangem.id.documents.VerifiableCredential
