@@ -9,7 +9,7 @@ import com.tangem.blockchain.blockchains.ethereum.network.EthereumNetworkManager
 import com.tangem.blockchain.common.*
 import com.tangem.blockchain.extensions.Result
 import com.tangem.blockchain.extensions.SimpleResult
-import com.tangem.commands.Card
+import com.tangem.commands.common.card.Card
 import com.tangem.common.extensions.toHexString
 import java.math.BigDecimal
 
@@ -56,9 +56,9 @@ class EthereumIssuerWalletManager(
         txCount = data.txCount
         pendingTxCount = data.pendingTxCount
         if (txCount == pendingTxCount) {
-            wallet.transactions.forEach { it.status = TransactionStatus.Confirmed }
-        } else if (wallet.transactions.isEmpty()) {
-            wallet.addIncomingTransaction()
+            wallet.recentTransactions.forEach { it.status = TransactionStatus.Confirmed }
+        } else if (wallet.recentTransactions.isEmpty()) {
+            wallet.addTransactionDummy(TransactionDirection.Incoming)
         }
     }
 
@@ -92,7 +92,6 @@ class EthereumIssuerWalletManager(
         val result = networkManager.getFee(GasLimit.Default.value)
         when (result) {
             is Result.Success -> {
-                val feeValues: List<BigDecimal> = result.data
                 return Result.Success(Amount(wallet.amounts[AmountType.Coin]!!, result.data[1]))
             }
             is Result.Failure -> return result

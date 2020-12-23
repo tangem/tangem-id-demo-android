@@ -8,16 +8,16 @@ import com.tangem.TangemSdk
 import com.tangem.TangemSdkError
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
-import com.tangem.commands.file.File
+import com.tangem.commands.file.FileData
 import com.tangem.commands.file.FileSettings
-import com.tangem.commands.file.WriteFileDataTask
 import com.tangem.common.CompletionResult
 import com.tangem.id.card.ChangeFilesTask
-import com.tangem.id.card.ReadFilesTask
-import com.tangem.id.card.issuer
+import com.tangem.id.card.ReadFilesAndDataTask
 import com.tangem.id.demo.*
 import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.utils.JsonLdCborEncoder
+import com.tangem.tasks.file.File
+import com.tangem.tasks.file.WriteFilesTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -55,7 +55,7 @@ class TangemIdHolder(
 
     fun readCredentialsAsHolder(callback: (CompletionResult<HolderData>) -> Unit) {
         tangemSdk.startSessionWithRunnable(
-            ReadFilesTask(true),
+            ReadFilesAndDataTask(true),
             initialMessage = tapHolderCardMessage
         ) { result ->
             when (result) {
@@ -137,10 +137,7 @@ class TangemIdHolder(
         }
 
         coroutineScope.launch {
-            val covidResult = DemoCovidCredential.createCovidCredential(
-                holderAddress!!, activity.applicationContext
-            )
-            when (covidResult) {
+            when (val covidResult = DemoCovidCredential.createCovidCredential(holderAddress!!)) {
                 is Result.Success -> writeNewCredential(covidResult.data, cardId, callback)
                 is Result.Failure ->
                     callback(
@@ -155,10 +152,10 @@ class TangemIdHolder(
         callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
     ) {
         val encoded = JsonLdCborEncoder.encode(credential.toMap())
+        val writeFilesTask = WriteFilesTask(listOf(FileData.DataProtectedByPasscode(encoded)))
 
-        val writeFileDataTask = WriteFileDataTask(encoded, issuer().dataKeyPair)
         tangemSdk.startSessionWithRunnable(
-            writeFileDataTask,
+            writeFilesTask,
             initialMessage = tapHolderCardMessage,
             cardId = cardId
         ) { result ->

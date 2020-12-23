@@ -4,8 +4,9 @@ import com.tangem.CardSession
 import com.tangem.CardSessionRunnable
 import com.tangem.commands.SimpleResponse
 import com.tangem.commands.file.ChangeFileSettingsCommand
-import com.tangem.commands.file.File
+import com.tangem.commands.file.FileSettingsChange
 import com.tangem.common.CompletionResult
+import com.tangem.tasks.file.File
 import java.util.*
 
 class ChangeFilesSettingsTask(
@@ -34,7 +35,8 @@ class ChangeFilesSettingsTask(
             )
             return
         }
-        val command = ChangeFileSettingsCommand(file.fileSettings!!, file.fileIndex)
+        val command =
+            ChangeFileSettingsCommand(FileSettingsChange(file.fileIndex, file.fileSettings!!))
         command.run(session) { result ->
             when (result) {
                 is CompletionResult.Success -> {

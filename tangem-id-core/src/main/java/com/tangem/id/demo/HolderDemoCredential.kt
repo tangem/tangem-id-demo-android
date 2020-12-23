@@ -1,9 +1,9 @@
 package com.tangem.id.demo
 
-import com.tangem.commands.file.File
 import com.tangem.id.card.toggleVisibility
 import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.utils.JsonLdCborEncoder
+import com.tangem.tasks.file.File
 
 data class HolderDemoCredential(
     val demoCredential: DemoCredential,

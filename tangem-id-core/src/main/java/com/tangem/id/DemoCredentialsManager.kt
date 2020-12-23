@@ -9,8 +9,7 @@ import com.tangem.blockchain.common.TransactionSigner
 import com.tangem.blockchain.extensions.Result
 import com.tangem.commands.SignResponse
 import com.tangem.common.CompletionResult
-import com.tangem.id.card.WriteFilesTask
-import com.tangem.id.card.issuer
+import com.tangem.id.card.DeleteAndWriteFilesTask
 import com.tangem.id.demo.DemoCredentialFactory
 import com.tangem.id.demo.DemoPersonData
 import com.tangem.id.documents.VerifiableCredential
@@ -37,8 +36,7 @@ class DemoCredentialsManager(
         val credentialFactory = DemoCredentialFactory(
             issuer = issuer,
             personData = personData,
-            subjectId = "did:ethr:$subjectEthereumAddress",
-            androidContext = androidContext
+            subjectId = "did:ethr:$subjectEthereumAddress"
         )
 
         val credentials = credentialFactory.createCredentials()
@@ -48,7 +46,7 @@ class DemoCredentialsManager(
             .map { credential ->
                 val proof = Secp256k1Proof("$issuer#owner")
                 credential.proof = proof
-                proof.calculateHashToSign(credential, androidContext)
+                proof.calculateHashToSign(credential)
             }
             .map { result ->
                 when (result) {
@@ -123,9 +121,8 @@ class DemoCredentialsManager(
 
         val result = suspendCancellableCoroutine<SimpleResponse> { continuation ->
             tangemSdk.startSessionWithRunnable(
-                WriteFilesTask(
-                    cborCredentials,
-                    issuer().dataKeyPair
+                DeleteAndWriteFilesTask(
+                    cborCredentials
                 ),
                 initialMessage = initialMessage,
                 cardId = holdersCardId
@@ -163,7 +160,11 @@ class IdSigner(private val tangemSdk: TangemSdk, private val initialMessage: Mes
         cardId: String
     ): CompletionResult<SignResponse> =
         suspendCancellableCoroutine { continuation ->
-            tangemSdk.sign(hashes, cardId, initialMessage = initialMessage) { result ->
+            tangemSdk.sign(
+                hashes = hashes,
+                cardId = cardId,
+                initialMessage = initialMessage
+            ) { result ->
                 if (continuation.isActive) continuation.resume(result)
             }
         }

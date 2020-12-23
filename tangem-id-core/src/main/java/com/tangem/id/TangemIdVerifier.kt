@@ -7,7 +7,7 @@ import com.tangem.Message
 import com.tangem.TangemSdk
 import com.tangem.TangemSdkError
 import com.tangem.common.CompletionResult
-import com.tangem.id.card.ReadFilesTask
+import com.tangem.id.card.ReadFilesAndDataTask
 import com.tangem.id.card.toVerifiableCredentials
 import com.tangem.id.demo.VerifiableDemoCredential
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +30,7 @@ class TangemIdVerifier(
 
     fun readCredentialsAsVerifier(callback: (CompletionResult<List<VerifiableDemoCredential>>) -> Unit) {
         tangemSdk.startSessionWithRunnable(
-            ReadFilesTask(false),
+            ReadFilesAndDataTask(false),
             initialMessage = tapHolderCardMessage
         ) { result ->
             coroutineScope.launch {

@@ -3,6 +3,7 @@ package com.tangem.id.documents
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
+import com.tangem.id.proof.LinkedDataProof
 import com.tangem.id.proof.Secp256k1Proof
 import java.time.Instant
 
@@ -16,7 +17,7 @@ open class VerifiableCredential(
     var ethCredentialStatus: String?,
     @Json(name = "@context") context: Collection<String>,
     type: Collection<String>,
-    proof: Secp256k1Proof?
+    proof: LinkedDataProof?
 ) : VerifiableDocument(context.toMutableSet(), type.toMutableSet(), proof) {
 
     constructor(

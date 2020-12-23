@@ -31,10 +31,7 @@ class VerifiableDemoCredential(
     }
 }
 
-suspend fun VerifiableDocument.simpleVerify(androidContext: Context): Boolean {
-    val result = this.verify(androidContext)
-    return result is SimpleResult.Success
-}
+suspend fun VerifiableDocument.simpleVerify() = this.verify() is SimpleResult.Success
 
 fun String.toDate(): LocalDate? =
     if (this.contains("/")) {

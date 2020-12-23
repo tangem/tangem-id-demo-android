@@ -16,7 +16,22 @@ allprojects {
         google()
         jcenter()
         maven { url 'https://jitpack.io' }
-        maven { url "https://api.bitbucket.org/2.0/repositories/tangem/maven_repository/src/releases" }
+        def nexusUser = "viewer"
+        def nexusPass = "smartcash124"
+        maven {
+            credentials {
+                username = nexusUser
+                password = nexusPass
+            }
+            url "https://nexus.tangem.com/repository/maven-releases/"
+        }
+        maven {
+            credentials {
+                username = nexusUser
+                password = nexusPass
+            }
+            url "https://nexus.tangem.com/repository/maven-snapshots/"
+        }
     }
 }
 

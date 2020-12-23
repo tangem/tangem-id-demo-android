@@ -1,11 +1,11 @@
 package com.tangem.id.features.holder.redux
 
-import com.tangem.commands.file.File
 import com.tangem.commands.file.FileSettings
 import com.tangem.id.card.toggleVisibility
 import com.tangem.id.common.entities.Button
 import com.tangem.id.common.entities.Credential
 import com.tangem.id.demo.HolderDemoCredential
+import com.tangem.tasks.file.File
 import org.rekotlin.StateType
 
 enum class AccessLevel {
@@ -68,12 +68,12 @@ data class HolderState(
     }
 
     fun getFilesToChangeVisibility(): List<File> {
-            return credentials.filter { credential ->
-                val credentialOnCard = credentialsOnCard.find {
-                    it.file.fileIndex == credential.file.fileIndex
-                }
-                credential.file.fileSettings != credentialOnCard?.file?.fileSettings
-            }.map { it.file }
+        return credentials.filter { credential ->
+            val credentialOnCard = credentialsOnCard.find {
+                it.file.fileIndex == credential.file.fileIndex
+            }
+            credential.file.fileSettings != credentialOnCard?.file?.fileSettings
+        }.map { it.file }
     }
 }
 

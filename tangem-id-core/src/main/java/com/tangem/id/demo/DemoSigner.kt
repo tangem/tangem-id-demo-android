@@ -1,9 +1,7 @@
 package com.tangem.id.demo
 
-import org.bitcoinj.core.ECKey.CURVE
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.crypto.signers.ECDSASigner
-import org.kethereum.extensions.toBigInteger
 
 class DemoSigner {
     fun sign(hashToSign: ByteArray, privateKey: ECPrivateKeyParameters): ByteArray {
