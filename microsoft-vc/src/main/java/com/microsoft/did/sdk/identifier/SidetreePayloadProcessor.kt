@@ -16,15 +16,15 @@ import com.microsoft.did.sdk.util.Constants.SECP256K1_CURVE_NAME_EC
 import com.microsoft.did.sdk.util.Constants.SIDETREE_MULTIHASH_CODE
 import com.microsoft.did.sdk.util.Constants.SIDETREE_MULTIHASH_LENGTH
 import com.microsoft.did.sdk.util.Constants.SIDETREE_PATCH_ACTION
-import com.microsoft.did.sdk.util.serializer.Serializer
 import com.microsoft.did.sdk.util.stringToByteArray
+import kotlinx.serialization.json.Json
 import org.erdtman.jcs.JsonCanonicalizer
 import java.security.MessageDigest
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SidetreePayloadProcessor @Inject constructor(private val serializer: Serializer) {
+class SidetreePayloadProcessor @Inject constructor(private val serializer: Json) {
     /**
      * Generates input payload for create operation on Sidetree.
      * In unpublished resolution or long form it is same as the initial-state portion of the identifier which can be used
@@ -95,7 +95,7 @@ class SidetreePayloadProcessor @Inject constructor(private val serializer: Seria
     }
 
     private fun createSuffixDataPayload(patchData: PatchData, recoveryCommitmentHash: ByteArray): SuffixData {
-        val patchDataJson = serializer.stringify(PatchData.serializer(), patchData)
+        val patchDataJson = serializer.encodeToString(PatchData.serializer(), patchData)
         val patchDataByteArray = stringToByteArray(patchDataJson)
         val patchDataHash = multiHash(patchDataByteArray)
         val patchDataHashEncoded = Base64Url.encode(patchDataHash)
@@ -112,26 +112,26 @@ class SidetreePayloadProcessor @Inject constructor(private val serializer: Seria
         return createSuffixDataPayload(patchData, recoveryCommitmentHash)
     }
 
-    fun multiHash(bytes: ByteArray): ByteArray {
+    internal fun multiHash(bytes: ByteArray): ByteArray {
         val digest = MessageDigest.getInstance(W3cCryptoApiConstants.Sha256.value)
         //Prepend the hash value with hash algorithm code and digest length to be in multihash format as expected by Sidetree
         return byteArrayOf(SIDETREE_MULTIHASH_CODE.toByte(), SIDETREE_MULTIHASH_LENGTH.toByte()) + digest.digest(bytes)
     }
 
     private fun encodeSuffixData(suffixData: SuffixData): String {
-        val suffixDataJson = serializer.stringify(SuffixData.serializer(), suffixData)
+        val suffixDataJson = serializer.encodeToString(SuffixData.serializer(), suffixData)
         val suffixDataByteArray = stringToByteArray(suffixDataJson)
         return Base64Url.encode(suffixDataByteArray)
     }
 
     private fun encodePatchData(patchData: PatchData): String {
-        val patchDataJson = serializer.stringify(PatchData.serializer(), patchData)
+        val patchDataJson = serializer.encodeToString(PatchData.serializer(), patchData)
         val patchDataByteArray = stringToByteArray(patchDataJson)
         return Base64Url.encode(patchDataByteArray)
     }
 
     internal fun canonicalizePublicKeyAsByteArray(publicKeyJwk: JsonWebKey): ByteArray {
-        val commitmentValue = serializer.stringify(JsonWebKey.serializer(), publicKeyJwk)
+        val commitmentValue = serializer.encodeToString(JsonWebKey.serializer(), publicKeyJwk)
         val jsonCanonicalizer = JsonCanonicalizer(commitmentValue)
         return jsonCanonicalizer.encodedUTF8
     }

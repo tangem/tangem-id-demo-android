@@ -10,7 +10,8 @@ import com.microsoft.did.sdk.credential.service.models.oidc.RevocationResponseCl
 import com.microsoft.did.sdk.crypto.CryptoOperations
 import com.microsoft.did.sdk.crypto.models.Sha
 import com.microsoft.did.sdk.identifier.models.Identifier
-import com.microsoft.did.sdk.util.serializer.Serializer
+import com.microsoft.did.sdk.util.Constants
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,11 +22,11 @@ import javax.inject.Singleton
 @Singleton
 class RevocationResponseFormatter @Inject constructor(
     private val cryptoOperations: CryptoOperations,
-    private val serializer: Serializer,
+    private val serializer: Json,
     private val signer: TokenSigner
 ) {
 
-    fun formatResponse(revocationRequest: RevocationRequest, expiryInSeconds: Int): String {
+    fun formatResponse(revocationRequest: RevocationRequest, expiryInSeconds: Int = Constants.DEFAULT_EXPIRATION_IN_SECONDS): String {
         val (issuedTime, expiryTime) = createIssuedAndExpiryTime(expiryInSeconds)
         val responder = revocationRequest.owner
         val key = cryptoOperations.keyStore.getPublicKey(responder.signatureKeyReference).getKey()
@@ -44,7 +45,7 @@ class RevocationResponseFormatter @Inject constructor(
     }
 
     private fun signContents(contents: RevocationResponseClaims, responder: Identifier): String {
-        val serializedResponseContent = serializer.stringify(RevocationResponseClaims.serializer(), contents)
+        val serializedResponseContent = serializer.encodeToString(RevocationResponseClaims.serializer(), contents)
         return signer.signWithIdentifier(serializedResponseContent, responder)
     }
 }

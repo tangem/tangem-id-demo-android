@@ -12,8 +12,10 @@ import com.microsoft.did.sdk.util.Constants.CREDENTIAL_PRESENTATION_FORMAT
 import com.microsoft.did.sdk.util.byteArrayToString
 import com.microsoft.did.sdk.util.controlflow.KeyException
 import com.microsoft.did.sdk.util.controlflow.SignatureException
-import com.microsoft.did.sdk.util.serializer.Serializer
+import com.microsoft.did.sdk.util.controlflow.UnSupportedAlgorithmException
 import com.microsoft.did.sdk.util.stringToByteArray
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.Locale
 
 /**
@@ -23,13 +25,13 @@ import java.util.Locale
 class JwsToken private constructor(
     private val payload: String,
     signatures: List<JwsSignature> = emptyList(),
-    private val serializer: Serializer
+    private val serializer: Json
 ) {
 
     val signatures: MutableList<JwsSignature> = signatures.toMutableList()
 
     companion object {
-        fun deserialize(jws: String, serializer: Serializer): JwsToken {
+        fun deserialize(jws: String, serializer: Json): JwsToken {
             val compactRegex = Regex("([A-Za-z\\d_-]*)\\.([A-Za-z\\d_-]*)\\.([A-Za-z\\d_-]*)")
             val compactMatches = compactRegex.matchEntire(jws.trim())
             when {
@@ -47,7 +49,7 @@ class JwsToken private constructor(
                 }
                 jws.toLowerCase(Locale.ENGLISH).contains("\"signatures\"") -> { // check for signature or signatures
                     // GENERAL
-                    val token = serializer.parse(JwsGeneralJson.serializer(), jws)
+                    val token = serializer.decodeFromString(JwsGeneralJson.serializer(), jws)
                     return JwsToken(
                         payload = token.payload,
                         signatures = token.signatures,
@@ -56,7 +58,7 @@ class JwsToken private constructor(
                 }
                 jws.toLowerCase(Locale.ENGLISH).contains("\"signature\"") -> {
                     // Flat
-                    val token = serializer.parse(JwsFlatJson.serializer(), jws)
+                    val token = serializer.decodeFromString(JwsFlatJson.serializer(), jws)
                     return JwsToken(
                         payload = token.payload,
                         signatures = listOf(
@@ -77,25 +79,25 @@ class JwsToken private constructor(
         }
     }
 
-    constructor(content: ByteArray, serializer: Serializer) : this(Base64Url.encode(content), emptyList(), serializer)
+    constructor(content: ByteArray, serializer: Json) : this(Base64Url.encode(content), emptyList(), serializer)
 
-    constructor(content: String, serializer: Serializer) : this(Base64Url.encode(stringToByteArray(content)), emptyList(), serializer)
+    constructor(content: String, serializer: Json) : this(Base64Url.encode(stringToByteArray(content)), emptyList(), serializer)
 
     /**
      * Serialize a JWS token object from token.
      */
-    fun serialize(serializer: Serializer, format: JwsFormat = JwsFormat.Compact): String {
+    fun serialize(serializer: Json, format: JwsFormat = JwsFormat.Compact): String {
         return when (format) {
             JwsFormat.Compact -> {
                 intermediateCompactSerialize()
             }
             JwsFormat.FlatJson -> {
                 val jws = intermediateFlatJsonSerialize()
-                serializer.stringify(JwsFlatJson.serializer(), jws)
+                serializer.encodeToString(JwsFlatJson.serializer(), jws)
             }
             JwsFormat.GeneralJson -> {
                 val jws = intermediateGeneralJsonSerialize()
-                serializer.stringify(JwsGeneralJson.serializer(), jws)
+                serializer.encodeToString(JwsGeneralJson.serializer(), jws)
             }
         }
     }
@@ -172,7 +174,7 @@ class JwsToken private constructor(
 
         var encodedProtected = ""
         if (protected.isNotEmpty()) {
-            val jsonProtected = serializer.stringify(protected, String::class, String::class)
+            val jsonProtected = serializer.encodeToString(protected)
             encodedProtected = Base64Url.encode(stringToByteArray(jsonProtected))
         }
 
@@ -198,13 +200,15 @@ class JwsToken private constructor(
      *Verify the JWS signatures
      */
     fun verify(cryptoOperations: CryptoOperations, publicKeys: List<PublicKey> = emptyList(), all: Boolean = false): Boolean {
-        val results = this.signatures.map {
-            val fullyQuantifiedKid = it.getKid(serializer) ?: ""
+        val results = this.signatures.map {jwsSignature ->
+            val algorithm = jwsSignature.getAlg(serializer)
+            if (algorithm != JoseConstants.Es256K.value) throw UnSupportedAlgorithmException("$algorithm is not supported.")
+            val fullyQuantifiedKid = jwsSignature.getKid(serializer) ?: ""
             val kid = JwaCryptoConverter.extractDidAndKeyId(fullyQuantifiedKid).second
-            val signatureInput = "${it.protected}.${this.payload}"
+            val signatureInput = "${jwsSignature.protected}.${this.payload}"
             val publicKey = cryptoOperations.keyStore.getPublicKeyById(kid)
             if (publicKey != null) {
-                verifyWithKey(cryptoOperations, signatureInput, it, publicKey)
+                verifyWithKey(cryptoOperations, signatureInput, jwsSignature, publicKey)
             } else {
                 // use one of the provided public Keys
                 val key = publicKeys.firstOrNull {
@@ -212,10 +216,10 @@ class JwsToken private constructor(
                 }
                 when {
                     key != null -> {
-                        verifyWithKey(cryptoOperations, signatureInput, it, key)
+                        verifyWithKey(cryptoOperations, signatureInput, jwsSignature, key)
                     }
                     publicKeys.isNotEmpty() -> {
-                        verifyWithKey(cryptoOperations, signatureInput, it, publicKeys.first())
+                        verifyWithKey(cryptoOperations, signatureInput, jwsSignature, publicKeys.first())
                     }
                     else -> false
                 }

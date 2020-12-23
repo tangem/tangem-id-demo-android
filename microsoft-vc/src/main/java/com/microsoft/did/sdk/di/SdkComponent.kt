@@ -6,8 +6,11 @@
 package com.microsoft.did.sdk.di
 
 import android.content.Context
+import com.microsoft.did.sdk.LinkedDomainsService
 import com.microsoft.did.sdk.IdentifierManager
-import com.microsoft.did.sdk.VerifiableCredentialManager
+import com.microsoft.did.sdk.IssuanceService
+import com.microsoft.did.sdk.PresentationService
+import com.microsoft.did.sdk.RevocationService
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Named
@@ -27,7 +30,13 @@ internal interface SdkComponent {
 
     fun identifierManager(): IdentifierManager
 
-    fun verifiableCredentialManager(): VerifiableCredentialManager
+    fun issuanceService(): IssuanceService
+
+    fun presentationService(): PresentationService
+
+    fun revocationService(): RevocationService
+
+    fun linkedDomainsService(): LinkedDomainsService
 
     @Component.Builder
     interface Builder {
@@ -41,5 +50,8 @@ internal interface SdkComponent {
 
         @BindsInstance
         fun registrationUrl(@Named("registrationUrl") registrationUrl: String): Builder
+
+        @BindsInstance
+        fun userAgentInfo(@Named("userAgentInfo") userAgentInfo: String): Builder
     }
 }

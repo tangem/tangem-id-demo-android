@@ -7,16 +7,16 @@ import com.microsoft.did.sdk.crypto.protocols.jose.jws.JwsToken
 import com.microsoft.did.sdk.identifier.models.identifierdocument.IdentifierDocument
 import com.microsoft.did.sdk.identifier.models.identifierdocument.IdentifierDocumentPublicKey
 import com.microsoft.did.sdk.identifier.resolvers.Resolver
-import com.microsoft.did.sdk.util.controlflow.ExpiredTokenExpirationException
-import com.microsoft.did.sdk.util.controlflow.InvalidSignatureException
 import com.microsoft.did.sdk.util.controlflow.Result
 import com.microsoft.did.sdk.util.controlflow.ValidatorException
-import com.microsoft.did.sdk.util.serializer.Serializer
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.lang.Exception
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -38,7 +38,7 @@ class JwtValidatorTest {
     private val mockedResolver: Resolver = mockk()
 
     private val validator: JwtValidator
-    private val serializer: Serializer = Serializer()
+    private val serializer: Json = Json
 
     private val expectedDid: String = "did:test:4235"
     private val expectedKid: String = "$expectedDid#kidTest2353"
@@ -87,7 +87,7 @@ class JwtValidatorTest {
             try {
                 validator.verifySignature(mockedJwsToken)
                 fail()
-            } catch(exception: Exception) {
+            } catch (exception: Exception) {
                 assertThat(exception).isInstanceOf(ValidatorException::class.java)
             }
         }
@@ -103,7 +103,7 @@ class JwtValidatorTest {
             try {
                 validator.verifySignature(mockedJwsToken)
                 fail()
-            } catch(exception: Exception) {
+            } catch (exception: Exception) {
                 assertThat(exception).isInstanceOf(ValidatorException::class.java)
             }
         }

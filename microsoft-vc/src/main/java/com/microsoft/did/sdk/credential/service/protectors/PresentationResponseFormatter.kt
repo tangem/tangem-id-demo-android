@@ -6,7 +6,7 @@
 package com.microsoft.did.sdk.credential.service.protectors
 
 import com.microsoft.did.sdk.credential.service.PresentationResponse
-import com.microsoft.did.sdk.credential.service.RequestedVchPresentationSubmissionMap
+import com.microsoft.did.sdk.credential.service.RequestedVcPresentationSubmissionMap
 import com.microsoft.did.sdk.credential.service.models.oidc.AttestationClaimModel
 import com.microsoft.did.sdk.credential.service.models.oidc.PresentationResponseClaims
 import com.microsoft.did.sdk.credential.service.models.presentationexchange.PresentationSubmission
@@ -16,7 +16,7 @@ import com.microsoft.did.sdk.crypto.models.Sha
 import com.microsoft.did.sdk.identifier.models.Identifier
 import com.microsoft.did.sdk.util.Constants
 import com.microsoft.did.sdk.util.Constants.DEFAULT_VP_EXPIRATION_IN_SECONDS
-import com.microsoft.did.sdk.util.serializer.Serializer
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,22 +24,23 @@ import javax.inject.Singleton
 @Singleton
 class PresentationResponseFormatter @Inject constructor(
     private val cryptoOperations: CryptoOperations,
-    private val serializer: Serializer,
+    private val serializer: Json,
     private val verifiablePresentationFormatter: VerifiablePresentationFormatter,
     private val signer: TokenSigner
 ) {
     fun formatResponse(
-        requestedVchPresentationSubmissionMap: RequestedVchPresentationSubmissionMap = mutableMapOf(),
+        requestedVcPresentationSubmissionMap: RequestedVcPresentationSubmissionMap = mutableMapOf(),
         presentationResponse: PresentationResponse,
+        responder: Identifier,
         expiryInSeconds: Int = Constants.DEFAULT_EXPIRATION_IN_SECONDS
     ): String {
         val (issuedTime, expiryTime) = createIssuedAndExpiryTime(expiryInSeconds)
         val responseId = UUID.randomUUID().toString()
         val (attestationResponse, credentialPresentationSubmission) = createAttestationsAndPresentationSubmission(
-            requestedVchPresentationSubmissionMap,
-            presentationResponse
+            requestedVcPresentationSubmissionMap,
+            presentationResponse,
+            responder
         )
-        val responder = presentationResponse.responder
         val key = cryptoOperations.keyStore.getPublicKey(responder.signatureKeyReference).getKey()
 
         val oidcResponseClaims = PresentationResponseClaims(credentialPresentationSubmission, attestationResponse).apply {
@@ -57,16 +58,17 @@ class PresentationResponseFormatter @Inject constructor(
     }
 
     private fun createAttestationsAndPresentationSubmission(
-        requestedVchPresentationSubmissionMap: RequestedVchPresentationSubmissionMap,
-        presentationResponse: PresentationResponse
+        requestedVcPresentationSubmissionMap: RequestedVcPresentationSubmissionMap,
+        presentationResponse: PresentationResponse,
+        responder: Identifier
     ): Pair<AttestationClaimModel, PresentationSubmission> {
         val attestationResponse = this.createAttestationClaimModel(
-            requestedVchPresentationSubmissionMap,
+            requestedVcPresentationSubmissionMap,
             presentationResponse.request.entityIdentifier,
-            presentationResponse.responder
+            responder
         )
         val credentialPresentationSubmissionDescriptors =
-            presentationResponse.requestedVchPresentationSubmissionMap.map {
+            presentationResponse.requestedVcPresentationSubmissionMap.map {
                 PresentationSubmissionDescriptor(
                     it.key.id,
                     "${Constants.CREDENTIAL_PATH_IN_RESPONSE}.${it.key.id}",
@@ -79,25 +81,25 @@ class PresentationResponseFormatter @Inject constructor(
     }
 
     private fun createAttestationClaimModel(
-        requestedVchPresentationSubmissionMap: RequestedVchPresentationSubmissionMap,
+        requestedVcPresentationSubmissionMap: RequestedVcPresentationSubmissionMap,
         presentationsAudience: String,
         responder: Identifier
     ): AttestationClaimModel {
-        if (requestedVchPresentationSubmissionMap.isNullOrEmpty()) {
+        if (requestedVcPresentationSubmissionMap.isNullOrEmpty()) {
             return AttestationClaimModel()
         }
-        val presentationAttestations = createPresentations(requestedVchPresentationSubmissionMap, presentationsAudience, responder)
+        val presentationAttestations = createPresentations(requestedVcPresentationSubmissionMap, presentationsAudience, responder)
         return AttestationClaimModel(presentations = presentationAttestations)
     }
 
     private fun createPresentations(
-        requestedVchPresentationSubmissionMap: RequestedVchPresentationSubmissionMap,
+        requestedVcPresentationSubmissionMap: RequestedVcPresentationSubmissionMap,
         audience: String,
         responder: Identifier
     ): Map<String, String> {
-        return requestedVchPresentationSubmissionMap.map { (key, value) ->
-            key.id to verifiablePresentationFormatter.createPresentation(
-                value.verifiableCredential,
+        return requestedVcPresentationSubmissionMap.map { (inputDescriptor, vc) ->
+            inputDescriptor.id to verifiablePresentationFormatter.createPresentation(
+                vc,
                 DEFAULT_VP_EXPIRATION_IN_SECONDS,
                 audience,
                 responder
@@ -106,7 +108,7 @@ class PresentationResponseFormatter @Inject constructor(
     }
 
     private fun signContents(contents: PresentationResponseClaims, responder: Identifier): String {
-        val serializedResponseContent = serializer.stringify(PresentationResponseClaims.serializer(), contents)
+        val serializedResponseContent = serializer.encodeToString(PresentationResponseClaims.serializer(), contents)
         return signer.signWithIdentifier(serializedResponseContent, responder)
     }
 }

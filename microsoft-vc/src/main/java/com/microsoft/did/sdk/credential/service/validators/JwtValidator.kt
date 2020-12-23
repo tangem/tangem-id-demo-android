@@ -12,7 +12,7 @@ import com.microsoft.did.sdk.crypto.protocols.jose.jws.JwsToken
 import com.microsoft.did.sdk.identifier.resolvers.Resolver
 import com.microsoft.did.sdk.util.controlflow.Result
 import com.microsoft.did.sdk.util.controlflow.ValidatorException
-import com.microsoft.did.sdk.util.serializer.Serializer
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,17 +23,21 @@ import javax.inject.Singleton
 class JwtValidator @Inject constructor(
     private val cryptoOperations: CryptoOperations,
     private val resolver: Resolver,
-    private val serializer: Serializer
+    private val serializer: Json
 ) {
 
     /**
      * Verify the signature on the JwsToken.
      */
     suspend fun verifySignature(token: JwsToken): Boolean {
-        val signature = token.signatures.first()
-        val (did, _) = getKid(signature)
-        val publicKeys = resolvePublicKeys(did)
+        val didInHeader = getDidFromHeader(token)
+        val publicKeys = resolvePublicKeys(didInHeader)
         return token.verify(cryptoOperations, publicKeys)
+    }
+
+    fun validateDidInHeaderAndPayload(jwsToken: JwsToken, didInPayload: String): Boolean {
+        val didInHeader = getDidFromHeader(jwsToken)
+        return didInHeader == didInPayload
     }
 
     private fun getKid(signature: JwsSignature): Pair<String, String> {
@@ -50,5 +54,11 @@ class JwtValidator @Inject constructor(
             }
             is Result.Failure -> throw ValidatorException("Unable to fetch public keys", requesterDidDocument.payload)
         }
+    }
+
+    private fun getDidFromHeader(token: JwsToken): String {
+        val signature = token.signatures.first()
+        val (didInHeader, _) = getKid(signature)
+        return didInHeader
     }
 }

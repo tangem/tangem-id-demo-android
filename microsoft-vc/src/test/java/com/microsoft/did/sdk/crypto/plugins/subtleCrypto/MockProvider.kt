@@ -1,14 +1,19 @@
 package com.microsoft.did.sdk.crypto.plugins.subtleCrypto
 
-import com.microsoft.did.sdk.crypto.models.webCryptoApi.*
-import com.microsoft.did.sdk.util.*
-import com.microsoft.did.sdk.crypto.models.webCryptoApi.algorithms.Algorithm
 import com.microsoft.did.sdk.crypto.models.webCryptoApi.CryptoKey
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.CryptoKeyPair
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.JsonWebKey
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.KeyFormat
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.KeyType
 import com.microsoft.did.sdk.crypto.models.webCryptoApi.KeyUsage
 import com.microsoft.did.sdk.crypto.models.webCryptoApi.W3cCryptoApiConstants
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.algorithms.Algorithm
+import com.microsoft.did.sdk.util.Base64Url
+import com.microsoft.did.sdk.util.byteArrayToString
 import com.microsoft.did.sdk.util.controlflow.KeyException
 import com.microsoft.did.sdk.util.controlflow.SignatureException
-import com.microsoft.did.sdk.util.serializer.Serializer
+import com.microsoft.did.sdk.util.defaultTestSerializer
+import com.microsoft.did.sdk.util.stringToByteArray
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
@@ -34,15 +39,13 @@ class MockProvider(override var name: String = W3cCryptoApiConstants.RsaOaep.val
 
         companion object {
             fun serialize(key: CryptoKey, data: ByteArray): ByteArray {
-                val serializer = Serializer()
                 val datagram = Datagram(key.handle as String, byteArrayToString(data))
-                val json = serializer.stringify(serializer(), datagram)
+                val json = defaultTestSerializer.encodeToString(serializer(), datagram)
                 return stringToByteArray(json)
             }
 
             fun deserialize(datagram: ByteArray): Datagram {
-                val serializer = Serializer()
-                return serializer.parse(serializer(), byteArrayToString(datagram))
+                return defaultTestSerializer.decodeFromString(serializer(), byteArrayToString(datagram))
             }
         }
     }
@@ -56,8 +59,7 @@ class MockProvider(override var name: String = W3cCryptoApiConstants.RsaOaep.val
         if (key.handle != datagram.keyId) {
             throw KeyException("Incorrect key used")
         }
-        datagram.getData().forEachIndexed {
-                index, byte ->
+        datagram.getData().forEachIndexed { index, byte ->
             if (data[index] != byte) {
                 throw SignatureException("Signed data differs at byte $index")
             }

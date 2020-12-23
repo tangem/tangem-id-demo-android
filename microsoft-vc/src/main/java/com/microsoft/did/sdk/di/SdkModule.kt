@@ -8,6 +8,9 @@ package com.microsoft.did.sdk.di
 import android.content.Context
 import androidx.room.Room
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import com.microsoft.did.sdk.credential.service.validators.DomainLinkageCredentialValidator
+import com.microsoft.did.sdk.credential.service.validators.JwtDomainLinkageCredentialValidator
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.microsoft.did.sdk.credential.service.validators.OidcPresentationRequestValidator
 import com.microsoft.did.sdk.credential.service.validators.PresentationRequestValidator
 import com.microsoft.did.sdk.crypto.CryptoOperations
@@ -20,18 +23,19 @@ import com.microsoft.did.sdk.crypto.plugins.AndroidSubtle
 import com.microsoft.did.sdk.crypto.plugins.EllipticCurveSubtleCrypto
 import com.microsoft.did.sdk.crypto.plugins.SubtleCryptoMapItem
 import com.microsoft.did.sdk.crypto.plugins.SubtleCryptoScope
-import com.microsoft.did.sdk.datasource.db.DbMigrations
 import com.microsoft.did.sdk.datasource.db.SdkDatabase
 import com.microsoft.did.sdk.identifier.registrars.Registrar
 import com.microsoft.did.sdk.identifier.registrars.SidetreeRegistrar
 import com.microsoft.did.sdk.util.log.SdkLog
 import dagger.Module
 import dagger.Provides
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -47,7 +51,7 @@ import javax.inject.Singleton
  * https://developer.android.com/training/dependency-injection
  */
 @Module
-internal class SdkModule {
+class SdkModule {
 
     @Provides
     @Singleton
@@ -71,22 +75,24 @@ internal class SdkModule {
 
     @Provides
     @Singleton
-    fun defaultOkHttpClient(): OkHttpClient {
+    fun defaultOkHttpClient(@Named("userAgentInfo") userAgentInfo: String): OkHttpClient {
         val httpLoggingInterceptor = HttpLoggingInterceptor { SdkLog.d(it) }
         return OkHttpClient()
             .newBuilder()
             .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(UserAgentInterceptor(userAgentInfo))
             .build()
     }
 
     @Provides
     @Singleton
-    fun defaultRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun defaultRetrofit(okHttpClient: OkHttpClient, serializer: Json): Retrofit {
+        val contentType = MediaType.get("application/json")
         return Retrofit.Builder()
             .baseUrl("http://TODO.me")
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(serializer.asConverterFactory(contentType))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()
     }
@@ -112,15 +118,30 @@ internal class SdkModule {
     @Provides
     @Singleton
     fun sdkDatabase(context: Context): SdkDatabase {
-        return Room.databaseBuilder(context, SdkDatabase::class.java, "VerifiableCredential-db")
-            .addMigrations(DbMigrations.MIGRATION_2_3)
+        return Room.databaseBuilder(context, SdkDatabase::class.java, "vc-sdk-db")
             .fallbackToDestructiveMigration() // TODO: we don't want this here as soon as we go into production
             .build()
     }
 
     @Provides
     @Singleton
-    fun defaultValidator(validator: OidcPresentationRequestValidator): PresentationRequestValidator {
+    fun defaultPresentationRequestValidator(validator: OidcPresentationRequestValidator): PresentationRequestValidator {
         return validator
+    }
+
+    @Provides
+    @Singleton
+    fun defaultDomainLinkageCredentialValidator(validator: JwtDomainLinkageCredentialValidator): DomainLinkageCredentialValidator {
+        return validator
+    }
+
+    @Provides
+    @Singleton
+    fun defaultJsonSerializer(): Json {
+        return Json {
+            encodeDefaults = false
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
     }
 }

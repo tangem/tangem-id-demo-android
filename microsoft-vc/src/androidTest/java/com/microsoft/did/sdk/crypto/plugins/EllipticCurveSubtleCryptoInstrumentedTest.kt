@@ -10,12 +10,16 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import com.microsoft.did.sdk.crypto.keyStore.AndroidKeyStore
 import com.microsoft.did.sdk.crypto.models.Sha
-import com.microsoft.did.sdk.crypto.models.webCryptoApi.*
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.CryptoKeyPair
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.KeyFormat
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.KeyType
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.KeyUsage
+import com.microsoft.did.sdk.crypto.models.webCryptoApi.W3cCryptoApiConstants
 import com.microsoft.did.sdk.crypto.models.webCryptoApi.algorithms.EcKeyGenParams
-import com.microsoft.did.sdk.util.serializer.Serializer
+import com.microsoft.did.sdk.di.defaultTestSerializer
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.assertj.core.api.Assertions.assertThat
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class EllipticCurveSubtleCryptoInstrumentedTest {
@@ -25,10 +29,9 @@ class EllipticCurveSubtleCryptoInstrumentedTest {
 
     init {
         val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-        val serializer = Serializer()
-        val keyStore = AndroidKeyStore(context, serializer)
+        val keyStore = AndroidKeyStore(context, defaultTestSerializer)
         androidSubtle = AndroidSubtle(keyStore)
-        ellipticCurveSubtleCrypto = EllipticCurveSubtleCrypto(androidSubtle, serializer)
+        ellipticCurveSubtleCrypto = EllipticCurveSubtleCrypto(androidSubtle, defaultTestSerializer)
         val keyReference = "KeyReference1"
         cryptoKeyPair = ellipticCurveSubtleCrypto.generateKeyPair(
             EcKeyGenParams(
@@ -109,7 +112,13 @@ class EllipticCurveSubtleCryptoInstrumentedTest {
     fun importPublicKey() {
         val jsonWebKey = ellipticCurveSubtleCrypto.exportKeyJwk(cryptoKeyPair.publicKey)
         val actualCryptoKey =
-            ellipticCurveSubtleCrypto.importKey(KeyFormat.Jwk, jsonWebKey, cryptoKeyPair.publicKey.algorithm, false, listOf(KeyUsage.Verify))
+            ellipticCurveSubtleCrypto.importKey(
+                KeyFormat.Jwk,
+                jsonWebKey,
+                cryptoKeyPair.publicKey.algorithm,
+                false,
+                listOf(KeyUsage.Verify)
+            )
         assertThat(actualCryptoKey.type).isEqualTo(KeyType.Public)
     }
 }

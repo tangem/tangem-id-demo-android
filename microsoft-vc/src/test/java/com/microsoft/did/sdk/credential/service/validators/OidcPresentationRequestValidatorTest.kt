@@ -11,13 +11,15 @@ import com.microsoft.did.sdk.crypto.protocols.jose.jws.JwsToken
 import com.microsoft.did.sdk.identifier.models.Identifier
 import com.microsoft.did.sdk.util.Constants
 import com.microsoft.did.sdk.util.controlflow.ExpiredTokenExpirationException
-import com.microsoft.did.sdk.util.controlflow.InvalidSignatureException
-import com.microsoft.did.sdk.util.serializer.Serializer
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.util.*
+import java.util.Date
 import kotlin.test.fail
 
 class OidcPresentationRequestValidatorTest {
@@ -28,28 +30,31 @@ class OidcPresentationRequestValidatorTest {
 
     private val mockedJwtValidator: JwtValidator = mockk()
 
-    private val mockedOidcRequestContentRequestContent: PresentationRequestContent = mockk()
+    private val mockedOidcRequestContent: PresentationRequestContent = mockk()
 
     private val mockedIdentifier: Identifier = mockk()
 
     private val expectedSerializedToken: String = "token2364302"
 
-    private val validator: OidcPresentationRequestValidator
-    private val serializer: Serializer = Serializer()
+    private val validator: OidcPresentationRequestValidator = OidcPresentationRequestValidator()
+    
+	private val serializer: Json = Json
 
     private val expectedSigningKeyRef: String = "sigKeyRef1243523"
     private val expectedDid: String = "did:test:2354543"
+    private val expectedResponseType = "id_token"
+    private val expectedResponseMode = "form_post"
+    private val expectedScope = "openid did_authn"
+    private val expectedExpirationTime = 86400L
 
     init {
-        validator = OidcPresentationRequestValidator(mockedJwtValidator, serializer)
         setUpPresentationRequest()
         setUpIdentifier()
         mockkObject(JwsToken)
     }
 
     private fun setUpPresentationRequest() {
-        every { mockedPresentationRequest.serializedToken } returns expectedSerializedToken
-        every { mockedPresentationRequest.content } returns mockedOidcRequestContentRequestContent
+        every { mockedPresentationRequest.content } returns mockedOidcRequestContent
     }
 
     private fun setUpIdentifier() {
@@ -60,38 +65,32 @@ class OidcPresentationRequestValidatorTest {
     private fun setUpExpiration(offsetInSecond: Long) {
         val currentTimeInSeconds: Long = Date().time / Constants.MILLISECONDS_IN_A_SECOND
         val currentTimePlusOffsetInSeconds = currentTimeInSeconds + offsetInSecond
-        every { mockedOidcRequestContentRequestContent.expirationTime } returns currentTimePlusOffsetInSeconds
+        every { mockedOidcRequestContent.expirationTime } returns currentTimePlusOffsetInSeconds
+    }
+
+    private fun setUpOidcRequestContent() {
+        every { mockedOidcRequestContent.responseType } returns expectedResponseType
+        every { mockedOidcRequestContent.responseMode } returns expectedResponseMode
+        every { mockedOidcRequestContent.scope } returns expectedScope
     }
 
     @Test
     fun `valid signature is validated successfully`() {
         setUpExpiration(86400)
         every { mockedPresentationRequest.getPresentationDefinition().credentialPresentationInputDescriptors } returns listOf(mockk())
+        every { mockedPresentationRequest.content } returns mockedOidcRequestContent
+        setUpOidcRequestContent()
         every { JwsToken.deserialize(expectedSerializedToken, serializer) } returns mockedJwsToken
         coEvery { mockedJwtValidator.verifySignature(mockedJwsToken) } returns true
         runBlocking {
-                validator.validate(mockedPresentationRequest)
-        }
-    }
-
-    @Test
-    fun `invalid signature fails successfully`() {
-        setUpExpiration(86400)
-        every { JwsToken.deserialize(expectedSerializedToken, serializer) } returns mockedJwsToken
-        coEvery { mockedJwtValidator.verifySignature(mockedJwsToken) } returns false
-        runBlocking {
-            try {
-                validator.validate(mockedPresentationRequest)
-                fail()
-            } catch (exception: Exception) {
-                assertThat(exception).isInstanceOf(InvalidSignatureException::class.java)
-            }
+            validator.validate(mockedPresentationRequest)
         }
     }
 
     @Test
     fun `throws when token expiration is expired`() {
         setUpExpiration(-86400)
+        setUpOidcRequestContent()
         every { JwsToken.deserialize(expectedSerializedToken, serializer) } returns mockedJwsToken
         coEvery { mockedJwtValidator.verifySignature(mockedJwsToken) } returns true
         runBlocking {

@@ -19,6 +19,8 @@ class KeyFormatException(message: String, cause: Throwable? = null) : CryptoExce
 
 class AlgorithmException(message: String, cause: Throwable? = null) : CryptoException(message, cause)
 
+class UnSupportedAlgorithmException(message: String, cause: Throwable? = null) : CryptoException(message, cause)
+
 class SignatureException(message: String, cause: Throwable? = null) : CryptoException(message, cause)
 
 class EncodingException(message: String, cause: Throwable? = null) : CryptoException(message, cause)
@@ -38,19 +40,31 @@ open class IssuanceException(message: String, cause: Throwable? = null, retryabl
 
 class ExchangeException(message: String, cause: Throwable? = null) : PresentationException(message, cause)
 
-open class RevocationException(message: String? = null, cause: Throwable? = null, retryable: Boolean = true) : SdkException(message, cause, retryable)
+open class RevocationException(message: String? = null, cause: Throwable? = null, retryable: Boolean = true) :
+    SdkException(message, cause, retryable)
 
-open class ValidatorException(message: String, cause: Throwable? = null, retryable: Boolean = false) : SdkException(message, cause, retryable)
+open class ValidatorException(message: String, cause: Throwable? = null, retryable: Boolean = false) :
+    SdkException(message, cause, retryable)
+
+class UnableToFetchWellKnownConfigDocument(message: String, cause: Throwable? = null, retryable: Boolean = false) : SdkException(message, cause, retryable)
 
 class InvalidSignatureException(message: String) : ValidatorException(message)
 
 class ExpiredTokenExpirationException(message: String) : ValidatorException(message)
 
+class InvalidResponseTypeException(message: String) : ValidatorException(message)
+
+class InvalidResponseModeException(message: String) : ValidatorException(message)
+
+class InvalidScopeException(message: String) : ValidatorException(message)
+
 class MissingInputInRequestException(message: String) : ValidatorException(message)
 
-class FormatterException(message: String, cause: Throwable? = null) : SdkException(message, cause)
+class DidInHeaderAndPayloadNotMatching(message: String) : ValidatorException(message)
 
-class ResolverException(message: String, cause: Throwable? = null) : SdkException(message, cause)
+open class ResolverException(message: String, cause: Throwable? = null) : SdkException(message, cause)
+
+class LinkedDomainEndpointInUnknownFormatException(message: String, cause: Throwable? = null) : ResolverException(message, cause)
 
 class RegistrarException(message: String, cause: Throwable? = null) : SdkException(message, cause)
 
