@@ -28,6 +28,7 @@ import com.tangem.id.R
 import com.tangem.id.common.redux.navigation.AppScreen
 import com.tangem.id.features.holder.ui.HolderFragment
 import com.tangem.id.features.holder.ui.QrScanFragment
+import com.tangem.id.features.holder.ui.RequestCredentialsFragment
 import com.tangem.id.features.home.HomeFragment
 import com.tangem.id.features.issuecredentials.ui.CameraFragment
 import com.tangem.id.features.issuecredentials.ui.IssueCredentialsFragment
@@ -132,6 +133,7 @@ private fun fragmentFactory(screen: AppScreen): Fragment {
         AppScreen.IssueCredentials -> IssueCredentialsFragment()
         AppScreen.Camera -> CameraFragment()
         AppScreen.QrScan -> QrScanFragment()
+        AppScreen.RequestCredentials -> RequestCredentialsFragment()
     }
 }
 

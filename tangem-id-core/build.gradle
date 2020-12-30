@@ -1,3 +1,6 @@
+plugins {
+    id "org.jetbrains.kotlin.plugin.serialization" version "$kotlin_version"
+} //TODO: check if needed
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -58,6 +61,10 @@ dependencies {
     implementation 'com.squareup.moshi:moshi:1.9.2'
     implementation "com.squareup.moshi:moshi-kotlin:1.9.2"
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.9.2")
+
+    //for Microsoft VC integration
+    implementation project(path: ':microsoft-vc')
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlin_serialization_version"
 
     testImplementation 'junit:junit:4.13'
     testImplementation "com.google.truth:truth:1.0.1"

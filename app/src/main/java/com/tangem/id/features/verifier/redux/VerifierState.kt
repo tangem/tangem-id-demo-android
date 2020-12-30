@@ -2,7 +2,9 @@ package com.tangem.id.features.verifier.redux
 
 import com.tangem.id.R
 import com.tangem.id.common.entities.*
-import com.tangem.id.demo.VerifiableDemoCredential
+import com.tangem.id.demo.MSVerifierDemoCredential
+import com.tangem.id.demo.TangemVerifierDemoCredential
+import com.tangem.id.demo.VerifierDemoCredential
 import org.rekotlin.StateType
 
 data class CredentialStatus(val issuer: Issuer, val verificationStatus: VerificationStatus)
@@ -53,6 +55,7 @@ data class VerifierState(
     val ageOfMajority: VerifierCredential<AgeOfMajority>? =
         VerifierCredential(AgeOfMajority(true), credentialStatus),
     val immunityPassport: VerifierCredential<ImmunityPassport>? = null,
+    val credentialNinja: VerifierCredential<CredentialNinja>? = null,
     val jsonShown: String? = null
 ) : StateType {
     fun getCredentials() =
@@ -64,14 +67,16 @@ data class VerifierCredential<T : Credential>(
     val credentialStatus: CredentialStatus
 ) {
     companion object {
-        fun from(demoCredential: VerifiableDemoCredential): VerifierCredential<*>? {
+        fun from(demoCredential: VerifierDemoCredential): VerifierCredential<*>? {
 
-            val issuerAddress = demoCredential.verifiableCredential.issuer
+            val issuerAddress = when (demoCredential) {
+                is TangemVerifierDemoCredential -> demoCredential.verifiableCredential.issuer
+                is MSVerifierDemoCredential -> demoCredential.verifiableCredential.contents.iss
+                else -> "Unknown issuer" //TODO: throw?
+            }
             val issuer = Issuer(issuerAddress, true)
-            val verificationStatus = if (demoCredential.verified == false)  {
+            val verificationStatus = if (demoCredential.verified == false) {
                 VerificationStatus.Invalid
-            } else if (demoCredential.verified == true) {
-                VerificationStatus.Valid
             } else {
                 VerificationStatus.Valid
             }

@@ -63,7 +63,7 @@ open class VerifiableCredential(
             return jsonAdapter.fromJson(jsonString)!!
         }
 
-        fun fromMap(map: Map<String, String>): VerifiableCredential { // TODO: change return type to Result
+        fun fromMap(map: Map<String, Any>): VerifiableCredential { // TODO: change return type to Result
             return jsonAdapter.fromJsonValue(map)!!
         }
     }

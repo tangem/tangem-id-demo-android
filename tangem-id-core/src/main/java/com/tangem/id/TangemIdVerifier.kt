@@ -8,8 +8,7 @@ import com.tangem.TangemSdk
 import com.tangem.TangemSdkError
 import com.tangem.common.CompletionResult
 import com.tangem.id.card.ReadFilesAndDataTask
-import com.tangem.id.card.toVerifiableCredentials
-import com.tangem.id.demo.VerifiableDemoCredential
+import com.tangem.id.demo.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -21,14 +20,19 @@ class TangemIdVerifier(
     private val tapHolderCardMessage =
         Message(activity.getString(R.string.sdk_view_delegate_message_holder))
 
-    private var verifierCredentials: List<VerifiableDemoCredential>? = null
+    private var verifierCredentials: List<VerifierDemoCredential>? = null
 
-    fun getCredentialsPrettyJson(): String {
-        return verifierCredentials!!.map { it.verifiableCredential.toPrettyJson() }
-            .joinToString("\n")
+    fun showRawVerifierCredential(): String {
+        return verifierCredentials!!.joinToString("\n") {
+            when (it) {
+                is TangemVerifierDemoCredential -> it.verifiableCredential.toPrettyJson()
+                is MSVerifierDemoCredential -> it.verifiableCredential.raw
+                else -> "Unknown credential type" //TODO: throw?
+            }
+        }
     }
 
-    fun readCredentialsAsVerifier(callback: (CompletionResult<List<VerifiableDemoCredential>>) -> Unit) {
+    fun readCredentialsAsVerifier(callback: (CompletionResult<List<VerifierDemoCredential>>) -> Unit) {
         tangemSdk.startSessionWithRunnable(
             ReadFilesAndDataTask(false),
             initialMessage = tapHolderCardMessage
@@ -37,28 +41,39 @@ class TangemIdVerifier(
                 when (result) {
                     is CompletionResult.Failure -> {
                         if (result.error is TangemSdkError.CardError) {
-                            callback(CompletionResult.Failure(TangemIdError.WrongHolderCardType(activity)))
+                            callback(
+                                CompletionResult.Failure(
+                                    TangemIdError.WrongHolderCardType(
+                                        activity
+                                    )
+                                )
+                            )
                             return@launch
                         }
                         if (result.error !is TangemSdkError.UserCancelled) {
-                            callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                            callback(
+                                CompletionResult.Failure(
+                                    TangemIdError.ReadingCardError(
+                                        activity
+                                    )
+                                )
+                            )
                         }
                     }
                     is CompletionResult.Success -> {
                         if (result.data.files.isEmpty() || result.data.files[0].fileData.isEmpty()) {
-                            callback(CompletionResult.Failure(TangemIdError.NoVisibleCredentials(activity)))
+                            callback(
+                                CompletionResult.Failure(
+                                    TangemIdError.NoVisibleCredentials(
+                                        activity
+                                    )
+                                )
+                            )
                             return@launch
                         }
 
-                        verifierCredentials = result.data.files
-                            .toVerifiableCredentials()
-                            .mapNotNull {
-                                VerifiableDemoCredential.from(
-                                    it
-//                                    ,
-//                                    it.simpleVerify(activity)
-                                )
-                            }
+                        verifierCredentials =
+                            result.data.files.mapNotNull { it.toVerifierCredential() }
                         Log.i("Credentials", verifierCredentials.toString())
                         callback(CompletionResult.Success(verifierCredentials!!))
                     }

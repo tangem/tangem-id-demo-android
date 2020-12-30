@@ -7,6 +7,7 @@
     <string name="error_creating_credentials">Something went wrong while creating and signing credentials</string>
     <string name="error_writing_credentials">Something went wrong while writing credentials on a card</string>
     <string name="error_adding_new_credential">Something went wrong in making new credential</string>
+    <string name="error_requesting_credentials">Something went wrong while requesting credentials</string>
     <string name="error_reading_card">Something went wrong in interaction with a card</string>
     <string name="error_converting_credential">Unknown credential</string>
     <string name="error_credential_already_issued">The holder already has this credential</string>

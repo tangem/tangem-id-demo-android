@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fl_ninja"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_ninja"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:elevation="3dp"
+        android:minWidth="300dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_ninja"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="6sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/credential_ninja"
+                android:textColor="@color/darkGray6"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_ninja_name_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="2sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/credential_personal_info_name"
+                android:textColor="@color/darkGray1"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_ninja_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/darkGray5"
+                android:textSize="16sp"
+                tools:text="John" />
+
+
+            <TextView
+                android:id="@+id/tv_ninja_surname_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="2sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/credential_personal_info_surname"
+                android:textColor="@color/darkGray1"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_ninja_surname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/darkGray5"
+                android:textSize="16sp"
+                tools:text="Smith" />
+
+            <View
+                android:id="@+id/v_separator_ninja"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/separatorGrey"/>
+
+            <include
+                android:id="@+id/l_credential_status_ninja"
+                layout="@layout/layout_credential_status" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_ninja_token"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/holder_screen_dialog_show_json"
+                android:textAllCaps="false"
+                android:textColor="@color/blue"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
+
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

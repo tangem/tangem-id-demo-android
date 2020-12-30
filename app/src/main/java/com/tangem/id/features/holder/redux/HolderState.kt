@@ -55,7 +55,7 @@ data class HolderState(
     val cardId: String? = null,
     val editActivated: Boolean = false,
     val detailsOpened: Credential? = null,
-    val jsonShown: String? = null,
+    val rawCredentialShown: String? = null,
     val credentials: List<HolderCredential> = listOf(),
     val credentialsOnCard: List<HolderCredential> = listOf(),
     val credentialsToDelete: List<File> = listOf()

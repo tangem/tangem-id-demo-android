@@ -46,23 +46,23 @@ val holderMiddleware: Middleware<AppState> = { dispatch, state ->
                         }
                     }
                 }
-                is HolderAction.RequestNewCredential -> {
-                    tangemIdSdk.holder.addCovidCredential(store.state.holderState.cardId) { result ->
-                        mainThread.post {
-                            when (result) {
-                                is CompletionResult.Success -> {
-                                    val holdersCredentials =
-                                        result.data.map { it.toHolderCredential() }
-                                    store.dispatch(
-                                        HolderAction.RequestNewCredential.Success(holdersCredentials)
-                                    )
-                                }
-                                is CompletionResult.Failure ->
-                                    store.dispatch(HolderAction.RequestNewCredential.Failure(result.error))
-                            }
-                        }
-                    }
-                }
+//                is HolderAction.RequestNewCredential -> {
+//                    tangemIdSdk.holder.addCovidCredential(store.state.holderState.cardId) { result ->
+//                        mainThread.post {
+//                            when (result) {
+//                                is CompletionResult.Success -> {
+//                                    val holdersCredentials =
+//                                        result.data.map { it.toHolderCredential() }
+//                                    store.dispatch(
+//                                        HolderAction.RequestNewCredential.Success(holdersCredentials)
+//                                    )
+//                                }
+//                                is CompletionResult.Failure ->
+//                                    store.dispatch(HolderAction.RequestNewCredential.Failure(result.error))
+//                            }
+//                        }
+//                    }
+//                }
             }
             next(action)
         }

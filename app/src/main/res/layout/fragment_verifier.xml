@@ -55,6 +55,12 @@
                 android:layout_height="wrap_content" />
 
 
+            <include
+                android:id="@+id/layout_ninja"
+                layout="@layout/layout_ninja"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_presentation_json"
                 style="@style/Widget.MaterialComponents.Button.TextButton"

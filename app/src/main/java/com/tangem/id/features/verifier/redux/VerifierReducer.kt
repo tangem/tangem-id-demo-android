@@ -23,12 +23,14 @@ fun verifierReducer(action: Action, state: AppState): VerifierState {
                 ageOfMajority = action.credentials.find { it.credential is AgeOfMajority }
                         as? VerifierCredential<AgeOfMajority>,
                 immunityPassport = action.credentials.find { it.credential is ImmunityPassport }
-                        as? VerifierCredential<ImmunityPassport>
+                        as? VerifierCredential<ImmunityPassport>,
+                credentialNinja = action.credentials.find { it.credential is CredentialNinja }
+                        as? VerifierCredential<CredentialNinja>
             )
         }
         is VerifierAction.ToggleIssuerStatus -> TODO()
         VerifierAction.ShowJson -> {
-            newState = newState.copy(jsonShown = tangemIdSdk.verifier.getCredentialsPrettyJson())
+            newState = newState.copy(jsonShown = tangemIdSdk.verifier.showRawVerifierCredential())
         }
         VerifierAction.HideJson -> {
             newState = newState.copy(jsonShown = null)

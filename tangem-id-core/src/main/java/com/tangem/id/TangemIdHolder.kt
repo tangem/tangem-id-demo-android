@@ -20,6 +20,7 @@ import com.tangem.tasks.file.File
 import com.tangem.tasks.file.WriteFilesTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.microsoft.did.sdk.credential.models.VerifiableCredential as MSVerifiableCredential
 
 data class HolderData(
     val cardId: String,
@@ -28,7 +29,7 @@ data class HolderData(
 
 class TangemIdHolder(
     private val tangemSdk: TangemSdk,
-    private val coroutineScope: CoroutineScope,
+    val coroutineScope: CoroutineScope,
     private val activity: ComponentActivity
 ) {
     private val tapHolderCardMessage =
@@ -38,8 +39,12 @@ class TangemIdHolder(
 
     private var holderCredentials: List<HolderDemoCredential>? = null
 
-    fun showHoldersCredential(index: Int): String {
-        return holderCredentials!![index].verifiableCredential.toPrettyJson()
+    fun showRawHoldersCredential(index: Int): String {
+        return when (val credential = holderCredentials!![index]) {
+            is TangemHolderDemoCredential -> credential.verifiableCredential.toPrettyJson()
+            is MSHolderDemoCredential -> credential.verifiableCredential.raw
+            else -> "Unknown credential type" //TODO: throw?
+        }
     }
 
     fun changePasscode(cardId: String?, callback: (SimpleResponse) -> Unit) {
@@ -128,7 +133,7 @@ class TangemIdHolder(
         }
     }
 
-    fun addCovidCredential(
+    fun addCovidCredential( // TODO: remove?
         cardId: String?, callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
     ) {
         if (holderCredentials?.find { it.demoCredential is DemoCredential.CovidCredential } != null) {
@@ -145,6 +150,19 @@ class TangemIdHolder(
                     )
             }
         }
+    }
+
+    fun addNinjaCredential(
+        credential: MSVerifiableCredential,
+        cardId: String?,
+        callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
+    ) {
+        if (holderCredentials?.find { it.demoCredential is DemoCredential.NinjaCredential } != null) {
+            callback(CompletionResult.Failure(TangemIdError.CredentialAlreadyIssued(activity)))
+            return
+        }
+//        coroutineScope.launch { writeNewMSCredential(credential, cardId, callback) } //TODO: now already called in coroutineScope
+        writeNewMSCredential(credential, cardId, callback)
     }
 
     private fun writeNewCredential(
@@ -167,12 +185,57 @@ class TangemIdHolder(
                 is CompletionResult.Success -> {
                     val demoCredential = credential.toDemoCredential()
                     if (demoCredential != null) {
-                        val holderCredential = HolderDemoCredential(
-                            demoCredential, credential,
+                        val holderCredential = TangemHolderDemoCredential(
                             File(
                                 result.data.fileIndex ?: holderCredentials!!.size,
                                 FileSettings.Public, encoded
+                            ),
+                            demoCredential,
+                            credential
+                        )
+                        holderCredentials = holderCredentials!! + holderCredential
+                        Log.i(this::class.java.simpleName, holderCredentials?.toString())
+                        callback(CompletionResult.Success(holderCredentials!!))
+                    } else {
+                        callback(
+                            CompletionResult.Failure(
+                                TangemIdError.ConvertingCredentialError(activity)
                             )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun writeNewMSCredential(
+        credential: MSVerifiableCredential, cardId: String?,
+        callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
+    ) {
+        val tokenBytes = credential.raw.toByteArray()
+        val writeFilesTask = WriteFilesTask(listOf(FileData.DataProtectedByPasscode(tokenBytes)))
+
+        tangemSdk.startSessionWithRunnable(
+            writeFilesTask,
+            initialMessage = tapHolderCardMessage,
+            cardId = cardId
+        ) { result ->
+            when (result) {
+                is CompletionResult.Failure ->
+                    if (result.error !is TangemSdkError.UserCancelled) {
+                        callback(CompletionResult.Failure(TangemIdError.ReadingCardError(activity)))
+                    }
+                is CompletionResult.Success -> {
+                    val demoCredential = credential.toDemoCredential()
+                    if (demoCredential != null) {
+                        val holderCredential = MSHolderDemoCredential(
+                            File(
+                                result.data.fileIndex ?: holderCredentials!!.size,
+                                FileSettings.Public,
+                                tokenBytes
+                            ),
+                            demoCredential,
+                            credential
                         )
                         holderCredentials = holderCredentials!! + holderCredential
                         Log.i(this::class.java.simpleName, holderCredentials?.toString())

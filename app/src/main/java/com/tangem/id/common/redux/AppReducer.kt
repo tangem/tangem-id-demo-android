@@ -2,6 +2,7 @@ package com.tangem.id.common.redux
 
 import com.tangem.id.common.redux.navigation.navigationReducer
 import com.tangem.id.features.holder.redux.holderReducer
+import com.tangem.id.features.holder.ui.requestCredentialsReducer
 import com.tangem.id.features.issuecredentials.redux.issueCredentialsReducer
 import com.tangem.id.features.issuer.redux.issuerReducer
 import com.tangem.id.features.verifier.redux.verifierReducer
@@ -15,7 +16,8 @@ fun appReducer(action: Action, state: AppState?): AppState {
         issuerState = issuerReducer(action, state),
         issueCredentialsState = issueCredentialsReducer(action, state),
         holderState = holderReducer(action, state),
-        verifierState = verifierReducer(action, state)
+        verifierState = verifierReducer(action, state),
+        requestCredentialsState = requestCredentialsReducer(action, state)
     )
 }
 
