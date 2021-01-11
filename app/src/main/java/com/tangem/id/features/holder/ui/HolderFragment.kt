@@ -194,8 +194,8 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
             }
             is CredentialNinja -> {
                 dialog.setContentView(R.layout.layout_ninja)
-                credential.name?.let { dialog.tv_name?.setText(it) }
-                credential.surname?.let { dialog.tv_surname?.setText(it) }
+                credential.name?.let { dialog.tv_ninja_name?.setText(it) }
+                credential.surname?.let { dialog.tv_ninja_surname?.setText(it) }
                 dialog.v_separator_ninja?.hide()
                 dialog.l_credential_status_ninja?.hide()
                 showRawCredentialButton = dialog.btn_ninja_token

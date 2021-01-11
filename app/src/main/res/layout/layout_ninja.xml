@@ -113,7 +113,7 @@
                 android:layout_marginBottom="8dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="@string/holder_screen_dialog_show_json"
+                android:text="@string/holder_screen_dialog_show_raw_token"
                 android:textAllCaps="false"
                 android:textColor="@color/blue"
                 android:textSize="16sp"
