@@ -78,7 +78,9 @@ sealed class TangemIdError(context: Context) : TangemError, Throwable() {
         override var customMessage = context.getString(messageResId)
     }
 
-
-
-
+    class ErrorRequestingCredentials(context: Context) : TangemIdError(context) {
+        override val code = 0
+        override val messageResId: Int = R.string.error_creating_credentials
+        override var customMessage = context.getString(messageResId)
+    }
 }

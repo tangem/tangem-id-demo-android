@@ -18,6 +18,7 @@
     <string name="credential_valid_until">Valid until %s</string>
     <string name="credential_valid_from">Valid from %s</string>
     <string name="credential_covid">Covid 19 Immunity Passport</string>
+    <string name="credential_ninja">Verified Credential Ninja Card</string>
     <string name="credential_dialog_share">Share</string>
     <string name="credential_dialog_hide">Hide</string>
 
@@ -38,6 +39,7 @@
     <string name="holder_screen_notification_change_passcode_success">Passcode has been changed</string>
     <string name="holder_screen_notification_no_camera_permission">You must grant camera permission to scan QR Code</string>
     <string name="holder_screen_dialog_show_json">Show JSON</string>
+    <string name="holder_screen_dialog_show_raw_token">Show raw token</string>
 
 
     
@@ -69,5 +71,9 @@
     <string name="verifier_screen_issuer_unknown">Unknown</string>
     <string name="verifier_screen_btn_json">Show Presentation JSON</string>
     <string name="verifier_screen_btn_json_description">Current presentation of credentials can be stored.</string>
+
+    <string name="request_credentials_screen_toolbar">Request Credentials</string>
+    <string name="request_credentials_status_prepare">Preparing data for credentials issuance</string>
+    <string name="request_credentials_status_issue">Please wait while credentials are being issued</string>
 
 </resources>

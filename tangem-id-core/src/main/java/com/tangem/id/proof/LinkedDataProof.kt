@@ -53,7 +53,7 @@ open class LinkedDataProof internal constructor(
             return jsonAdapter.fromJson(jsonObject.toString())!!
         }
 
-        fun fromMap(map: Map<String, String>): LinkedDataProof { // TODO: change return type to Result
+        fun fromMap(map: Map<String, Any>): LinkedDataProof { // TODO: change return type to Result
             return jsonAdapter.fromJsonValue(map)!!
         }
     }

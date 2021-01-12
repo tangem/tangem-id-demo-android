@@ -56,6 +56,7 @@ class HolderCredentialsAdapter(
                 is SecurityNumber -> context.getString(R.string.credential_ssn)
                 is AgeOfMajority -> context.getString(R.string.credential_age_of_majority)
                 is ImmunityPassport -> context.getString(R.string.credential_covid)
+                is CredentialNinja -> context.getString(R.string.credential_ninja)
                 else -> "Unknown"
             }
 

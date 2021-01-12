@@ -1,3 +1,4 @@
 include ':tangem-id-core'
 include ':app'
+include ':microsoft-vc'
 rootProject.name = "tangem-id"

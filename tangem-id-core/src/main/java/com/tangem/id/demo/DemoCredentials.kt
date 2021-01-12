@@ -3,6 +3,7 @@ package com.tangem.id.demo
 import android.util.Base64
 import com.tangem.id.documents.VerifiableCredential
 import java.time.LocalDate
+import com.microsoft.did.sdk.credential.models.VerifiableCredential as MSVerifiableCredential
 
 class DemoPersonData(
     val givenName: String,
@@ -26,6 +27,7 @@ sealed class DemoCredential {
     data class SsnCredential(val ssn: String) : DemoCredential()
     data class AgeOfMajorityCredential(val valid: Boolean) : DemoCredential()
     data class CovidCredential(val result: CovidStatus) : DemoCredential()
+    data class NinjaCredential(val name: String, val surname: String) : DemoCredential()
 }
 
 enum class CovidStatus {
@@ -79,5 +81,15 @@ fun VerifiableCredential.toDemoCredential(): DemoCredential? {
             DemoCredential.CovidCredential(CovidStatus.fromString(covid))
         }
         else -> null
+    }
+}
+
+fun MSVerifiableCredential.toDemoCredential(): DemoCredential? {
+    return try {
+        val name = this.contents.vc.credentialSubject["firstName"]
+        val surname = this.contents.vc.credentialSubject["lastName"]
+        DemoCredential.NinjaCredential(name!!, surname!!)
+    } catch (exception: Exception) {
+        null
     }
 }

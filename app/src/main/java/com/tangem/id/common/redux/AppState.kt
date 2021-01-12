@@ -4,6 +4,7 @@ import com.tangem.id.common.redux.navigation.NavigationState
 import com.tangem.id.common.redux.navigation.navigationMiddleware
 import com.tangem.id.features.holder.redux.HolderState
 import com.tangem.id.features.holder.redux.holderMiddleware
+import com.tangem.id.features.holder.ui.RequestCredentialsState
 import com.tangem.id.features.home.redux.homeMiddleware
 import com.tangem.id.features.issuecredentials.redux.IssueCredentialsState
 import com.tangem.id.features.issuecredentials.redux.issueCredentialsMiddleware
@@ -18,7 +19,8 @@ data class AppState(
     val issuerState: IssuerState = IssuerState(),
     val issueCredentialsState: IssueCredentialsState = IssueCredentialsState(),
     val holderState: HolderState = HolderState(),
-    val verifierState: VerifierState = VerifierState()
+    val verifierState: VerifierState = VerifierState(),
+    val requestCredentialsState: RequestCredentialsState = RequestCredentialsState()
 ) : StateType {
 
     companion object {

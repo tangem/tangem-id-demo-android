@@ -19,7 +19,7 @@ class DeleteAndWriteFilesResponse(
     val cardId: String
 ) : CommandResponse
 
-fun List<File>.toVerifiableCredentials(): List<VerifiableCredential> {
+fun List<File>.toVerifiableCredentials(): List<VerifiableCredential> { //TODO: remove?
     return this.map { it.fileData }
         .map { JsonLdCborEncoder.decode(it) }
         .map { VerifiableCredential.fromMap((it as Map<String, String>)) }

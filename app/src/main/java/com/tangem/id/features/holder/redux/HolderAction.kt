@@ -15,7 +15,7 @@ sealed class HolderAction : Action {
         val credentials: List<HolderCredential>
     ) : HolderAction()
 
-    object RequestNewCredential : HolderAction() {
+    data class RequestNewCredential(val requestUri: String) : HolderAction() {
         data class Success(val allCredentials: List<HolderCredential>) :
             HolderAction(), NotificationAction {
             override val messageResource = R.string.holder_screen_notification_request_credential_success
@@ -48,6 +48,6 @@ sealed class HolderAction : Action {
     data class RemoveCredential(val credential: Credential) : HolderAction()
     data class ShowCredentialDetails(val credential: Credential) : HolderAction()
     object HideCredentialDetails : HolderAction()
-    data class ShowJson(val credential: Credential) : HolderAction()
+    data class ShowRawCredential(val credential: Credential) : HolderAction()
 }
 

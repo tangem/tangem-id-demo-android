@@ -27,7 +27,10 @@ import kotlinx.android.synthetic.main.layout_button.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_covid.*
 import kotlinx.android.synthetic.main.layout_dialog_json.*
+import kotlinx.android.synthetic.main.layout_ninja.*
 import kotlinx.android.synthetic.main.layout_passport.*
+import kotlinx.android.synthetic.main.layout_passport.tv_name
+import kotlinx.android.synthetic.main.layout_passport.tv_surname
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
 import org.rekotlin.StoreSubscriber
@@ -133,10 +136,10 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
     }
 
     private fun showDetails(state: HolderState) {
-        if (state.jsonShown != null) {
+        if (state.rawCredentialShown != null) {
             dialog?.setContentView(R.layout.layout_dialog_json)
-            dialog?.tv_json?.text = state.jsonShown
-            dialog?.btn_share_json?.setOnClickListener { context?.shareText(state.jsonShown) }
+            dialog?.tv_json?.text = state.rawCredentialShown
+            dialog?.btn_share_json?.setOnClickListener { context?.shareText(state.rawCredentialShown) }
             return
         }
         dialog = Dialog(requireContext())
@@ -147,7 +150,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
     }
 
     private fun fillInCredentialDetails(dialog: Dialog, credential: Credential) {
-        var showJsonButton: MaterialButton? = null
+        var showRawCredentialButton: MaterialButton? = null
         when (credential) {
             is Passport -> {
                 dialog.setContentView(R.layout.layout_passport)
@@ -155,7 +158,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 credential.surname?.let { dialog.tv_surname?.setText(it) }
                 credential.gender?.let { dialog.tv_gender?.setText(it.toString()) }
                 credential.birthDate?.let { dialog.tv_birth_date?.setText(it) }
-                showJsonButton = dialog.btn_passport_json
+                showRawCredentialButton = dialog.btn_passport_json
                 dialog.v_separator_passport?.hide()
                 dialog.l_credential_status_passport?.hide()
             }
@@ -163,7 +166,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 dialog.setContentView(R.layout.layout_photo)
                 credential.photo?.let { dialog.iv_photo?.setImageBitmap(it) }
                 dialog.l_credential_status_photo?.hide()
-                showJsonButton = dialog.btn_photo_json
+                showRawCredentialButton = dialog.btn_photo_json
 
             }
             is SecurityNumber -> {
@@ -171,7 +174,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 credential.number?.let { dialog.tv_ssn?.setText(it) }
                 dialog.v_separator_ssn?.hide()
                 dialog.l_credential_status_ssn?.hide()
-                showJsonButton = dialog.btn_ssn_json
+                showRawCredentialButton = dialog.btn_ssn_json
             }
             is AgeOfMajority -> {
                 dialog.setContentView(R.layout.layout_checkbox_card)
@@ -179,7 +182,7 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 dialog.checkbox?.isEnabled = false
                 dialog.v_separator_age_of_majority?.hide()
                 dialog.l_credential_status_age_of_majority?.hide()
-                showJsonButton = dialog.btn_age_of_majority_json
+                showRawCredentialButton = dialog.btn_age_of_majority_json
             }
             is ImmunityPassport -> {
                 dialog.setContentView(R.layout.layout_covid)
@@ -187,11 +190,19 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 dialog.checkbox?.isEnabled = false
                 dialog.v_separator_covid?.hide()
                 dialog.l_credential_status_covid?.hide()
-                showJsonButton = dialog.btn_covid_json
+                showRawCredentialButton = dialog.btn_covid_json
+            }
+            is CredentialNinja -> {
+                dialog.setContentView(R.layout.layout_ninja)
+                credential.name?.let { dialog.tv_ninja_name?.setText(it) }
+                credential.surname?.let { dialog.tv_ninja_surname?.setText(it) }
+                dialog.v_separator_ninja?.hide()
+                dialog.l_credential_status_ninja?.hide()
+                showRawCredentialButton = dialog.btn_ninja_token
             }
         }
-        showJsonButton?.show()
-        showJsonButton?.setOnClickListener { store.dispatch(HolderAction.ShowJson(credential)) }
+        showRawCredentialButton?.show()
+        showRawCredentialButton?.setOnClickListener { store.dispatch(HolderAction.ShowRawCredential(credential)) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

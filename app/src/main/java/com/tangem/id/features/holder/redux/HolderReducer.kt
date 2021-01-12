@@ -92,13 +92,13 @@ fun holderReducer(action: Action, state: AppState): HolderState {
             newState = newState.copy(detailsOpened = action.credential)
         }
         HolderAction.HideCredentialDetails -> {
-            newState = newState.copy(detailsOpened = null, jsonShown = null)
+            newState = newState.copy(detailsOpened = null, rawCredentialShown = null)
         }
-        is HolderAction.ShowJson -> {
+        is HolderAction.ShowRawCredential -> {
             val index =
                 newState.credentialsOnCard.indexOfFirst { it.credential == action.credential }
-            val json = tangemIdSdk.holder.showHoldersCredential(index)
-            newState = newState.copy(jsonShown = json)
+            val json = tangemIdSdk.holder.showRawHoldersCredential(index)
+            newState = newState.copy(rawCredentialShown = json)
 
         }
     }

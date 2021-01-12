@@ -8,12 +8,16 @@ android {
 
     defaultConfig {
         applicationId "com.tangem.id"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 5
         versionName "0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                'appAuthRedirectScheme': 'vcclient'
+        ]
     }
 
     buildTypes {
@@ -80,5 +84,14 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    //Microsoft VC
+    implementation project(path: ':microsoft-vc')
+//    implementation "com.squareup.retrofit2:retrofit:$retrofit2_version"
+//    implementation "com.squareup.retrofit2:converter-gson:$retrofit2_version"
+//    implementation "com.squareup.retrofit2:converter-scalars:$retrofit2_version"
+//    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2"
+//    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlin_serialization_version"
+//    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlin_serialization_version"
+    implementation 'net.openid:appauth:0.7.1'
 }
 //apply from: new File(rootProject.projectDir, '.liquidcore/liquidcore.build.gradle')

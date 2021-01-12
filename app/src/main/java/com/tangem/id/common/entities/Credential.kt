@@ -6,7 +6,7 @@ import com.tangem.id.common.extensions.toBitmap
 import com.tangem.id.common.extensions.toDate
 import com.tangem.id.demo.CovidStatus
 import com.tangem.id.demo.DemoCredential
-import com.tangem.id.demo.VerifiableDemoCredential
+import com.tangem.id.demo.VerifierDemoCredential
 
 interface Credential {
     fun isDataPresent(): Boolean
@@ -29,6 +29,8 @@ interface Credential {
                 is DemoCredential.AgeOfMajorityCredential -> AgeOfMajority(credential.valid)
                 is DemoCredential.CovidCredential ->
                     ImmunityPassport(credential.result == CovidStatus.Positive)
+                is DemoCredential.NinjaCredential ->
+                    CredentialNinja(credential.name, credential.surname)
             }
         }
     }
@@ -68,7 +70,7 @@ data class Passport(
     }
 
     companion object {
-        fun from(demoCredential: VerifiableDemoCredential): Passport? {
+        fun from(demoCredential: VerifierDemoCredential): Passport? {
             val credential = demoCredential.decodedCredential
             return if (credential is DemoCredential.PersonalInfoCredential) {
                 Passport(
@@ -101,6 +103,13 @@ data class AgeOfMajority(val valid: Boolean = false) : Credential {
 
 data class ImmunityPassport(val valid: Boolean) : Credential {
     override fun isDataPresent(): Boolean = true
+}
+
+data class CredentialNinja(
+    val name: String? = null,
+    val surname: String? = null
+) : Credential {
+    override fun isDataPresent(): Boolean = !name.isNullOrBlank() && !surname.isNullOrBlank()
 }
 
 enum class Gender {
