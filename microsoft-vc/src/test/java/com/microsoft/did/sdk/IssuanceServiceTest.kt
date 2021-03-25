@@ -11,6 +11,7 @@ import com.microsoft.did.sdk.credential.service.RequestedVcMap
 import com.microsoft.did.sdk.credential.service.models.attestations.PresentationAttestation
 import com.microsoft.did.sdk.credential.service.models.contracts.VerifiableCredentialContract
 import com.microsoft.did.sdk.credential.service.models.linkedDomains.LinkedDomainMissing
+import com.microsoft.did.sdk.credential.service.models.linkedDomains.LinkedDomainUnVerified
 import com.microsoft.did.sdk.credential.service.models.linkedDomains.LinkedDomainVerified
 import com.microsoft.did.sdk.credential.service.protectors.ExchangeResponseFormatter
 import com.microsoft.did.sdk.credential.service.protectors.IssuanceResponseFormatter
@@ -24,14 +25,15 @@ import com.microsoft.did.sdk.identifier.models.Identifier
 import com.microsoft.did.sdk.identifier.models.identifierdocument.IdentifierDocument
 import com.microsoft.did.sdk.identifier.models.payload.document.IdentifierDocumentService
 import com.microsoft.did.sdk.identifier.resolvers.Resolver
+import com.microsoft.did.sdk.internal.ImageLoader
 import com.microsoft.did.sdk.util.Constants
 import com.microsoft.did.sdk.util.controlflow.Result
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
@@ -51,6 +53,7 @@ class IssuanceServiceTest {
     private val mockedJwtDomainLinkageCredentialValidator = JwtDomainLinkageCredentialValidator(mockedJwtValidator, defaultTestSerializer)
     private val linkedDomainsService =
         spyk(LinkedDomainsService(mockk(relaxed = true), mockedResolver, mockedJwtDomainLinkageCredentialValidator))
+    private val imageLoader: ImageLoader = mockk()
     private val issuanceService =
         spyk(
             IssuanceService(
@@ -60,7 +63,8 @@ class IssuanceServiceTest {
                 mockk(relaxed = true),
                 mockedJwtValidator,
                 issuanceResponseFormatter,
-                defaultTestSerializer
+                defaultTestSerializer,
+                imageLoader
             )
         )
 
@@ -97,11 +101,12 @@ class IssuanceServiceTest {
 
     init {
         coEvery { identifierManager.getMasterIdentifier() } returns Result.Success(masterIdentifier)
-        coEvery { identifierManager.createPairwiseIdentifier(masterIdentifier, any()) } returns Result.Success(pairwiseIdentifier)
+        coEvery { identifierManager.getOrCreatePairwiseIdentifier(masterIdentifier, any()) } returns Result.Success(pairwiseIdentifier)
         mockkConstructor(FetchContractNetworkOperation::class)
         expectedContract = setUpTestContract(expectedContractString)
         mockkConstructor(SendVerifiableCredentialIssuanceRequestNetworkOperation::class)
         coEvery { issuanceResponseFormatter.formatResponse(any(), any(), any(), any()) } returns formattedResponse
+        coEvery { imageLoader.loadRemoteImagesIntoContract(any()) } returns Unit
     }
 
     private fun setUpTestContract(expectedContractJwt: String): VerifiableCredentialContract {
@@ -109,7 +114,31 @@ class IssuanceServiceTest {
     }
 
     @Test
-    fun `test to get Issuance Request`() {
+    fun `test to get Issuance Request with linked domains unverified`() {
+        val suppliedContractUrl = "BusinessCard"
+        val expectedEntityName = "Adatum Corporation"
+        val expectedEntityIdentifier =
+            "did:ion:EiCfeOciEjwupwRQsJC3wMZzz3_M3XIo6bhy7aJkCG6CAQ?-ion-initial-state=eyJkZWx0YV9oYXNoIjoiRWlEMDQwY2lQakUxR0xqLXEyWmRyLVJaXzVlcU8yNFlDMFI5bTlEd2ZHMkdGQSIsInJlY292ZXJ5X2NvbW1pdG1lbnQiOiJFaUMyRmQ5UE90emFNcUtMaDNRTFp0Wk43V0RDRHJjdkN4eTNvdlNERDhKRGVRIn0.eyJ1cGRhdGVfY29tbWl0bWVudCI6IkVpQ2gtaTFDMW1fM2N4SGJNM3pXemRRdExxMnBvRldaX25FVEJTb0NhT2JZTWciLCJwYXRjaGVzIjpbeyJhY3Rpb24iOiJyZXBsYWNlIiwiZG9jdW1lbnQiOnsicHVibGljX2tleXMiOlt7ImlkIjoic2lnXzBmOTdlZWZjIiwidHlwZSI6IkVjZHNhU2VjcDI1NmsxVmVyaWZpY2F0aW9uS2V5MjAxOSIsImp3ayI6eyJrdHkiOiJFQyIsImNydiI6InNlY3AyNTZrMSIsIngiOiJoQ0xsb3JJbGx2M2FWSkRiYkNxM0VHbzU2bWV6Q3RLWkZGcUtvS3RVc3BzIiwieSI6Imh1VG5iTEc3MWU0NDNEeVJkeU5DX3dfc3paR0hVYUcxUHdsMHpXb0h2LUEifSwicHVycG9zZSI6WyJhdXRoIiwiZ2VuZXJhbCJdfV19fV19"
+
+        coEvery { anyConstructed<FetchContractNetworkOperation>().fire() } returns Result.Success(unwrapContract(expectedContractJwt))
+        coEvery { mockedJwtValidator.verifySignature(any()) } returns true
+        coEvery { linkedDomainsService.fetchAndVerifyLinkedDomains(any()) } returns Result.Success(
+            LinkedDomainUnVerified(mockedIdentifierDocumentServiceEndpoint)
+        )
+        coEvery { mockedResolver.resolve(expectedContract.input.issuer) } returns Result.Success(mockedIdentifierDocument)
+
+        runBlocking {
+            val actualRequest = issuanceService.getRequest(suppliedContractUrl)
+            assertThat(actualRequest).isInstanceOf(Result.Success::class.java)
+            assertThat((actualRequest as Result.Success).payload.contractUrl).isEqualTo(suppliedContractUrl)
+            assertThat(actualRequest.payload.linkedDomainResult).isInstanceOf(LinkedDomainUnVerified::class.java)
+            assertThat(actualRequest.payload.entityName).isEqualTo(expectedEntityName)
+            assertThat(actualRequest.payload.entityIdentifier).isEqualTo(expectedEntityIdentifier)
+        }
+    }
+
+    @Test
+    fun `test to get Issuance Request with linked domains verified`() {
         val suppliedContractUrl = "BusinessCard"
         val expectedEntityName = "Adatum Corporation"
         val expectedEntityIdentifier =
@@ -139,14 +168,14 @@ class IssuanceServiceTest {
     @Test
     fun `test to send Issuance Response`() {
         val suppliedContractUrl = "BusinessCard"
-        val issuanceRequest = IssuanceRequest(expectedContract, suppliedContractUrl, LinkedDomainMissing())
+        val issuanceRequest = IssuanceRequest(expectedContract, suppliedContractUrl, LinkedDomainMissing)
         val issuanceResponse = IssuanceResponse(issuanceRequest)
         val requestedVcMap = mapOf(mockk<PresentationAttestation>() to expectedVerifiableCredential) as RequestedVcMap
 
-        coEvery { issuanceService["exchangeVcsInIssuanceRequest"](issuanceResponse, pairwiseIdentifier) } returns Result.Success(
+        every { issuanceService["exchangeVcsInIssuanceRequest"](issuanceResponse, pairwiseIdentifier) } returns Result.Success(
             requestedVcMap
         )
-        coEvery {
+        every {
             issuanceService["formAndSendResponse"](
                 issuanceResponse,
                 pairwiseIdentifier,
@@ -165,7 +194,7 @@ class IssuanceServiceTest {
             assertThat(createdVerifiableCredential.payload.contents).isEqualTo(suppliedVcContent)
         }
 
-        coVerify(exactly = 1) {
+        verify(exactly = 1) {
             issuanceService["exchangeVcsInIssuanceRequest"](issuanceResponse, pairwiseIdentifier)
             issuanceService["formAndSendResponse"](
                 issuanceResponse,
@@ -177,7 +206,7 @@ class IssuanceServiceTest {
     }
 
     private fun unwrapContract(jwsTokenString: String): VerifiableCredentialContract {
-        val jwsToken = JwsToken.deserialize(jwsTokenString, defaultTestSerializer)
+        val jwsToken = JwsToken.deserialize(jwsTokenString)
         return defaultTestSerializer.decodeFromString(VerifiableCredentialContract.serializer(), jwsToken.content())
     }
 }

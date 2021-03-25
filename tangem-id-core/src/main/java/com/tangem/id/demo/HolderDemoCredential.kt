@@ -1,12 +1,11 @@
 package com.tangem.id.demo
 
-import com.microsoft.did.sdk.util.formVerifiableCredential
 import com.tangem.id.card.toggleVisibility
 import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.utils.JsonLdCborEncoder
+import com.tangem.id.utils.MSVeriviableCredentialFromString
 import com.tangem.tasks.file.File
 import com.microsoft.did.sdk.credential.models.VerifiableCredential as MSVerifiableCredential
-import kotlinx.serialization.json.Json
 
 abstract class HolderDemoCredential {
     abstract val file: File
@@ -48,9 +47,10 @@ fun File.toHolderCredential(): HolderDemoCredential? {
         TangemHolderDemoCredential(this, demoCredential, verifiableCredential)
 
     } catch (exception: Exception) {
-        val token = String(this.fileData)
-        val msVerifiableCredential = formVerifiableCredential(token, Json.Default)
+        val tokenString = String(this.fileData)
+        val msVerifiableCredential = MSVeriviableCredentialFromString(tokenString)
         val demoCredential = msVerifiableCredential.toDemoCredential() ?: return null
         MSHolderDemoCredential(this, demoCredential, msVerifiableCredential)
     }
+
 }

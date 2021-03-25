@@ -87,12 +87,17 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
     }
 
     private fun requestMicrosoftCredential(requestUri: String) {
-        authService = AuthorizationService(activity!!)
+        authService = AuthorizationService(requireContext())
         coroutineScope.launch {
             try {
-                VerifiableCredentialSdk.init(activity!!, "testAgent")
+                VerifiableCredentialSdk.init(requireContext(), "testAgent")
                 issuanceService = VerifiableCredentialSdk.issuanceService
                 presentationService = VerifiableCredentialSdk.presentationService
+
+//                val issuanceRequest = when (val result = issuanceService.getRequest(requestUri)) {
+//                    is MSResult.Success -> result.payload
+//                    is MSResult.Failure -> return@launch
+//                }
 
                 presentationRequest =
                     when (val result = presentationService.getRequest(requestUri)) {
@@ -101,14 +106,14 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
                     }
 
                 presentationRequest = PresentationRequest(
-                    presentationRequest.content.copy(audience = presentationRequest.content.clientId),
+                    presentationRequest.content.copy(audience = presentationRequest.content.clientId!!),
                     presentationRequest.linkedDomainResult
                 )
 
-//            val contract = presentationRequest.getPresentationDefinition()
-//                .credentialPresentationInputDescriptors[0].issuanceMetadataList[0].issuerContract
-                val contract =
-                    "https://portableidentitycards.azure-api.net/v1.0/3c32ed40-8a10-465b-8ba4-0b1e86882668/portableIdentities/contracts/VerifiedCredentialNinja"
+            val contract = presentationRequest.getPresentationDefinition()
+                .credentialPresentationInputDescriptors[0].issuanceMetadataList[0].issuerContract
+//                val contract =
+//                    "https://portableidentitycards.azure-api.net/v1.0/3c32ed40-8a10-465b-8ba4-0b1e86882668/portableIdentities/contracts/VerifiedCredentialNinja"
 
                 val issuanceRequest =
                     when (val result = issuanceService.getRequest(contract)) {
@@ -232,7 +237,7 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
         mainThread.post {
             store.dispatch(
                 HolderAction.RequestNewCredential.Failure(
-                    TangemIdError.ErrorRequestingCredentials(activity!!)
+                    TangemIdError.ErrorRequestingCredentials(requireActivity())
                 )
             )
             store.dispatch(NavigationAction.PopBackTo())

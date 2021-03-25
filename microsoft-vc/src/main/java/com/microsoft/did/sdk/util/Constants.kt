@@ -5,6 +5,8 @@
 
 package com.microsoft.did.sdk.util
 
+import android.util.Base64
+
 object Constants {
 
     // OIDC Protocol Constants
@@ -38,17 +40,26 @@ object Constants {
 
     const val DEEP_LINK_SCHEME = "openid"
     const val DEEP_LINK_HOST = "vc"
+    const val CORRELATION_VECTOR_IN_PREF = "correlation_vector"
 
     //Identifier Constants
-    const val MASTER_IDENTIFIER_NAME = "did.identifier"
+    const val MAIN_IDENTIFIER_REFERENCE = "did.main.identifier"
     const val METHOD_NAME = "ion"
-    const val INITIAL_STATE_LONGFORM = "-$METHOD_NAME-initial-state"
-    const val SIDETREE_OPERATION_TYPE = "create"
+    const val IDENTIFIER_PUBLIC_KEY_PURPOSE = "authentication"
+    const val COLON = ":"
     const val SIDETREE_PATCH_ACTION = "replace"
     const val SIDETREE_MULTIHASH_CODE = 18
     const val SIDETREE_MULTIHASH_LENGTH = 32
     const val SECP256K1_CURVE_NAME_EC = "secp256k1"
-    const val SIGNATURE_KEYREFERENCE = "sign"
-    const val RECOVERY_KEYREFERENCE = "recover"
-    const val UPDATE_KEYREFERENCE = "update"
+
+    // Header Constants for network calls
+    const val USER_AGENT_HEADER = "User-Agent"
+    const val CORRELATION_VECTOR_HEADER = "ms-cv"
+    const val REQUEST_ID_HEADER = "request-id"
+
+    //  Base64 Encoding flags
+    const val BASE64_URL_SAFE = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+
+    const val AES_KEY = "AES"
+    const val SEED_BYTES = 32
 }

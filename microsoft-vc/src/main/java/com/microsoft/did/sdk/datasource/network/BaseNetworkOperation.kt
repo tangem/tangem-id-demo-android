@@ -5,12 +5,20 @@
 
 package com.microsoft.did.sdk.datasource.network
 
+import com.microsoft.did.sdk.util.Constants.CORRELATION_VECTOR_HEADER
+import com.microsoft.did.sdk.util.Constants.REQUEST_ID_HEADER
+import com.microsoft.did.sdk.util.NetworkErrorParser
+import com.microsoft.did.sdk.util.controlflow.ClientException
+import com.microsoft.did.sdk.util.controlflow.ForbiddenException
 import com.microsoft.did.sdk.util.controlflow.LocalNetworkException
 import com.microsoft.did.sdk.util.controlflow.NetworkException
+import com.microsoft.did.sdk.util.controlflow.NotFoundException
+import com.microsoft.did.sdk.util.controlflow.RedirectException
 import com.microsoft.did.sdk.util.controlflow.Result
-import com.microsoft.did.sdk.util.controlflow.ServiceErrorException
 import com.microsoft.did.sdk.util.controlflow.ServiceUnreachableException
 import com.microsoft.did.sdk.util.controlflow.UnauthorizedException
+import com.microsoft.did.sdk.util.log.SdkLog
+import com.microsoft.did.sdk.util.logNetworkTime
 import retrofit2.Response
 import java.io.IOException
 
@@ -27,7 +35,9 @@ abstract class BaseNetworkOperation<S, T> {
 
     open suspend fun fire(): Result<T> {
         try {
-            val response = call.invoke()
+            val response = logNetworkTime("${this::class.simpleName}") {
+                call.invoke()
+            }
             if (response.isSuccessful) {
                 return onSuccess(response)
             }
@@ -47,36 +57,22 @@ abstract class BaseNetworkOperation<S, T> {
 
     // TODO("what do we want our base to look like")
     open fun onFailure(response: Response<S>): Result<Nothing> {
-        val requestId = response.headers()["request-id"] ?: "?"
-        val correlationVector = response.headers()["ms-cv"] ?: "?"
-        return when (response.code()) {
-            401 -> Result.Failure(
-                UnauthorizedException(
-                    requestId,
-                    defaultErrorMessage(response.code(), requestId, correlationVector, response.errorBody()?.string() ?: ""),
-                    false
-                )
-            )
-            402, 403, 404 -> Result.Failure(
-                ServiceErrorException(
-                    requestId,
-                    defaultErrorMessage(response.code(), requestId, correlationVector, response.errorBody()?.string() ?: ""),
-                    false
-                )
-            )
-            500, 501, 502, 503 -> Result.Failure(
-                ServiceUnreachableException(
-                    requestId,
-                    defaultErrorMessage(response.code(), requestId, correlationVector, response.errorBody()?.string() ?: ""),
-                    true
-                )
-            )
-            else -> Result.Failure(NetworkException(requestId, "Unknown Status code ${response.code()}", true))
+        val exception = when (response.code()) {
+            301, 302, 308 -> RedirectException(response.errorBody()?.string() ?: "", false)
+            401 -> UnauthorizedException(response.errorBody()?.string() ?: "", false)
+            400, 402 -> ClientException(response.errorBody()?.string() ?: "", false)
+            403 -> ForbiddenException(response.errorBody()?.string() ?: "", false)
+            404 -> NotFoundException(response.errorBody()?.string() ?: "", false)
+            500, 501, 502, 503 -> ServiceUnreachableException(response.errorBody()?.string() ?: "", true)
+            else -> NetworkException("Unknown Status code", true)
         }
-    }
-
-    private fun defaultErrorMessage(httpCode: Int, requestId: String, correlationVector: String, errorBody: String): String {
-        return "RequestId: $requestId\nCorrelationVector: $correlationVector\nHttp code: $httpCode\nErrorBody: $errorBody"
+        exception.errorCode = response.code().toString()
+        exception.correlationVector = response.headers()[CORRELATION_VECTOR_HEADER]
+        exception.requestId = response.headers()[REQUEST_ID_HEADER]
+        exception.errorBody = response.errorBody()?.string()
+        exception.innerErrors = NetworkErrorParser.extractInnerErrorsCodes(exception.errorBody)
+        SdkLog.v("HttpError: ${exception.errorCode} body: ${exception.errorBody}")
+        return Result.Failure(exception)
     }
 
     fun <S> onRetry(): Result<S> {
