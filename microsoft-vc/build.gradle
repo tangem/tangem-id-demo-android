@@ -12,6 +12,10 @@ jacoco {
     toolVersion = "0.8.5"
 }
 
+repositories{
+    maven { url "https://jitpack.io" }
+}
+
 android {
     compileSdkVersion compile_sdk_version as Integer
     buildToolsVersion build_tools_version
@@ -103,14 +107,22 @@ dependencies {
     implementation "androidx.core:core-ktx:$core_ktx_version"
 
     //other
-    implementation "androidx.security:security-crypto:1.0.0-rc03"
+    implementation "androidx.preference:preference-ktx:$androidx_preference_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "com.squareup.picasso:picasso:$picasso_version"
 
-    api 'com.google.guava:guava:28.1-android'
-    // TODO: this seems to be required as api for org.bitcoin.jar? Can we avoid this?
-    implementation "com.madgag.spongycastle:prov:1.58.0.0"
+    //noinspection GradleDependency
+    implementation "androidx.security:security-crypto:1.0.0-rc03"
+    implementation "org.bouncycastle:bcprov-jdk15on:$org_bouncycastle_bcprov"
+
+    implementation 'com.google.guava:guava:28.1-android'
+    // JWE/JWS
+    implementation("com.nimbusds:nimbus-jose-jwt:$nimbus_jose_jwt_version") {
+        exclude group: 'com.github.stephenc.jcip', module: 'jcip-annotations'
+    }
     //Used for Json Canonicalization performed for ION
     implementation "io.github.erdtman:java-json-canonicalization:1.1"
+    implementation "com.github.microsoft:CorrelationVector-Java:$correlation_vector_version"
 
     // test dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidx_test_junit_version"
@@ -148,7 +160,7 @@ task jacocoCoverageReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', '
 
     sourceDirectories.setFrom(files([mainSrc]))
     classDirectories.setFrom(files([debugTree, kotlinClasses]))
-    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+    executionData.setFrom(fileTree(dir: project.projectDir, includes: [
             '**/*.exec', '**/*.ec'
     ]))
 }

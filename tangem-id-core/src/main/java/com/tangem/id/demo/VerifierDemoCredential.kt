@@ -1,10 +1,10 @@
 package com.tangem.id.demo
 
-import com.microsoft.did.sdk.util.formVerifiableCredential
 import com.tangem.blockchain.extensions.SimpleResult
 import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.documents.VerifiableDocument
 import com.tangem.id.utils.JsonLdCborEncoder
+import com.tangem.id.utils.MSVeriviableCredentialFromString
 import com.tangem.tasks.file.File
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
@@ -56,8 +56,8 @@ fun File.toVerifierCredential(): VerifierDemoCredential? {
         TangemVerifierDemoCredential(demoCredential, true, verifiableCredential) // TODO: change "true" to "verifiableCredential.simpleVerify()"
 
     } catch (exception: Exception) {
-        val token = String(this.fileData)
-        val msVerifiableCredential = formVerifiableCredential(token, Json)
+        val tokenString = String(this.fileData)
+        val msVerifiableCredential = MSVeriviableCredentialFromString(tokenString)
         val demoCredential = msVerifiableCredential.toDemoCredential() ?: return null
         MSVerifierDemoCredential(demoCredential, true, msVerifiableCredential)
     }
