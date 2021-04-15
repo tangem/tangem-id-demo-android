@@ -24,11 +24,12 @@ import com.microsoft.did.sdk.credential.models.VerifiableCredential as MSVerifia
 
 data class HolderData(
     val cardId: String,
+    val walletPublicKey: ByteArray,
     val credentials: List<HolderDemoCredential>
 )
 
 class TangemIdHolder(
-    private val tangemSdk: TangemSdk,
+    val tangemSdk: TangemSdk,
     val coroutineScope: CoroutineScope,
     private val activity: ComponentActivity
 ) {
@@ -86,7 +87,7 @@ class TangemIdHolder(
                         EthereumAddressService().makeAddress(result.data.walletPublicKey)
 
                     callback(
-                        CompletionResult.Success(HolderData(result.data.cardId, holderCredentials))
+                        CompletionResult.Success(HolderData(result.data.cardId, result.data.walletPublicKey, holderCredentials))
                     )
                 }
             }
@@ -152,12 +153,12 @@ class TangemIdHolder(
         }
     }
 
-    fun addNinjaCredential(
+    fun addVCExpertCredential(
         credential: MSVerifiableCredential,
         cardId: String?,
         callback: (CompletionResult<List<HolderDemoCredential>>) -> Unit
     ) {
-        if (holderCredentials?.find { it.demoCredential is DemoCredential.NinjaCredential } != null) {
+        if (holderCredentials?.find { it.demoCredential is DemoCredential.VCExpertCredential } != null) {
             callback(CompletionResult.Failure(TangemIdError.CredentialAlreadyIssued(activity)))
             return
         }

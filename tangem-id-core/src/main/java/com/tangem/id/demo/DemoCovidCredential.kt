@@ -1,16 +1,18 @@
 package com.tangem.id.demo
 
-import android.content.Context
+
 import com.tangem.blockchain.blockchains.ethereum.EthereumAddressService
 import com.tangem.blockchain.extensions.Result
 import com.tangem.id.documents.VerifiableCredential
 import com.tangem.id.proof.Secp256k1Proof
 import org.bitcoinj.core.ECKey.CURVE
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair
-import org.bouncycastle.crypto.generators.ECKeyPairGenerator
-import org.bouncycastle.crypto.params.ECKeyGenerationParameters
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters
-import org.bouncycastle.crypto.params.ECPublicKeyParameters
+import org.spongycastle.crypto.AsymmetricCipherKeyPair
+import org.spongycastle.crypto.generators.ECKeyPairGenerator
+import org.spongycastle.crypto.params.ECDomainParameters
+import org.spongycastle.crypto.params.ECKeyGenerationParameters
+import org.spongycastle.crypto.params.ECPrivateKeyParameters
+import org.spongycastle.crypto.params.ECPublicKeyParameters
+import org.spongycastle.jce.ECNamedCurveTable
 import java.security.SecureRandom
 
 class DemoCovidCredential {
@@ -54,7 +56,9 @@ class DemoCovidCredential {
         private fun generateKeyPair(): AsymmetricCipherKeyPair {
             val gen = ECKeyPairGenerator()
             val secureRandom = SecureRandom()
-            val keyGenParam = ECKeyGenerationParameters(CURVE, secureRandom)
+            val spec = ECNamedCurveTable.getParameterSpec("secp256k1")
+            val domainParameters = ECDomainParameters(spec.curve, spec.g, spec.n, spec.h, spec.seed)
+            val keyGenParam = ECKeyGenerationParameters(domainParameters, secureRandom)
             gen.init(keyGenParam)
             return gen.generateKeyPair()
         }

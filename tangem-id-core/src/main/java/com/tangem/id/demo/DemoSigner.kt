@@ -1,7 +1,7 @@
 package com.tangem.id.demo
 
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters
-import org.bouncycastle.crypto.signers.ECDSASigner
+import org.spongycastle.crypto.params.ECPrivateKeyParameters
+import org.spongycastle.crypto.signers.ECDSASigner
 
 class DemoSigner {
     fun sign(hashToSign: ByteArray, privateKey: ECPrivateKeyParameters): ByteArray {

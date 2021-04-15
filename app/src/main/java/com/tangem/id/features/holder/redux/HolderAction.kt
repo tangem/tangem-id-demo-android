@@ -12,6 +12,7 @@ sealed class HolderAction : Action {
 
     data class CredentialsRead(
         val cardId: String,
+        val walletPublicKey: ByteArray,
         val credentials: List<HolderCredential>
     ) : HolderAction()
 

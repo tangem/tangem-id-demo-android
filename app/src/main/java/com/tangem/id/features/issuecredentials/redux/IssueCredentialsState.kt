@@ -22,7 +22,7 @@ data class IssueCredentialsState(
 ) : StateType {
 
     init {
-        Log.v("TangemIssState", this.toString())
+        Log.debug { "TangemIssState: $this" }
     }
 
     fun getCredentials() = listOfNotNull(photo, passport, securityNumber, ageOfMajority)

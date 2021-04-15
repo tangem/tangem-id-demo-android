@@ -55,7 +55,7 @@ data class VerifierState(
     val ageOfMajority: VerifierCredential<AgeOfMajority>? =
         VerifierCredential(AgeOfMajority(true), credentialStatus),
     val immunityPassport: VerifierCredential<ImmunityPassport>? = null,
-    val credentialNinja: VerifierCredential<CredentialNinja>? = null,
+    val vcExpert: VerifierCredential<VCExpert>? = null,
     val jsonShown: String? = null
 ) : StateType {
     fun getCredentials() =

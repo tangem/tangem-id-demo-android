@@ -27,7 +27,7 @@ sealed class DemoCredential {
     data class SsnCredential(val ssn: String) : DemoCredential()
     data class AgeOfMajorityCredential(val valid: Boolean) : DemoCredential()
     data class CovidCredential(val result: CovidStatus) : DemoCredential()
-    data class NinjaCredential(val name: String, val surname: String) : DemoCredential()
+    data class VCExpertCredential(val name: String, val surname: String) : DemoCredential()
 }
 
 enum class CovidStatus {
@@ -88,7 +88,7 @@ fun MSVerifiableCredential.toDemoCredential(): DemoCredential? {
     return try {
         val name = this.contents.vc.credentialSubject["firstName"]
         val surname = this.contents.vc.credentialSubject["lastName"]
-        DemoCredential.NinjaCredential(name!!, surname!!)
+        DemoCredential.VCExpertCredential(name!!, surname!!)
     } catch (exception: Exception) {
         null
     }

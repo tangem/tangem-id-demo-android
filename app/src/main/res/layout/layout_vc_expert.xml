@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fl_ninja"
+    android:id="@+id/fl_vc_expert"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_ninja"
+        android:id="@+id/card_vc_expert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
@@ -19,7 +19,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_ninja"
+                android:id="@+id/tv_vc_expert"
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
                 android:layout_gravity="center"
@@ -27,13 +27,13 @@
                 android:lineSpacingExtra="6sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/credential_ninja"
+                android:text="@string/vc_expert"
                 android:textColor="@color/darkGray6"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_ninja_name_title"
+                android:id="@+id/tv_vc_expert_name_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -46,7 +46,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tv_ninja_name"
+                android:id="@+id/tv_vc_expert_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -61,7 +61,7 @@
 
 
             <TextView
-                android:id="@+id/tv_ninja_surname_title"
+                android:id="@+id/tv_vc_expert_surname_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -74,7 +74,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tv_ninja_surname"
+                android:id="@+id/tv_vc_expert_surname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -88,7 +88,7 @@
                 tools:text="Smith" />
 
             <View
-                android:id="@+id/v_separator_ninja"
+                android:id="@+id/v_separator_vc_expert"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="16dp"
@@ -96,11 +96,11 @@
                 android:background="@color/separatorGrey"/>
 
             <include
-                android:id="@+id/l_credential_status_ninja"
+                android:id="@+id/l_credential_status_vc_expert"
                 layout="@layout/layout_credential_status" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_ninja_token"
+                android:id="@+id/btn_vc_expert_token"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"

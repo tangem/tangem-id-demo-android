@@ -74,7 +74,7 @@ class TangemIdVerifier(
 
                         verifierCredentials =
                             result.data.files.mapNotNull { it.toVerifierCredential() }
-                        Log.i("Credentials", verifierCredentials.toString())
+                        Log.debug { "Credentials" + verifierCredentials.toString() }
                         callback(CompletionResult.Success(verifierCredentials!!))
                     }
                 }

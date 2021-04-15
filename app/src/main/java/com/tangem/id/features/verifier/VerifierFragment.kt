@@ -17,13 +17,13 @@ import kotlinx.android.synthetic.main.fragment_issuer.toolbar
 import kotlinx.android.synthetic.main.fragment_verifier.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_covid.*
-import kotlinx.android.synthetic.main.layout_ninja.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_passport.card_passport
 import kotlinx.android.synthetic.main.layout_passport.tv_name
 import kotlinx.android.synthetic.main.layout_passport.tv_surname
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
+import kotlinx.android.synthetic.main.layout_vc_expert.*
 import org.rekotlin.StoreSubscriber
 
 class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<VerifierState> {
@@ -124,15 +124,15 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
             )
             card_covid?.setMargins()
         }
-        if (state.credentialNinja == null) {
-            layout_ninja?.hide()
+        if (state.vcExpert == null) {
+            layout_vc_expert?.hide()
         } else {
-            layout_ninja?.show()
-            val credential = state.credentialNinja.credential
-            tv_ninja_name?.text = credential.name
-            tv_ninja_surname?.text = credential.surname
-            setCredentialsStatus(credential, state.credentialNinja.credentialStatus)
-            card_ninja?.setMargins()
+            layout_vc_expert?.show()
+            val credential = state.vcExpert.credential
+            tv_vc_expert_name?.text = credential.name
+            tv_vc_expert_surname?.text = credential.surname
+            setCredentialsStatus(credential, state.vcExpert.credentialStatus)
+            card_vc_expert?.setMargins()
         }
     }
 
@@ -179,7 +179,7 @@ class VerifierFragment : Fragment(R.layout.fragment_verifier), StoreSubscriber<V
             is SecurityNumber -> l_credential_status_ssn
             is AgeOfMajority -> l_credential_status_age_of_majority
             is ImmunityPassport -> l_credential_status_covid
-            is CredentialNinja -> l_credential_status_ninja
+            is VCExpert -> l_credential_status_vc_expert
             else -> null
         }
     }

@@ -27,12 +27,12 @@ import kotlinx.android.synthetic.main.layout_button.*
 import kotlinx.android.synthetic.main.layout_checkbox_card.*
 import kotlinx.android.synthetic.main.layout_covid.*
 import kotlinx.android.synthetic.main.layout_dialog_json.*
-import kotlinx.android.synthetic.main.layout_ninja.*
 import kotlinx.android.synthetic.main.layout_passport.*
 import kotlinx.android.synthetic.main.layout_passport.tv_name
 import kotlinx.android.synthetic.main.layout_passport.tv_surname
 import kotlinx.android.synthetic.main.layout_photo.*
 import kotlinx.android.synthetic.main.layout_ssn.*
+import kotlinx.android.synthetic.main.layout_vc_expert.*
 import org.rekotlin.StoreSubscriber
 
 
@@ -192,13 +192,13 @@ class HolderFragment : Fragment(R.layout.fragment_holder), StoreSubscriber<Holde
                 dialog.l_credential_status_covid?.hide()
                 showRawCredentialButton = dialog.btn_covid_json
             }
-            is CredentialNinja -> {
-                dialog.setContentView(R.layout.layout_ninja)
-                credential.name?.let { dialog.tv_ninja_name?.setText(it) }
-                credential.surname?.let { dialog.tv_ninja_surname?.setText(it) }
-                dialog.v_separator_ninja?.hide()
-                dialog.l_credential_status_ninja?.hide()
-                showRawCredentialButton = dialog.btn_ninja_token
+            is VCExpert -> {
+                dialog.setContentView(R.layout.layout_vc_expert)
+                credential.name?.let { dialog.tv_vc_expert_name?.setText(it) }
+                credential.surname?.let { dialog.tv_vc_expert_surname?.setText(it) }
+                dialog.v_separator_vc_expert?.hide()
+                dialog.l_credential_status_vc_expert?.hide()
+                showRawCredentialButton = dialog.btn_vc_expert_token
             }
         }
         showRawCredentialButton?.show()
