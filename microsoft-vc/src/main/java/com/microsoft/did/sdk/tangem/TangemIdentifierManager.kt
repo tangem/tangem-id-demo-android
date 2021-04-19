@@ -17,7 +17,7 @@ class TangemIdentifierManager @Inject constructor(
     private val identifierCreator: TangemIdentifierCreator,
     private val keyManager: TangemKeyManager
 ) {
-    var masterIdentifier: Identifier? = null
+    private var masterIdentifier: Identifier? = null
 
     suspend fun getMasterIdentifier(): Result<Identifier> {
         return if (masterIdentifier != null) {
@@ -30,8 +30,8 @@ class TangemIdentifierManager @Inject constructor(
     private suspend fun createMasterIdentifier(): Result<Identifier> {
         return runResultTry {
             val jwk = keyManager.publicKey
-            val identifier = identifierCreator.createIdentifier(MAIN_IDENTIFIER_REFERENCE, jwk, jwk, jwk)
-            Result.Success(identifier)
+            masterIdentifier = identifierCreator.createIdentifier(MAIN_IDENTIFIER_REFERENCE, jwk, jwk, jwk)
+            Result.Success(masterIdentifier!!)
         }
     }
 }
