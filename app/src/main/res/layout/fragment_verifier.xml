@@ -56,8 +56,8 @@
 
 
             <include
-                android:id="@+id/layout_ninja"
-                layout="@layout/layout_ninja"
+                android:id="@+id/layout_vc_expert"
+                layout="@layout/layout_vc_expert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

@@ -18,7 +18,7 @@
     <string name="credential_valid_until">Valid until %s</string>
     <string name="credential_valid_from">Valid from %s</string>
     <string name="credential_covid">Covid 19 Immunity Passport</string>
-    <string name="credential_ninja">Verified Credential Ninja Card</string>
+    <string name="vc_expert">Verified Credential Expert Card</string>
     <string name="credential_dialog_share">Share</string>
     <string name="credential_dialog_hide">Hide</string>
 

@@ -45,7 +45,7 @@ abstract class VerifiableDocument(
         val document = this.toJSONObject()
         document.remove("proof")
 
-        Log.i("TangemCredential", this.toJson())
+        Log.debug { "TangemCredential" + this.toJson() }
 
 //        val documentHash = document.toString().calculateSha256()
 //        val proofOptionsHash = proofOptions.toString().calculateSha256()
@@ -53,7 +53,7 @@ abstract class VerifiableDocument(
 
 
         return try {
-            coroutineScope<Result<ByteArray>> {
+            coroutineScope {
                 val normalizedDocumentDeferred = async { normalizeJsonLd(document.toString()) }
                 val normalizedProofOptionsDeferred = async { normalizeJsonLd(proofOptions.toString()) }
 

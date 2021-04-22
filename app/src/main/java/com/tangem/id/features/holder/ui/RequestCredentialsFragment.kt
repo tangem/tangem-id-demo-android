@@ -8,13 +8,14 @@ import android.os.Looper
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import com.microsoft.did.sdk.IssuanceService
-import com.microsoft.did.sdk.PresentationService
-import com.microsoft.did.sdk.VerifiableCredentialSdk
 import com.microsoft.did.sdk.credential.service.IssuanceResponse
 import com.microsoft.did.sdk.credential.service.PresentationRequest
 import com.microsoft.did.sdk.credential.service.PresentationResponse
 import com.microsoft.did.sdk.credential.service.models.attestations.IdTokenAttestation
+import com.microsoft.did.sdk.tangem.TangemIssuanceService
+import com.microsoft.did.sdk.tangem.TangemPresentationService
+import com.microsoft.did.sdk.tangem.TangemVerifiableCredentialSdk
+import com.tangem.blockchain.extensions.Signer
 import com.tangem.common.CompletionResult
 import com.tangem.id.R
 import com.tangem.id.TangemIdError
@@ -22,6 +23,7 @@ import com.tangem.id.common.redux.AppState
 import com.tangem.id.common.redux.navigation.NavigationAction
 import com.tangem.id.features.holder.redux.HolderAction
 import com.tangem.id.features.holder.redux.toHolderCredential
+import com.tangem.id.features.microsoftvc.CardTangemKeyManager
 import com.tangem.id.store
 import com.tangem.id.tangemIdSdk
 import kotlinx.android.synthetic.main.activity_main.*
@@ -31,16 +33,20 @@ import net.openid.appauth.*
 import net.openid.appauth.AuthorizationServiceConfiguration
 import org.rekotlin.Action
 import org.rekotlin.StoreSubscriber
+import java.util.*
 import com.microsoft.did.sdk.util.controlflow.Result as MSResult
 
 // TODO: remove logic from fragment
 class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credentials),
     StoreSubscriber<RequestCredentialsState> {
 
+    private var cardId: String? = null
+    private var publicKey: ByteArray? = null
+
     private val mainThread = Handler(Looper.getMainLooper())
     private val coroutineScope = tangemIdSdk.holder.coroutineScope
-    private lateinit var issuanceService: IssuanceService
-    private lateinit var presentationService: PresentationService
+    private lateinit var issuanceService: TangemIssuanceService
+    private lateinit var presentationService: TangemPresentationService
     private lateinit var presentationRequest: PresentationRequest
     private lateinit var issuanceResponse: IssuanceResponse
     private lateinit var requestedToken: IdTokenAttestation
@@ -75,6 +81,8 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
     override fun newState(state: RequestCredentialsState) {
         if (activity == null || state.requestUri == null || requestInProgress) return
         requestInProgress = true
+        cardId = state.cardId
+        publicKey = state.publicKey
         requestMicrosoftCredential(state.requestUri)
     }
 
@@ -89,63 +97,71 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
     private fun requestMicrosoftCredential(requestUri: String) {
         authService = AuthorizationService(requireContext())
         coroutineScope.launch {
-            try {
-                VerifiableCredentialSdk.init(requireContext(), "testAgent")
-                issuanceService = VerifiableCredentialSdk.issuanceService
-                presentationService = VerifiableCredentialSdk.presentationService
+            withContext(Dispatchers.IO) {
+                try {
+                    val keyManager = CardTangemKeyManager(
+                        publicKey!!,
+                        cardId!!,
+                        Signer(tangemIdSdk.holder.tangemSdk),
+                        coroutineScope
+                    )
+                    TangemVerifiableCredentialSdk.init(requireContext(), "testAgent", keyManager)
+                    issuanceService = TangemVerifiableCredentialSdk.issuanceService
+                    presentationService = TangemVerifiableCredentialSdk.presentationService
 
 //                val issuanceRequest = when (val result = issuanceService.getRequest(requestUri)) {
 //                    is MSResult.Success -> result.payload
 //                    is MSResult.Failure -> return@launch
 //                }
 
-                presentationRequest =
-                    when (val result = presentationService.getRequest(requestUri)) {
-                        is MSResult.Success -> result.payload
-                        is MSResult.Failure -> return@launch
-                    }
+                    presentationRequest =
+                        when (val result = presentationService.getRequest(requestUri)) {
+                            is MSResult.Success -> result.payload
+                            is MSResult.Failure -> return@withContext
+                        }
 
-                presentationRequest = PresentationRequest(
-                    presentationRequest.content.copy(audience = presentationRequest.content.clientId!!),
-                    presentationRequest.linkedDomainResult
-                )
+                    presentationRequest = PresentationRequest(
+                        presentationRequest.content.copy(audience = presentationRequest.content.clientId!!),
+                        presentationRequest.linkedDomainResult
+                    )
 
-            val contract = presentationRequest.getPresentationDefinition()
-                .credentialPresentationInputDescriptors[0].issuanceMetadataList[0].issuerContract
+                    val contract = presentationRequest.getPresentationDefinition()
+                        .credentialPresentationInputDescriptors[0].issuanceMetadataList[0].issuerContract
 //                val contract =
 //                    "https://portableidentitycards.azure-api.net/v1.0/3c32ed40-8a10-465b-8ba4-0b1e86882668/portableIdentities/contracts/VerifiedCredentialNinja"
 
-                val issuanceRequest =
-                    when (val result = issuanceService.getRequest(contract)) {
-                        is MSResult.Success -> result.payload
-                        is MSResult.Failure -> return@launch
+                    val issuanceRequest =
+                        when (val result = issuanceService.getRequest(contract)) {
+                            is MSResult.Success -> result.payload
+                            is MSResult.Failure -> return@withContext
+                        }
+
+                    issuanceResponse = IssuanceResponse(issuanceRequest)
+
+                    requestedToken = issuanceRequest.getAttestations().idTokens[0]
+
+                    AuthorizationServiceConfiguration.fetchFromUrl(
+                        Uri.parse(requestedToken.configuration)
+                    ) { _serviceConfig, exception ->
+                        serviceConfig = _serviceConfig!!
+                        val authRequestBuilder = AuthorizationRequest.Builder(
+                            serviceConfig!!,  // the authorization service configuration
+                            requestedToken.client_id,  // the client ID, typically pre-registered and static
+                            ResponseTypeValues.CODE,  // the response_type value: we want a code
+                            Uri.parse(requestedToken.redirect_uri) // the redirect URI to which the auth response is sent
+                        )
+
+                        val authRequest = authRequestBuilder
+                            .setScope("openid")
+                            .setResponseMode("query")
+                            .setCodeVerifier("0123456789_0123456789_0123456789_0123456789")
+                            .build()
+
+                        doAuthorization(authRequest)
                     }
-
-                issuanceResponse = IssuanceResponse(issuanceRequest)
-
-                requestedToken = issuanceRequest.getAttestations().idTokens[0]
-
-                AuthorizationServiceConfiguration.fetchFromUrl(
-                    Uri.parse(requestedToken.configuration)
-                ) { _serviceConfig, exception ->
-                    serviceConfig = _serviceConfig!!
-                    val authRequestBuilder = AuthorizationRequest.Builder(
-                        serviceConfig!!,  // the authorization service configuration
-                        requestedToken.client_id,  // the client ID, typically pre-registered and static
-                        ResponseTypeValues.CODE,  // the response_type value: we want a code
-                        Uri.parse(requestedToken.redirect_uri) // the redirect URI to which the auth response is sent
-                    )
-
-                    val authRequest = authRequestBuilder
-                        .setScope("openid")
-                        .setResponseMode("query")
-                        .setCodeVerifier("0123456789_0123456789_0123456789_0123456789")
-                        .build()
-
-                    doAuthorization(authRequest)
+                } catch (exception: Exception) {
+                    completeWithError()
                 }
-            } catch (exception: Exception) {
-                completeWithError()
             }
         }
     }
@@ -180,53 +196,55 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
                 issuanceResponse.requestedIdTokenMap[requestedToken.configuration] =
                     response!!.idToken!!
                 coroutineScope.launch {
-                    try {
-                        val verifiableCredential = when (val result =
-                            issuanceService.sendResponse(issuanceResponse)) {
-                            is MSResult.Success -> result.payload
-                            is MSResult.Failure -> throw result.payload
-                        }
+                    withContext(Dispatchers.IO) {
+                        try {
+                            val verifiableCredential = when (val result =
+                                issuanceService.sendResponse(issuanceResponse)
+                            ) {
+                                is MSResult.Success -> result.payload
+                                is MSResult.Failure -> throw result.payload
+                            }
 
-                        val presentationResponse = PresentationResponse(presentationRequest)
-                        val requestedVc = presentationRequest.getPresentationDefinition()
-                            .credentialPresentationInputDescriptors[0]
-                        presentationResponse.requestedVcPresentationSubmissionMap[requestedVc] =
-                            verifiableCredential
+                            val presentationResponse = PresentationResponse(presentationRequest)
+                            val requestedVc = presentationRequest.getPresentationDefinition()
+                                .credentialPresentationInputDescriptors[0]
+                            presentationResponse.requestedVcPresentationSubmissionMap[requestedVc] =
+                                verifiableCredential
 
-                        tangemIdSdk.holder.addNinjaCredential(
-                            verifiableCredential,
-                            store.state.holderState.cardId
-                        ) { result ->
-                            mainThread.post {
-                                when (result) {
-                                    is CompletionResult.Success -> {
-                                        CoroutineScope(Job()).launch {
-                                            presentationService.sendResponse(
-                                                presentationResponse
+
+                            val presentationResult =
+                                presentationService.sendResponse(presentationResponse)
+
+                            tangemIdSdk.holder.addVCExpertCredential(
+                                verifiableCredential,
+                                store.state.holderState.cardId
+                            ) { result ->
+                                mainThread.post {
+                                    when (result) {
+                                        is CompletionResult.Success -> {
+                                            val holdersCredentials =
+                                                result.data.map { it.toHolderCredential() }
+                                            store.dispatch(
+                                                HolderAction.RequestNewCredential.Success(
+                                                    holdersCredentials
+                                                )
                                             )
                                         }
-                                        val holdersCredentials =
-                                            result.data.map { it.toHolderCredential() }
-                                        store.dispatch(
-                                            HolderAction.RequestNewCredential.Success(
-                                                holdersCredentials
+                                        is CompletionResult.Failure ->
+                                            store.dispatch(
+                                                HolderAction.RequestNewCredential.Failure(
+                                                    result.error
+                                                )
                                             )
-                                        )
                                     }
-                                    is CompletionResult.Failure ->
-                                        store.dispatch(
-                                            HolderAction.RequestNewCredential.Failure(
-                                                result.error
-                                            )
-                                        )
-                                }
 //                            store.dispatch(NavigationAction.PopBackTo(AppScreen.Holder)) //TODO: why doesn't work?
-                                store.dispatch(NavigationAction.PopBackTo())
-                                store.dispatch(NavigationAction.PopBackTo())
+                                    store.dispatch(NavigationAction.PopBackTo())
+                                    store.dispatch(NavigationAction.PopBackTo())
+                                }
                             }
+                        } catch (exception: Exception) {
+                            completeWithError()
                         }
-                    } catch (exception: Exception) {
-                        completeWithError()
                     }
                 }
             }
@@ -247,12 +265,18 @@ class RequestCredentialsFragment : Fragment(R.layout.fragment_request_credential
 }
 
 data class RequestCredentialsState(
-    val requestUri: String? = null
+    val requestUri: String? = null,
+    val cardId: String? = null,
+    val publicKey: ByteArray? = null
 )
 
 fun requestCredentialsReducer(action: Action, state: AppState): RequestCredentialsState {
     return if (action is HolderAction.RequestNewCredential) {
-        state.requestCredentialsState.copy(requestUri = action.requestUri)
+        state.requestCredentialsState.copy(
+            requestUri = action.requestUri,
+            cardId = state.holderState.cardId,
+            publicKey = state.holderState.walletPublicKey
+        )
     } else {
         state.requestCredentialsState
     }

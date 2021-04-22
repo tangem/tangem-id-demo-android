@@ -14,6 +14,7 @@ fun holderReducer(action: Action, state: AppState): HolderState {
         is HolderAction.CredentialsRead -> {
             newState = HolderState(
                 cardId = action.cardId,
+                walletPublicKey = action.walletPublicKey,
                 credentials = action.credentials,
                 credentialsOnCard = action.credentials
             )

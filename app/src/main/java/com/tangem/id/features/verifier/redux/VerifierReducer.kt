@@ -24,8 +24,8 @@ fun verifierReducer(action: Action, state: AppState): VerifierState {
                         as? VerifierCredential<AgeOfMajority>,
                 immunityPassport = action.credentials.find { it.credential is ImmunityPassport }
                         as? VerifierCredential<ImmunityPassport>,
-                credentialNinja = action.credentials.find { it.credential is CredentialNinja }
-                        as? VerifierCredential<CredentialNinja>
+                vcExpert = action.credentials.find { it.credential is VCExpert }
+                        as? VerifierCredential<VCExpert>
             )
         }
         is VerifierAction.ToggleIssuerStatus -> TODO()

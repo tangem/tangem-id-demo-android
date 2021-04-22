@@ -69,7 +69,9 @@ val homeMiddleware: Middleware<AppState> = { dispatch, state ->
 
                                     store.dispatch(
                                         HolderAction.CredentialsRead(
-                                            result.data.cardId, holdersCredentials
+                                            result.data.cardId,
+                                            result.data.walletPublicKey,
+                                            holdersCredentials
                                         )
                                     )
                                     store.dispatch(NavigationAction.NavigateTo(AppScreen.Holder))

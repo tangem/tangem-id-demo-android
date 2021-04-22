@@ -29,8 +29,8 @@ interface Credential {
                 is DemoCredential.AgeOfMajorityCredential -> AgeOfMajority(credential.valid)
                 is DemoCredential.CovidCredential ->
                     ImmunityPassport(credential.result == CovidStatus.Positive)
-                is DemoCredential.NinjaCredential ->
-                    CredentialNinja(credential.name, credential.surname)
+                is DemoCredential.VCExpertCredential ->
+                    VCExpert(credential.name, credential.surname)
             }
         }
     }
@@ -105,7 +105,7 @@ data class ImmunityPassport(val valid: Boolean) : Credential {
     override fun isDataPresent(): Boolean = true
 }
 
-data class CredentialNinja(
+data class VCExpert(
     val name: String? = null,
     val surname: String? = null
 ) : Credential {

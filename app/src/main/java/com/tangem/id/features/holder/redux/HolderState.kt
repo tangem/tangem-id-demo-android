@@ -53,6 +53,7 @@ sealed class HolderScreenButton(enabled: Boolean) : Button(enabled) {
 
 data class HolderState(
     val cardId: String? = null,
+    val walletPublicKey: ByteArray? = null,
     val editActivated: Boolean = false,
     val detailsOpened: Credential? = null,
     val rawCredentialShown: String? = null,
